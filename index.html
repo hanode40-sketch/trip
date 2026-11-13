@@ -99,6 +99,14 @@ if(!/[?&]card=/.test(location.search)){document.write('<script src="https://hano
     <input id="mobile-edit-input" type="text" placeholder="مثال: 597429166" style="width:100%;box-sizing:border-box"/>
     <p id="hint-mobile-edit" style="font-size:11px;color:var(--text-muted);margin:4px 0 0">أدخل الرقم بدون صفر أو رمز الدولة (مثال: 597429166) — التعديل هنا يخص هذه الرسالة فقط ولا يغيّر الملف الأصلي.</p>
   </div>
+    <div id="duty-c2-wrap" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border-strong)">
+    <label id="label-c2" style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;font-weight:600">👥 السائق الثاني (Captain #2)</label>
+    <div style="position:relative">
+      <input id="driver2-input" type="text" autocomplete="off" style="width:100%;box-sizing:border-box"/>
+      <div id="driver2-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:20;background:#fff;border:1px solid var(--border-strong);border-top:none;border-radius:0 0 var(--radius) var(--radius);max-height:220px;overflow-y:auto;box-shadow:0 4px 10px rgba(0,0,0,0.08)"></div>
+    </div>
+    <input id="driver2-mobile" type="text" inputmode="tel" style="display:none;width:100%;box-sizing:border-box;margin-top:6px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius)"/>
+  </div>
 </div>
 
 <div style="background:var(--surface-2);border-radius:12px;border:1px solid var(--border);padding:1.25rem;margin-bottom:16px">
@@ -139,14 +147,6 @@ if(!/[?&]card=/.test(location.search)){document.write('<script src="https://hano
   <div id="duty-body">
     <span id="label-c1" style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">Captain #1</span>
     <div id="duty-c1" style="font-size:13px;padding:9px 10px;background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px"></div>
-    <div id="duty-c2-wrap" style="display:none;margin-bottom:12px">
-      <span id="label-c2" style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">Captain #2</span>
-      <div style="position:relative">
-        <input id="driver2-input" type="text" autocomplete="off" style="width:100%;box-sizing:border-box"/>
-        <div id="driver2-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:20;background:#fff;border:1px solid var(--border-strong);border-top:none;border-radius:0 0 var(--radius) var(--radius);max-height:220px;overflow-y:auto;box-shadow:0 4px 10px rgba(0,0,0,0.08)"></div>
-      </div>
-      <input id="driver2-mobile" type="text" inputmode="tel" style="display:none;width:100%;box-sizing:border-box;margin-top:6px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius)"/>
-    </div>
     <label id="label-bus" style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px"></label>
     <div style="position:relative">
       <input id="bus-input" type="text" inputmode="numeric" autocomplete="off" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--radius)"/>
@@ -540,11 +540,11 @@ const DUTY_LAYOUT={
 };
 const DUTY_TXT={
   ar:{label:'٥. بطاقة جدول الرحلة (Trip Schedule Card)',two:n=>'👥 الوردية '+n+' — بسائقين (Double driver)',one:n=>'👤 الوردية '+n+' — بسائق واحد',none:n=>'⚠️ لا توجد بطاقة جدول رحلة للوردية '+n,
-      pick1:'اختر السائق في الخطوة ٢',c2ph:'ابحث عن السائق الثاني برقم الإقامة أو الاسم',mob2:'جوال السائق الثاني',bus:'رقم الحافلة / رقم اللوحة BUS # (اختياري — يُترك فارغاً إذا غير معروف)',busph:'اضغط للقائمة أو ابحث برقم الحافلة أو اللوحة',plate:'لوحة',
+      pick1:'اختر السائق في الخطوة ٢',c2lbl:'👥 السائق الثاني — الرحلة بسائقين (Captain #2)',c2ph:'ابحث عن السائق الثاني برقم الإقامة أو الاسم',mob2:'جوال السائق الثاني',bus:'رقم الحافلة / رقم اللوحة BUS # (اختياري — يُترك فارغاً إذا غير معروف)',busph:'اضغط للقائمة أو ابحث برقم الحافلة أو اللوحة',plate:'لوحة',
       share:'🔗 رابط البطاقة للسائق',share1:'🔗 رابط البطاقة للسائق الأول',share2:'🔗 رابط البطاقة للسائق الثاني',file:'📎 ملف PDF',fmTitle:'إرسال بطاقة جدول الرحلة كصورة',fmMob:'رقم واتساب السائق (تأكد منه أو عدّله)',bad:'الرقم غير صحيح — سعودي 9 أرقام يبدأ بـ 5، أو دولي يبدأ بـ + ومفتاح الدولة',copyImg:'📋 نسخ الصورة',openChat:'💬 فتح محادثة السائق',pasteHint:'في واتساب: اضغط مطوّلاً على خانة الكتابة ← لصق ← إرسال',imgReady:'الصورة جاهزة — اضغط «نسخ الصورة» ثم افتح محادثة السائق',copiedImg:'✓ تم نسخ الصورة — افتح المحادثة والصقها',noClip:'جهازك ما يسمح بنسخ الصور — استخدم «مشاركة الصورة» واختر السائق',shareImg:'مشاركة الصورة…',fmBusy:'جاري تجهيز الملف...',fmReady:'الملف جاهز — اضغط "مشاركة الملف" ثم اختر واتساب وهذا السائق',fmShare:'مشاركة الملف',fmCancel:'إغلاق',copy:'نسخ الرقم',copied:'تم النسخ ✓',fmDl:'جهازك ما يدعم المشاركة — تم تحميل الملف، أرسله من واتساب كمرفق',r1:'السائق الأول — Captain #1',r2:'السائق الثاني — Captain #2',dl:'📄 تحميل PDF',dljpg:'🖼️ تحميل صورة',imgBusy:'جاري تحويل البطاقة لصورة...',imgFail:'تعذّر تحويل البطاقة لصورة — استخدم PDF',nolink:'رابط البطاقة يشتغل بس لما تفتح البرنامج من رابط GitHub',busy:'جاري تجهيز البطاقة...',ready:'البطاقة جاهزة — اضغط مشاركة مرة ثانية',done:'تم تجهيز البطاقة ✓',
       nofile:'تعذّر فتح ملف البطاقة — تأكد إن مجلد duty مرفوع على GitHub وإنك فاتح البرنامج من رابط GitHub',nolib:'تعذّر تحميل أداة PDF — تأكد من الإنترنت',no2:'تنبيه: ما اخترت السائق الثاني — خانته بتطلع فاضية'},
   en:{label:'5. Trip Schedule Card',two:n=>'👥 Shift '+n+' — Double driver',one:n=>'👤 Shift '+n+' — Single driver',none:n=>'⚠️ No trip schedule card for shift '+n,
-      pick1:'Select the driver in step 2',c2ph:'Search second driver by Iqama or name',mob2:'Second driver mobile',bus:'Bus # / Plate # (optional — leave blank if unknown)',busph:'Tap for the list or search by bus or plate number',plate:'Plate',
+      pick1:'Select the driver in step 2',c2lbl:'👥 Second driver — double-driver trip (Captain #2)',c2ph:'Search second driver by Iqama or name',mob2:'Second driver mobile',bus:'Bus # / Plate # (optional — leave blank if unknown)',busph:'Tap for the list or search by bus or plate number',plate:'Plate',
       share:'🔗 Card link to driver',share1:'🔗 Card link to first driver',share2:'🔗 Card link to second driver',file:'📎 PDF file',fmTitle:'Send Trip Schedule Card as image',fmMob:'Driver WhatsApp number (check or edit)',bad:'Invalid number — Saudi 9 digits starting with 5, or international starting with + and country code',copyImg:'📋 Copy image',openChat:'💬 Open driver chat',pasteHint:'In WhatsApp: long-press the message box → Paste → Send',imgReady:'Image ready — tap “Copy image”, then open the driver chat',copiedImg:'✓ Image copied — open the chat and paste it',noClip:'Your device can’t copy images — use “Share image” and pick the driver',shareImg:'Share image…',fmBusy:'Preparing the file...',fmReady:'File ready — tap "Share file", choose WhatsApp, then this driver',fmShare:'Share file',fmCancel:'Close',copy:'Copy number',copied:'Copied ✓',fmDl:'Sharing not supported — the file was downloaded, attach it in WhatsApp',r1:'First driver — Captain #1',r2:'Second driver — Captain #2',dl:'📄 Download PDF',dljpg:'🖼️ Download image',imgBusy:'Converting the card to an image...',imgFail:'Could not convert to an image — use PDF',nolink:'The card link only works when the tool is opened from its GitHub link',busy:'Preparing the card...',ready:'Card ready — tap Share again',done:'Card ready ✓',
       nofile:'Could not open the trip schedule card file — make sure the duty folder is uploaded to GitHub and the tool is opened from its GitHub link',nolib:'Could not load the PDF tool — check your internet',no2:'Note: second driver not selected — that row will be blank'}
 };
@@ -558,14 +558,15 @@ const dutyEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>
 function renderDuty(){
   const T=DUTY_TXT[UI_LANG];
   if(typeof renderSendButtons==='function') renderSendButtons();
-  if(!selectedTrip){ dutySection.style.display='none'; return; }
+  document.getElementById('label-c2').textContent=T.c2lbl;
+  if(!selectedTrip){ dutySection.style.display='none'; dutyC2Wrap.style.display='none'; return; }
   dutySection.style.display='block';
   document.getElementById('label-duty').textContent=T.label;
   document.getElementById('label-bus').textContent=T.bus;
   busInput.placeholder=T.busph; driver2Input.placeholder=T.c2ph; driver2Mobile.placeholder=T.mob2;
   dutyDlBtn.textContent=T.dl; document.getElementById('duty-dljpg-btn').textContent=T.dljpg;
   const code=selectedTrip.dutyCode, info=DUTY_INDEX[code];
-  if(!info){ dutyBadge.textContent=T.none(code); dutyBadge.style.background='#fdecea'; dutyBadge.style.color='#b3261e'; dutyBody.style.display='none'; return; }
+  if(!info){ dutyC2Wrap.style.display='none'; dutyBadge.textContent=T.none(code); dutyBadge.style.background='#fdecea'; dutyBadge.style.color='#b3261e'; dutyBody.style.display='none'; return; }
   dutyBody.style.display='block';
   const two=info[0]===2;
   dutyBadge.textContent=two?T.two(code):T.one(code);
