@@ -96,7 +96,7 @@ window.NW_ACC={
   'جازان':{en:'Jazan',re:/jazan|jizan/i,url:'https://maps.app.goo.gl/tcxscqGBX9iceGSo8'},
   'خميس مشيط':{en:'Khamis Mushait',re:/khamis/i,url:'https://maps.app.goo.gl/v42ocuXGKkHJ5UQWA'},
   'حائل':{en:'Hail',re:/hail|rafha/i,url:'https://maps.app.goo.gl/3UX7sizgkvtqvqQK9'},
-  'البشائر':{en:'Al Bashayer',re:/bashayer/i,url:'https://maps.app.goo.gl/Nzw9A59LbF7jhtoJ8'},
+  'البشائر':{en:'Al Bashayer',re:/bashayer/i,url:'https://maps.app.goo.gl/3Qk1N5zG6QZcGrR98'},   // السكن نفس محطة البشائر
   'بريدة':{en:'Buraydah',re:/buraydah|qassim/i,url:'https://maps.app.goo.gl/sdxYJsod4LGhCfeq7'}};
 window.accFor=function(station){ for(var k in NW_ACC){ var a=NW_ACC[k]; if(a.re.test(station||'')&&a.url) return {ar:k,en:a.en,url:a.url}; } return null; };
 window.waAnchor=function(a,num){ var how=waHowGet(); a.href=waLink(num,'',how); a.target=how==='app'?'_self':(how==='web'?'nwWaWeb':'_blank'); };
