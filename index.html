@@ -51,6 +51,9 @@ if(!/[?&]card=/.test(location.search)){document.write('<script src="https://hano
   html[data-theme="dark"] .wrap > div:first-child img { background:rgba(255,255,255,.88); }
   html[data-theme="dark"] #cv-preview { background:#fff; }
 
+  /* ألوان احتياطية: صفحة بطاقة السائق (?card=) تفتح بدون auth.js — بدونها النص يطلع غامق على خلفية غامقة */
+  :root{--nw-bg:#eef2f8;--nw-card:#ffffff;--nw-ink:#0f1e3d;--nw-muted:#64748b;--nw-line:#e2e8f0;--nw-soft:#f6f8fc;--nw-navy:#13274f}
+  html[data-theme="dark"]{--nw-bg:#0b1220;--nw-card:#141c2e;--nw-ink:#e6ecf7;--nw-muted:#8b9ab5;--nw-line:#24304a;--nw-soft:#0f1626}
   /* ===== التصميم الموحد (ألوان auth.js --nw-*) ===== */
   :root,html[data-theme="dark"]{--border:var(--nw-line,#e0e0e0);--surface-2:var(--nw-card,#fff);--text-primary:var(--nw-ink,#1a1a1a);--text-secondary:var(--nw-muted,#555)}
   html[data-theme="dark"]{--surface-1:#0f1624}
@@ -1321,6 +1324,12 @@ applyUILang();
   .btag{display:inline-block;font-size:11.5px;font-weight:800;border-radius:6px;padding:2px 7px;margin-inline-start:4px;white-space:nowrap}
   .btrips{margin:8px 0;font-size:13.5px;line-height:1.7}
   .btrips .tc{font-weight:800;direction:ltr;unicode-bidi:isolate}
+  .bsug{position:absolute;top:100%;inset-inline:0;z-index:50;margin-top:4px;background:var(--nw-card,#fff);border:1px solid var(--nw-line);border-radius:12px;box-shadow:0 12px 30px rgba(15,23,42,.18);max-height:360px;overflow:auto;font-weight:400}
+  .bsug div{padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--nw-line);color:var(--nw-ink)}
+  .bsug div:last-child{border-bottom:0}
+  .bsug div:hover,.bsug div.on{background:var(--nw-soft,#f1f5f9)}
+  .bsug b{direction:ltr;unicode-bidi:isolate}
+  .bsug small{display:block;color:var(--nw-muted);font-size:12px;margin-top:2px}
   .btrips .btr{padding:3px 0}
   .btrips .btr+.btr{border-top:1px dotted var(--nw-line)}
   .btrips .s{font-size:12.5px;color:var(--nw-muted)}
@@ -1344,7 +1353,7 @@ applyUILang();
         <label>تاريخ الرحلات <input type="date" id="bDate"></label>
         <button class="bbtn sm" data-bd="0">اليوم</button><button class="bbtn sm" data-bd="1">بكرة</button>
         <label>الكراج <select id="bGar"><option value="">كل الكراجات</option></select></label>
-        <label class="bgrow">بحث <input type="search" id="bQ" placeholder="واجب، رحلة، سائق، إقامة..."></label>
+        <label class="bgrow" style="position:relative">بحث برقم الواجب أو الرحلة <input type="search" id="bQ" autocomplete="off" placeholder="مثال: NW04 أو NW28-1-1 أو اسم السائق..."><div id="bSug" class="bsug" style="display:none"></div></label>
         <button class="bbtn" id="bRefresh">🔄 تحديث</button>
         <button class="bbtn" id="bUpSched" style="display:none">📤 رفع الجدول</button>
         <button class="bbtn" id="bUpRoster" style="display:none">📤 رفع الروستر</button>
@@ -1583,7 +1592,37 @@ applyUILang();
   const now=new Date(); $('bDate').value=iso(new Date(now.getFullYear(),now.getMonth(),now.getDate()+1));
   $('bDate').onchange=loadDay;
   document.querySelectorAll('[data-bd]').forEach(b=>b.onclick=()=>{ $('bDate').value=addDays(iso(new Date()),+b.dataset.bd); loadDay(); });
-  $('bGar').onchange=draw; let tm; $('bQ').oninput=()=>{ clearTimeout(tm); tm=setTimeout(draw,200); };
+  $('bGar').onchange=draw;
+  /* ---- بحث بقائمة منسدلة: رقم الواجب / رقم الرحلة / السائق ---- */
+  let tm, SUG=[], SI=-1;
+  function sugs(){
+    const q=$('bQ').value.trim().toLowerCase(), box=$('bSug'); SI=-1;
+    if(!q||!DUTIES.length){ box.style.display='none'; return; }
+    const g=$('bGar').value, items=dayItems().filter(it=>!g||it.garage===g);
+    SUG=[];
+    items.forEach(it=>{
+      const dm=it.duty.toLowerCase().includes(q), tm_=it.trips.filter(t=>t.trip.toLowerCase().includes(q));
+      const dr=it.drivers.filter(iq=>(iq+' '+((DRV[iq]||[])[1]||'')).toLowerCase().includes(q));
+      if(dm||tm_.length||dr.length) SUG.push({it, hit:tm_.length&&!dm?tm_[0].trip:'', drv:dr.length&&!dm&&!tm_.length?dr[0]:''});
+    });
+    SUG.sort((a,b)=>(a.it.duty.toLowerCase().startsWith(q)?0:1)-(b.it.duty.toLowerCase().startsWith(q)?0:1));
+    SUG=SUG.slice(0,15);
+    box.innerHTML=SUG.length?SUG.map((x,i)=>{ const it=x.it, done=dutyDone(it);
+      return `<div data-si="${i}"><b>${esc(it.duty)}</b>${x.hit?' · رحلة <b>'+esc(x.hit)+'</b>':''} ${it.off?'<span class="s">⚪ لا يعمل</span>':done?'<span class="bok">✓</span>':'<span class="bno">✗</span>'}
+        <small>${esc(it.trips.map(t=>t.trip).join(' + '))} · الخروج ${esc(it.disp.dt||it.disp.t0)} · ${esc(it.garage)}${x.drv?' · 👤 '+esc((DRV[x.drv]||[])[1]||x.drv):it.drivers.length?' · 👤 '+esc(it.drivers.map(iq=>(DRV[iq]||[])[1]||iq).join('، ')):''}</small></div>`; }).join('')
+      :'<div style="cursor:default;color:var(--nw-muted)">ما فيه نتائج</div>';
+    box.style.display='';
+  }
+  function pick(i){ const x=SUG[i]; if(!x) return; $('bQ').value=x.it.duty; $('bSug').style.display='none'; FILTER=x.it.off?'off':'all'; draw();
+    setTimeout(()=>{ const el=document.querySelector('.bduty'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); },50); }
+  $('bQ').oninput=()=>{ sugs(); clearTimeout(tm); tm=setTimeout(draw,250); };
+  $('bQ').onfocus=sugs;
+  $('bQ').onkeydown=e=>{ const box=$('bSug'); if(box.style.display==='none') return; const n=SUG.length;
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); SI=(SI+(e.key==='ArrowDown'?1:-1)+n)%n; box.querySelectorAll('[data-si]').forEach((d,k)=>d.classList.toggle('on',k===SI)); }
+    else if(e.key==='Enter'){ e.preventDefault(); pick(SI<0?0:SI); } else if(e.key==='Escape') box.style.display='none'; };
+  $('bSug').addEventListener('mousedown',e=>{ const d=e.target.closest('[data-si]'); if(d){ e.preventDefault(); pick(+d.dataset.si); } });
+  $('bQ').addEventListener('blur',()=>setTimeout(()=>{ $('bSug').style.display='none'; },150));
+  $('bQ').addEventListener('search',()=>{ if(!$('bQ').value){ $('bSug').style.display='none'; draw(); } });
   $('bRefresh').onclick=()=>{ loadSched(true).then(loadDay); };
   $('bChips').onclick=e=>{ const b=e.target.closest('[data-f]'); if(b){ FILTER=b.dataset.f; draw(); } };
   $('bList').onclick=e=>{ const s=e.target.closest('[data-send]'), c=e.target.closest('[data-card]'); if(s) openSend(s.dataset.send,s.dataset.iq,'msg'); else if(c) openSend(c.dataset.card,c.dataset.iq,'card'); };
