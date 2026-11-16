@@ -1140,8 +1140,16 @@ applyUILang();
     <p id="rm-hint" style="margin:0 0 14px;font-size:12px;color:var(--text-muted)"></p>
     <label id="rm-l-date" style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px"></label>
     <input id="rm-date" type="date" style="width:100%;box-sizing:border-box;margin-bottom:12px"/>
-    <label id="rm-l-file" style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px"></label>
-    <input id="rm-file" type="file" accept=".xlsx,.xls,.csv" style="width:100%;box-sizing:border-box;margin-bottom:12px"/>
+    <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px" id="rm-l-paste">📋 الصق الروستر هنا (انسخ الأعمدة من الإكسل: رقم الرحلة + هوية السائق الأول + هوية السائق الثاني)</label>
+    <textarea id="rm-paste" rows="9" dir="ltr" placeholder="Driver Duty	Trip	1_roaster	2_roaster
+NW15-1-1	NW15-O-1	2559064015	2565876923
+NW22-1-2	NW22-I-1	2558350316" style="width:100%;box-sizing:border-box;margin-bottom:6px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:inherit;resize:vertical;white-space:pre;tab-size:14"></textarea>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;font-size:12px;color:var(--text-muted)">
+      <button type="button" id="rm-clear" style="padding:4px 12px;font-size:12px">مسح</button>
+      <span id="rm-or">أو ارفع ملف بدل اللصق:</span>
+      <label id="rm-l-file" style="display:none"></label>
+      <input id="rm-file" type="file" accept=".xlsx,.xls,.csv" style="flex:1;min-width:200px;font-size:12px"/>
+    </div>
     <div id="rm-preview" style="font-size:13px;line-height:1.8"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
       <button id="rm-cancel" type="button"></button>
@@ -1154,7 +1162,7 @@ applyUILang();
   const RT={
     ar:{none:d=>'📋 لا يوجد روستر مرفوع لتاريخ '+d+' — اختر السائقين يدوياً',has:(d,n,by,at)=>'📋 روستر '+d+': '+n+' رحلة'+(by?' — رفعه '+by+' ('+at+')':''),loading:'📋 جاري تحميل الروستر...',
       err:'📋 تعذّر تحميل الروستر — اختر السائقين يدوياً',up:'📤 رفع الروستر',title:'📤 رفع روستر السائقين',
-      hint:'الملف بنفس شكل ملف الروستر: عمود الرحلة (trip)، والسائق الأول (D1)، والسائق الثاني (D2) برقم الإقامة. الرفع يستبدل روستر نفس التاريخ للكل.',
+      hint:'انسخ من ملف الروستر الأعمدة: رقم الرحلة (Trip) + هوية السائق الأول + هوية السائق الثاني والصقها تحت (مع العناوين أو بدونها) — أو ارفع الملف نفسه. الحفظ يستبدل روستر التاريخ المختار للكل.',
       lDate:'تاريخ الروستر (تاريخ الرحلات)',lFile:'ملف الروستر (Excel أو CSV)',cancel:'إلغاء',save:'حفظ للكل',saving:'جاري الحفظ...',
       reading:'جاري قراءة الملف...',badFile:'تعذّر قراءة الملف — تأكد إنه Excel أو CSV بنفس شكل الروستر',noCols:'ما لقيت عمود الرحلة (trip) أو السائق الأول (D1) في الملف',
       sum:(n,d2)=>'✅ '+n+' رحلة — منها '+d2+' بسائقين',unkTrip:n=>'⚠️ '+n+' رحلة غير موجودة في البرنامج (بتنحفظ لكن ما تنختار):',unkDrv:n=>'⚠️ '+n+' إقامة غير موجودة في قائمة السائقين:',
@@ -1162,7 +1170,7 @@ applyUILang();
       filled:'📋 تعبّى السائقين من الروستر',notIn:d=>'📋 الرحلة غير موجودة في روستر '+d},
     en:{none:d=>'📋 No roster uploaded for '+d+' — pick drivers manually',has:(d,n,by,at)=>'📋 Roster '+d+': '+n+' trips'+(by?' — uploaded by '+by+' ('+at+')':''),loading:'📋 Loading roster...',
       err:'📋 Could not load the roster — pick drivers manually',up:'📤 Upload roster',title:'📤 Upload driver roster',
-      hint:'Same layout as the roster file: trip column (trip), first driver (D1), second driver (D2) by Iqama. Uploading replaces that date\'s roster for everyone.',
+      hint:'Copy from the roster sheet the columns: Trip + first driver Iqama + second driver Iqama and paste below (with or without headers) — or upload the file itself. Saving replaces that date\'s roster for everyone.',
       lDate:'Roster date (trip date)',lFile:'Roster file (Excel or CSV)',cancel:'Cancel',save:'Save for everyone',saving:'Saving...',
       reading:'Reading file...',badFile:'Could not read the file — make sure it is Excel or CSV in the roster layout',noCols:'Could not find the trip or D1 column in the file',
       sum:(n,d2)=>'✅ '+n+' trips — '+d2+' with two drivers',unkTrip:n=>'⚠️ '+n+' trips are not in the tool (saved but not selectable):',unkDrv:n=>'⚠️ '+n+' Iqamas are not in the driver list:',
@@ -1250,7 +1258,11 @@ applyUILang();
     const t=T(); parsed=null;
     $('rm-title').textContent=t.title; $('rm-hint').textContent=t.hint; $('rm-l-date').textContent=t.lDate; $('rm-l-file').textContent=t.lFile;
     $('rm-cancel').textContent=t.cancel; $('rm-save').textContent=t.save; $('rm-save').disabled=true;
-    $('rm-date').value=tripDateInput.value||getTomorrowISO(); $('rm-file').value=''; $('rm-preview').innerHTML='';
+    $('rm-date').value=tripDateInput.value||getTomorrowISO(); $('rm-file').value=''; $('rm-paste').value=''; $('rm-preview').innerHTML='';
+    const en=(typeof UI_LANG!=='undefined'&&UI_LANG==='en');
+    $('rm-l-paste').textContent=en?'📋 Paste the roster here (copy from Excel: Trip + first driver Iqama + second driver Iqama)':'📋 الصق الروستر هنا (انسخ الأعمدة من الإكسل: رقم الرحلة + هوية السائق الأول + هوية السائق الثاني)';
+    $('rm-or').textContent=en?'or upload a file instead:':'أو ارفع ملف بدل اللصق:'; $('rm-clear').textContent=en?'Clear':'مسح';
+    setTimeout(()=>$('rm-paste').focus(),50);
     $('roster-modal').style.display='flex';
   }
   function closeModal(){ $('roster-modal').style.display='none'; }
@@ -1271,26 +1283,48 @@ applyUILang();
       await loadXlsxLib();
       const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
       const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:''});
-      // نلقى صف العناوين: فيه trip و D1
-      let h=-1, ct=-1, c1=-1, c2=-1;
-      for(let i=0;i<Math.min(rows.length,15)&&h<0;i++){
-        const r=rows[i].map(x=>String(x).trim().toLowerCase());
-        const t_=r.findIndex(x=>/trip|رحلة/.test(x)), a=r.findIndex(x=>/d1|driver ?1|سائق ?(1|الأول)/.test(x)), b=r.findIndex(x=>/d2|driver ?2|سائق ?(2|الثاني)/.test(x));
-        if(t_>-1&&a>-1){ h=i; ct=t_; c1=a; c2=b; }
-      }
-      if(h<0){ pv.innerHTML='<span style="color:var(--text-danger)">'+esc(t.noCols)+'</span>'; return; }
-      const out=[];
-      rows.slice(h+1).forEach(r=>{ const tr=String(r[ct]||'').trim().toUpperCase(); const a=digits(r[c1]), b=c2>-1?digits(r[c2]):''; if(tr&&a) out.push([tr,a,b]); });
-      if(!out.length){ pv.innerHTML='<span style="color:var(--text-danger)">'+esc(t.noCols)+'</span>'; return; }
-      const known=new Set(Object.keys(TRIP_DB).flatMap(k=>[nk(k)].concat(k.split('+').map(nk))));
-      const unkT=out.filter(r=>!known.has(nk(r[0]))).map(r=>r[0]);
-      const unkD=[...new Set(out.flatMap(r=>[r[1],r[2]]).filter(x=>x&&!DRIVER_DATA.some(d=>d[0]===x)))];
-      let h2='<div style="color:var(--text-success);font-weight:700">'+esc(t.sum(out.length,out.filter(r=>r[2]).length))+'</div>';
-      if(unkT.length) h2+='<div style="color:#b7791f;margin-top:6px">'+esc(t.unkTrip(unkT.length))+'<div style="font-size:12px;opacity:.85;direction:ltr;text-align:start">'+esc(unkT.join(', '))+'</div></div>';
-      if(unkD.length) h2+='<div style="color:#b7791f;margin-top:6px">'+esc(t.unkDrv(unkD.length))+'<div style="font-size:12px;opacity:.85;direction:ltr;text-align:start">'+esc(unkD.join(', '))+'</div></div>';
-      pv.innerHTML=h2; parsed=out; $('rm-save').disabled=false;
+      if(!showParsed(rowsToOut(rows))) return;
+      $('rm-paste').value='';
     }catch(e){ pv.innerHTML='<span style="color:var(--text-danger)">'+esc(t.badFile)+'</span>'; }
   });
+  const TRIP_RE=/^NW\d+[A-Z]?(\+NW\d+[A-Z]?)*-[IO]-\d+$/i;
+  /* جدول (صفوف وأعمدة) → [رحلة، سائق1، سائق2]: بالعناوين لو موجودة، وإلا بالشكل (رقم رحلة + أرقام هوية 10 خانات) */
+  function rowsToOut(rows){
+    let h=-1, ct=-1, c1=-1, c2=-1;
+    for(let i=0;i<Math.min(rows.length,15)&&h<0;i++){
+      const r=rows[i].map(x=>String(x).trim().toLowerCase());
+      const t_=r.findIndex(x=>/^trip$|trip ?(no|code|#)?$|رقم الرحلة|^الرحلة$/.test(x)), a=r.findIndex(x=>/d1|driver ?1|1_?ro?a?ste?r|ro?a?ster_?1|سائق ?(1|الأول)/.test(x)), b=r.findIndex(x=>/d2|driver ?2|2_?ro?a?ste?r|ro?a?ster_?2|سائق ?(2|الثاني)/.test(x));
+      if(t_>-1&&a>-1){ h=i; ct=t_; c1=a; c2=b; }
+    }
+    const out=[], seen=new Set();
+    if(h>-1){
+      rows.slice(h+1).forEach(r=>{ const tr=String(r[ct]||'').trim().toUpperCase(); const a=digits(r[c1]), b=c2>-1?digits(r[c2]):''; if(tr&&a&&!seen.has(tr)){ seen.add(tr); out.push([tr,a,b]); } });
+    } else {
+      rows.forEach(r=>{ const cells=r.map(x=>String(x).trim()); const tr=cells.find(x=>TRIP_RE.test(x)); if(!tr) return;
+        const ids=cells.map(digits).filter(x=>/^\d{10}$/.test(x)); const T_=tr.toUpperCase();
+        if(ids[0]&&!seen.has(T_)){ seen.add(T_); out.push([T_,ids[0],ids[1]||'']); } });
+    }
+    return out;
+  }
+  function showParsed(out){
+    const t=T(), pv=$('rm-preview'); parsed=null; $('rm-save').disabled=true;
+    if(!out.length){ pv.innerHTML='<span style="color:var(--text-danger)">'+esc(t.noCols)+'</span>'; return false; }
+    let known=new Set(Object.keys(TRIP_DB).flatMap(k=>[nk(k)].concat(k.split('+').map(nk))));
+    try{ const c=JSON.parse(localStorage.getItem('nwSched1')||'null'); if(c&&c.trips&&c.trips.length) known=new Set(c.trips.map(x=>nk(x.trip))); }catch(_){}   // نقارن بجدول الرحلات المرفوع (أحدث من قائمة البرنامج القديمة)
+    const unkT=out.filter(r=>!known.has(nk(r[0]))).map(r=>r[0]);
+    const unkD=[...new Set(out.flatMap(r=>[r[1],r[2]]).filter(x=>x&&!DRIVER_DATA.some(d=>d[0]===x)))];
+    let h2='<div style="color:var(--text-success);font-weight:700">'+esc(t.sum(out.length,out.filter(r=>r[2]).length))+'</div>';
+    if(unkT.length) h2+='<div style="color:#b7791f;margin-top:6px">'+esc(t.unkTrip(unkT.length))+'<div style="font-size:12px;opacity:.85;direction:ltr;text-align:start">'+esc(unkT.join(', '))+'</div></div>';
+    if(unkD.length) h2+='<div style="color:#b7791f;margin-top:6px">'+esc(t.unkDrv(unkD.length))+'<div style="font-size:12px;opacity:.85;direction:ltr;text-align:start">'+esc(unkD.join(', '))+'</div></div>';
+    pv.innerHTML=h2; parsed=out; $('rm-save').disabled=false; return true;
+  }
+  let pasteT=0;
+  $('rm-paste').addEventListener('input',()=>{ clearTimeout(pasteT); pasteT=setTimeout(()=>{
+    const v=$('rm-paste').value; if(!v.trim()){ parsed=null; $('rm-save').disabled=true; $('rm-preview').innerHTML=''; return; }
+    $('rm-file').value='';
+    const rows=v.replace(/\r/g,'').split('\n').filter(l=>l.trim()).map(l=>l.includes('\t')?l.split('\t'):l.split(/[,;]|\s{2,}|\s+(?=\d{10}\b)|(?<=\S)\s+(?=NW)/i));
+    showParsed(rowsToOut(rows)); },250); });
+  $('rm-clear').addEventListener('click',()=>{ $('rm-paste').value=''; $('rm-paste').dispatchEvent(new Event('input')); $('rm-paste').focus(); });
   $('rm-save').addEventListener('click',async()=>{
     const t=T(), date=$('rm-date').value, btn=$('rm-save');
     if(!parsed||!date) return;
