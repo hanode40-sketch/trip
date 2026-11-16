@@ -1679,6 +1679,7 @@ applyUILang();
         const link=(window.cardLink&&cardLink({code:it.duty,trip:it.trips[0].trip,date:it.date,bus:busOf(it),p1:P[0]||null,p2:P[1]||null}))||'';
         return (ML[l]||ML.en).card(r[1]||'',it.duty,dateTxt(it.date,l),link); } return compose(it,iq,l); };
     let text;
+    const orig=String(r[4]||r[3]||'').replace(/\D/g,''), origShow=window.waShow?waShow(orig):orig;
     if(kind==='card'&&!busOf(it)){ alert(L('حدد رقم الحافلة للواجب أول — البطاقة تنرسل بعد تعيين الحافلة','Set the bus number for this duty first — the card is sent after the bus is assigned')); return; }
     text=mk(lang);
     const m=modal(`<h3 style="margin:0 0 6px">${kind==='card'?'🪪 إرسال البطاقة':'📤 إرسال المسار'} — ${esc(r[1]||iq)}</h3>
@@ -1686,6 +1687,8 @@ applyUILang();
       <label class="bnote" style="display:block;margin:0 0 4px;font-weight:700">رقم الواتساب</label>
       <input id="bmNum" type="tel" dir="ltr" style="width:100%;box-sizing:border-box;margin-bottom:4px" value="${esc(window.waShow?waShow(waNum(iq)):waNum(iq))}">
       <div id="bmBad" class="bno" style="display:none;margin-bottom:6px">الرقم غير صحيح</div>
+      <div id="bmFix" class="bnote" style="display:${WAFIX[iq]?'flex':'none'};align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 4px;color:#b7791f">⚠️ هذا رقم معدّل على هذا الجهاز — رقم السائق الأصلي: <b dir="ltr">${esc(origShow||'—')}</b> <button type="button" class="bbtn" id="bmReset" style="padding:3px 10px">رجّع الأصلي</button></div>
+      <label class="bnote" id="bmSaveL" style="display:none;align-items:center;gap:6px;margin:4px 0 0;cursor:pointer"><input type="checkbox" id="bmSave"> احفظ هذا الرقم للسائق (بدّل رقمه المسجل على هذا الجهاز)</label>
       <label class="bnote" style="display:block;margin:8px 0 4px;font-weight:700">طريقة الفتح</label>
       <select id="bmHow" style="width:100%">${[['app','تطبيق واتساب على الكمبيوتر — مباشرة'],['web','واتساب ويب']].map(([k,v])=>`<option value="${k}"${k===waHow()?' selected':''}>${v}</option>`).join('')}</select>
       <label class="bnote" style="display:block;margin:8px 0 4px;font-weight:700">لغة الرسالة</label>
@@ -1694,14 +1697,17 @@ applyUILang();
       <textarea id="bmTxt" dir="${ML[lang].rtl?'rtl':'ltr'}">${esc(text)}</textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="bbtn" data-close>إلغاء</button><button class="bbtn wa" id="bmGo">فتح واتساب وإرسال</button></div>`);
     const num=m.querySelector('#bmNum'), ok=()=>{ const v=window.waValidNum?waValidNum(num.value):/\d{9,}/.test(num.value); m.querySelector('#bmBad').style.display=ok0(v); m.querySelector('#bmGo').disabled=!v; return v; }, ok0=v=>v?'none':'';
-    num.oninput=ok; ok();
+    const saveL=m.querySelector('#bmSaveL'), dOf=v=>window.waDigits?waDigits(v):String(v).replace(/\D/g,''), same=(x,y)=>x.slice(-9)===y.slice(-9);
+    const chg=()=>{ saveL.style.display=(!same(dOf(num.value),orig)&&!same(dOf(num.value),WAFIX[iq]||orig))?'flex':'none'; };
+    num.oninput=()=>{ ok(); chg(); }; ok();
+    m.querySelector('#bmReset').onclick=()=>{ delete WAFIX[iq]; try{ localStorage.setItem('nwBoardWa',JSON.stringify(WAFIX)); }catch(e){} num.value=origShow; m.querySelector('#bmFix').style.display='none'; ok(); chg(); };
     if(isMobile){ const h=m.querySelector('#bmHow'); h.previousElementSibling.style.display='none'; h.style.display='none'; }
     m.querySelector('#bmLang').onchange=e=>{ lang=e.target.value; const ta=m.querySelector('#bmTxt'); ta.value=mk(lang); ta.dir=ML[lang].rtl?'rtl':'ltr';
       if(lang===langOf(iq)) delete langPref[iq]; else langPref[iq]=lang; try{ localStorage.setItem(LANG_KEY,JSON.stringify(langPref)); }catch(_){} };
     m.querySelector('#bmGo').onclick=async()=>{
       if(!ok()) return;
       const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
-      if(d!==String(r[4]||r[3]||'').replace(/\D/g,'')){ WAFIX[iq]=d; try{ localStorage.setItem('nwBoardWa',JSON.stringify(WAFIX)); }catch(e){} }
+      if(m.querySelector('#bmSave').checked && saveL.style.display!=='none'){ if(same(d,orig)) delete WAFIX[iq]; else WAFIX[iq]=d; try{ localStorage.setItem('nwBoardWa',JSON.stringify(WAFIX)); }catch(e){} }   // التعديل لهالمرة بس، إلا لو اختار الحفظ
       const how=m.querySelector('#bmHow').value, tx=encodeURIComponent(m.querySelector('#bmTxt').value);
       if(!isMobile) waHowSet(how);
       waGo(d,m.querySelector('#bmTxt').value,isMobile?'wa':how);
