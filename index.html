@@ -1619,7 +1619,15 @@ applyUILang();
 
   /* ---------- الرسالة ---------- */
   const fmt12=t=>{ const m=mins(t); if(m==null) return t||''; const h=Math.floor(m/60), mi=m%60; return ((h+11)%12+1)+':'+pad(mi)+(h>=12?' PM':' AM'); };
-  const mapLink=(route,name)=>{ const L=(typeof ROUTE_STOPS!=='undefined'?ROUTE_STOPS:{})[route]||[]; const k=String(name||'').toLowerCase().replace(/[^a-z0-9]/g,''); const f=L.find(s=>String(s[0]).toLowerCase().replace(/[^a-z0-9]/g,'')===k); return f?f[1]:''; };
+  const normS=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const canonS=x=>normS(x).replace(/(new|\d+)$/,'');                       // "Buraydah Airport 2" / "Yanbu Bus Station New" = نفس المحطة
+  const sideS=x=>{ const m=String(x||'').match(/\s-\s*([AB])\s*$/i); return m?m[1].toUpperCase():''; }, noSide=x=>String(x||'').replace(/\s-\s*[AB]\s*$/i,'');
+  const mapLink=(route,name)=>{ const RS=(typeof ROUTE_STOPS!=='undefined'?ROUTE_STOPS:{}), L=RS[route]||[], k=normS(name); if(!k) return '';
+    const f=L.find(s=>normS(s[0])===k)||L.find(s=>canonS(s[0])===canonS(name))
+      ||(sideS(name)&&L.find(s=>!sideS(s[0])&&canonS(s[0])===canonS(noSide(name))));      // "Sabya - B" ← "Sabya" (بس لو المحفوظ بدون جهة)
+    if(f) return f[1];
+    for(const r in RS){ const g=RS[r].find(s=>normS(s[0])===k); if(g) return g[1]; }   // نفس المحطة باسمها في مسار ثاني
+    return ''; };
   /* نصوص رسالة السائق: عربي، إنجليزي، أردو، هندي، إندونيسي — أسماء المحطات تبقى مثل ما هي */
   const ML={
     ar:{name:'العربية',rtl:1,loc:'ar-SA-u-ca-gregory-nu-latn',hi:'مرحباً ',hi2:'،',duty:'واجبك: ',date:'التاريخ: ',bt:'نوع الباص: ',types:{VIP:'VIP',WHEELCHAIR:'كراسي متحركة',STANDARD:'عادي'},bus:'رقم الحافلة: ',rep:'وقت الحضور للكراج لاستلام الباص: ',night:' (الليلة اللي قبل الرحلة)',n:'عدد الرحلات في الواجب: ',trip:'الرحلة: ',tripN:i=>'الرحلة '+i+': ',route:'المسار: ',ar:' ← ',dep:'المغادرة: ',arr:' — الوصول: ',next:' (اليوم التالي)',stops:'نقاط التوقف:',rest:' (استراحة فقط)',a:'وصول ',d:'مغادرة ',bye:'الرجاء الحضور بالوقت المحدد. قيادة آمنة.',
