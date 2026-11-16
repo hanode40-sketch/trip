@@ -976,7 +976,8 @@ function nwLogSend(act, drv){
   try{
     if(!window.NWAuth||!NWAuth.log) return;
     const trip=selectedTrip?(selectedTrip.code||selectedTrip.dutyCode||''):'';
-    NWAuth.log(act, trip, [drv&&drv.name, tripDateInput.value, busInput&&busInput.value.trim()?('باص '+busInput.value.trim()):''].filter(Boolean).join(' · '));
+    // رقم الإقامة في التفاصيل: يربط الإرسال بالسائق في تقرير «إرسال المسارات» (صفحة مراجعة البيانات)
+    NWAuth.log(act, trip, [drv&&drv.name, tripDateInput.value, busInput&&busInput.value.trim()?('باص '+busInput.value.trim()):'', drv&&drv.iqama?('إقامة '+drv.iqama):''].filter(Boolean).join(' · '));
   }catch(e){}
 }
 const chooser=document.getElementById('send-chooser'); let scWhich=1;
