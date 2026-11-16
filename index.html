@@ -1648,6 +1648,8 @@ applyUILang();
   /* ---------- نافذة الإرسال ---------- */
   function modal(html){ const m=document.createElement('div'); m.className='bmod'; m.innerHTML='<div>'+html+'</div>'; document.body.appendChild(m); m.addEventListener('click',e=>{ if(e.target===m||e.target.closest('[data-close]')) m.remove(); }); return m; }
   function waNum(iq){ const r=DRV[iq]||[]; return WAFIX[iq]||r[4]||r[3]||''; }
+  const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const waHow=()=>{ try{ const v=localStorage.getItem('nwWaHow'); if(v) return v; }catch(e){} return isMobile?'wa':'app'; };
   function openSend(duty,iq,kind){
     const it=dayItems().find(x=>x.duty===duty); if(!it) return;
     const r=DRV[iq]||[];
@@ -1663,6 +1665,8 @@ applyUILang();
       <label class="bnote" style="display:block;margin:0 0 4px;font-weight:700">رقم الواتساب</label>
       <input id="bmNum" type="tel" dir="ltr" style="width:100%;box-sizing:border-box;margin-bottom:4px" value="${esc(window.waShow?waShow(waNum(iq)):waNum(iq))}">
       <div id="bmBad" class="bno" style="display:none;margin-bottom:6px">الرقم غير صحيح</div>
+      <label class="bnote" style="display:block;margin:8px 0 4px;font-weight:700">طريقة الفتح</label>
+      <select id="bmHow" style="width:100%">${[['wa','الرابط العادي (الجوال)'],['app','تطبيق واتساب على الكمبيوتر — مباشرة'],['web','واتساب ويب']].map(([k,v])=>`<option value="${k}"${k===waHow()?' selected':''}>${v}</option>`).join('')}</select>
       <label class="bnote" style="display:block;margin:8px 0 4px;font-weight:700">لغة الرسالة</label>
       <select id="bmLang" style="width:100%">${Object.keys(ML).map(k=>`<option value="${k}"${k===lang?' selected':''}>${ML[k].name}${k===langOf(iq)?' ✓':''}</option>`).join('')}</select>
       <label class="bnote" style="display:block;margin:8px 0 4px;font-weight:700">الرسالة (تقدر تعدّلها)</label>
@@ -1676,7 +1680,11 @@ applyUILang();
       if(!ok()) return;
       const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
       if(d!==String(r[4]||r[3]||'').replace(/\D/g,'')){ WAFIX[iq]=d; try{ localStorage.setItem('nwBoardWa',JSON.stringify(WAFIX)); }catch(e){} }
-      window.open('https://wa.me/'+d+'?text='+encodeURIComponent(m.querySelector('#bmTxt').value),'_blank');
+      const how=m.querySelector('#bmHow').value, tx=encodeURIComponent(m.querySelector('#bmTxt').value);
+      try{ localStorage.setItem('nwWaHow',how); }catch(_){}
+      if(how==='app') location.href='whatsapp://send?phone='+d+'&text='+tx;                       // يفتح تطبيق واتساب على الكمبيوتر مباشرة
+      else if(how==='web') window.open('https://web.whatsapp.com/send?phone='+d+'&text='+tx,'nwWaWeb');  // نفس تبويب واتساب ويب كل مرة
+      else window.open('https://wa.me/'+d+'?text='+tx,'_blank');
       m.remove();
       const k=it.duty+'|'+iq, row={kind:kind==='card'?'بطاقة':'مسار',by:auth.name||'',at:'الحين…'};
       (SENT[k]=SENT[k]||[]).push(row); draw();
@@ -1748,7 +1756,7 @@ applyUILang();
     ['بدون سائق في الروستر','no driver in roster'],['مو موجود في روستر هذا اليوم','not in today\'s roster'],
     ['✅ كل المسارات انرسلت','✅ All routes sent'],['✅ ما فيه مسارات فات موعدها','✅ No overdue routes'],['لا توجد واجبات','No duties'],['ما فيه نتائج','No results'],['⚪ لا يعمل','⚪ not running'],
     ['جاري تحميل الروستر وحالة الإرسال...','Loading roster and send status...'],['جاري التحميل...','Loading...'],
-    ['📤 إرسال المسار —','📤 Send route —'],['🪪 إرسال البطاقة —','🪪 Send card —'],['رقم الواتساب','WhatsApp number'],['الرقم غير صحيح','Invalid number'],['لغة الرسالة','Message language'],
+    ['📤 إرسال المسار —','📤 Send route —'],['🪪 إرسال البطاقة —','🪪 Send card —'],['رقم الواتساب','WhatsApp number'],['طريقة الفتح','Open with'],['الرابط العادي (الجوال)','Standard link (phone)'],['تطبيق واتساب على الكمبيوتر — مباشرة','WhatsApp desktop app — direct'],['واتساب ويب','WhatsApp Web'],['الرقم غير صحيح','Invalid number'],['لغة الرسالة','Message language'],
     ['الرسالة (تقدر تعدّلها)','Message (you can edit it)'],['فتح واتساب وإرسال','Open WhatsApp & send'],['إلغاء','Cancel'],
     ['🔁 تبديل سائق —','🔁 Swap driver —'],['السائق المتعذر:','Unavailable driver:'],['السائق البديل (اسم أو إقامة)','Replacement driver (name or Iqama)'],['ابحث...','Search...'],
     ['السبب','Reason'],['— اختر —','— choose —'],['ملاحظة (إجباري)','Note (required)'],['مثال: اتصل الساعة 3 واعتذر بسبب...','e.g. called at 3 and excused because...'],['تبديل','Swap'],
