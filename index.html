@@ -1383,7 +1383,9 @@ applyUILang();
   const gN=g=>String(g||'').replace(/كراج/g,'').trim();
   const NODISP=s=>/no dispatch/i.test(s||'');
 
-  let SCHED=null, META={}, DUTIES=[], ROSTER=null, SENT={}, FILTER='miss', LOADING=0;
+  let SCHED=null, META={}, DUTIES=[], ROSTER=null, SENT={}, BUSES={}, FILTER='miss', LOADING=0;
+  const LEAD_H=10;   // المسار لازم يوصل السائق قبل الرحلة بـ 10 ساعات كأقل حد
+  const BUSL=(typeof BUS_DATA!=='undefined'?BUS_DATA:[]);   // [رقم الحافلة، اللوحة، النوع VIP/WCR/STD]
   const DRV={}; (typeof DRIVER_DATA!=='undefined'?DRIVER_DATA:[]).forEach(r=>DRV[String(r[0])]=r);   // [إقامة، اسم، جنسية، جوال، واتساب]
   const WAFIX=JSON.parse(localStorage.getItem('nwBoardWa')||'{}');          // أرقام واتساب صُححت من هذا الجهاز
 
@@ -1428,9 +1430,11 @@ applyUILang();
     try{
       const [r,s]=await Promise.all([auth.call('rosterGet',{date}), auth.call('routeDay',{date}), loadSched()]);
       if(my!==LOADING) return;
-      ROSTER={}; ((r&&r.ok&&r.rows)||[]).forEach(x=>ROSTER[nk(x[0])]=[String(x[1]||''),String(x[2]||'')]);
+      ROSTER={}; ((r&&r.ok&&r.rows)||[]).forEach(x=>{ const k=nk(x[0]), v=[String(x[1]||''),String(x[2]||'')]; ROSTER[k]=v;
+        if(k.includes('+')) k.split('+').forEach(p=>{ if(p&&!ROSTER[p]) ROSTER[p]=v; }); });   // روستر قديم بأرقام مدموجة (A + B)
       ROSTER.__n=((r&&r.rows)||[]).length; ROSTER.__by=r&&r.by; ROSTER.__at=r&&r.at;
       SENT={}; ((s&&s.ok&&s.sent)||[]).forEach(x=>{ const k=x[0]+'|'+x[1]; (SENT[k]=SENT[k]||[]).push({kind:x[2],by:x[3],at:x[4]}); });
+      BUSES=(s&&s.ok&&s.buses)||{};
     }catch(e){ if(my===LOADING) $('bList').innerHTML='<div class="bmsg">تعذّر التحميل: '+esc(e.message||e)+'</div>'; return; }
     draw();
   }
@@ -1446,6 +1450,18 @@ applyUILang();
   const sentOf=(it,iq)=>(SENT[it.duty+'|'+iq]||[]);
   const isSent=(it,iq)=>sentOf(it,iq).some(x=>x.kind==='مسار');
   const dutyDone=it=>!it.off&&it.drivers.every(iq=>isSent(it,iq));
+  /* ---- موعد الإرسال: أول مغادرة في الواجب − 10 ساعات ---- */
+  const tsOf=s=>{ const m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})/); return m?new Date(+m[1],m[2]-1,+m[3],+m[4],+m[5]).getTime():NaN; };
+  const depTs=it=>tsOf(it.date+' '+(it.disp.t0||'00:00'));
+  const dlTs=it=>depTs(it)-LEAD_H*3600e3;
+  const fmtTs=t=>{ const d=new Date(t); return pad(d.getDate())+'/'+pad(d.getMonth()+1)+' '+pad(d.getHours())+':'+pad(d.getMinutes()); };
+  const left=ms=>{ const h=Math.floor(ms/3600e3), m=Math.floor(ms%3600e3/60e3); return h?h+' س '+m+' د':m+' د'; };
+  const firstSent=(it,iq)=>{ const L=sentOf(it,iq).filter(x=>x.kind==='مسار').map(x=>tsOf(x.at)).filter(x=>!isNaN(x)); return L.length?Math.min(...L):NaN; };
+  /** حالة السائق: ok في الوقت · late انرسل متأخر · over ما انرسل والموعد فات · wait باقي وقت */
+  function timing(it,iq){ const dl=dlTs(it), st=firstSent(it,iq);
+    if(isSent(it,iq)) return isNaN(st)||st<=dl?'ok':'late';
+    return Date.now()>dl?'over':'wait'; }
+  const dutyOver=it=>!it.off&&it.drivers.some(iq=>timing(it,iq)==='over');
 
   function draw(){
     if(!SCHED||!SCHED.length){
@@ -1457,16 +1473,46 @@ applyUILang();
     const act=all.filter(it=>!it.off), drvN=act.reduce((a,it)=>a+it.drivers.length,0), sentN=act.reduce((a,it)=>a+it.drivers.filter(iq=>isSent(it,iq)).length,0);
     const pct=drvN?Math.round(sentN/drvN*100):0;
     $('bPct').textContent=drvN?pct+'%':'—'; $('bBar').style.width=pct+'%'; $('bBar').style.background=pct>=95?'#16a34a':pct>=60?'#f59e0b':'#dc2626';
-    $('bCnt').textContent=`${act.length} واجب · ${sentN} من ${drvN} سائق وصلهم المسار`+(all.length-act.length?` · ${all.length-act.length} واجب ما يشتغل/مو في الروستر`:'');
-    const n={miss:act.filter(it=>!dutyDone(it)).length, done:act.filter(dutyDone).length, all:act.length, off:all.length-act.length};
-    $('bChips').innerHTML=[['miss','لم يُرسل'],['done','تم الإرسال'],['all','الكل'],['off','لا يعمل اليوم']].map(([k,t])=>`<button class="bchip${FILTER===k?' on':''}" data-f="${k}">${t} (${n[k]})</button>`).join('');
+    const n={miss:act.filter(it=>!dutyDone(it)).length, over:act.filter(dutyOver).length, done:act.filter(dutyDone).length, all:act.length, off:all.length-act.length};
+    const lateN=act.reduce((a,it)=>a+it.drivers.filter(iq=>timing(it,iq)==='late').length,0);
+    $('bCnt').textContent=`${act.length} واجب · ${sentN} من ${drvN} سائق وصلهم المسار`+(lateN?` · ${lateN} انرسل متأخر (أقل من ${LEAD_H} ساعات)`:'')+(all.length-act.length?` · ${all.length-act.length} واجب ما يشتغل/مو في الروستر`:'');
+    $('bChips').innerHTML=[['miss','لم يُرسل'],['over','🔴 فات موعده'],['done','تم الإرسال'],['all','الكل'],['off','لا يعمل اليوم']].map(([k,t])=>`<button class="bchip${FILTER===k?' on':''}" data-f="${k}">${t} (${n[k]})</button>`).join('');
     const info=[];
     info.push(`<div class="bnote">📅 الجدول: ${esc(META.valid||'—')}${META.by?' · رفعه '+esc(META.by)+' ('+esc(META.at)+')':''} · 📋 روستر ${esc($('bDate').value)}: ${ROSTER&&ROSTER.__n?ROSTER.__n+' رحلة'+(ROSTER.__by?' · رفعه '+esc(ROSTER.__by)+' ('+esc(ROSTER.__at)+')':''):'<b style="color:#dc2626">غير مرفوع</b>'}</div>`);
     if(ROSTER&&!ROSTER.__n) info.push('<div class="bwarn">⚠️ ما فيه روستر مرفوع لهذا التاريخ — الواجبات تطلع «لا يعمل اليوم» لين يترفع.</div>');
+    if(ROSTER&&ROSTER.__n){   // تطابق الروستر مع الجدول: رحلات في الروستر مو موجودة في الجدول = غالباً روستر قديم أو جدول قديم
+      const known=new Set((SCHED||[]).map(t=>nk(t.trip)));
+      const unk=Object.keys(ROSTER).filter(k=>!k.startsWith('__')&&!known.has(k));
+      const miss=all.filter(it=>!it.inRoster).map(it=>it.disp.trip);
+      if(unk.length) info.push(`<div class="bwarn">⚠️ ${unk.length} رحلة في روستر هذا اليوم مو موجودة في الجدول المرفوع — غالباً الروستر مرفوع من ملف قديم أو بأرقام رحلات مختلفة. أعد رفع الروستر بنفس شكل ملف الجدول الحالي.<div style="direction:ltr;text-align:start;font-size:12px;margin-top:4px">${esc(unk.slice(0,30).join(', '))}${unk.length>30?' …':''}</div></div>`);
+      if(miss.length) info.push(`<div class="bnote">ℹ️ ${miss.length} واجب رحلة خروجه مو موجودة في الروستر: <span style="direction:ltr;unicode-bidi:isolate">${esc(miss.slice(0,20).join(', '))}${miss.length>20?' …':''}</span></div>`);
+    }
     $('bInfo').innerHTML=info.join('');
-    let L=all.filter(it=> FILTER==='off'?it.off : !it.off && (FILTER==='all' || (FILTER==='done'?dutyDone(it):!dutyDone(it))));
+    let L=all.filter(it=> FILTER==='off'?it.off : !it.off && (FILTER==='all' || (FILTER==='over'?dutyOver(it):FILTER==='done'?dutyDone(it):!dutyDone(it))));
+    if(FILTER==='miss'||FILTER==='over') L.sort((a,b)=>dlTs(a)-dlTs(b));   // الأقرب موعداً أول
     if(q) L=L.filter(it=>[it.duty,it.trips.map(t=>t.trip+' '+t.fr+' '+t.to).join(' '),it.drivers.map(iq=>iq+' '+((DRV[iq]||[])[1]||'')).join(' ')].join(' ').toLowerCase().includes(q));
-    $('bList').innerHTML=L.length?'<div class="blist">'+L.map(card).join('')+'</div>':`<div class="bmsg">${FILTER==='miss'&&act.length?'✅ كل المسارات انرسلت':'لا توجد واجبات'}</div>`;
+    $('bList').innerHTML=L.length?'<div class="blist">'+L.map(card).join('')+'</div>':`<div class="bmsg">${FILTER==='miss'&&act.length?'✅ كل المسارات انرسلت':FILTER==='over'?'✅ ما فيه مسارات فات موعدها':'لا توجد واجبات'}</div>`;
+  }
+  const busOf=it=>{ const b=BUSES[it.duty]; return b&&b[0]?b[0]:''; };
+  const TYPEMAP={VIP:'VIP',WCR:'WHEELCHAIR',STD:'STANDARD'};
+  function busRow(it){
+    const b=BUSES[it.duty], no=b&&b[0], info=no&&BUSL.find(x=>x[0]===no);
+    const mism=info&&TYPEMAP[info[2]]&&TYPEMAP[info[2]]!==busKey(it.bus);
+    return `<div class="bdrv" style="justify-content:flex-start"><span class="s" style="font-weight:700">🚌 رقم الحافلة:</span>
+      ${no?`<b style="direction:ltr">${esc(no)}</b>${info?` <span class="s">(لوحة ${esc(info[1])} · ${esc(info[2])})</span>`:''}${mism?` <span class="btag" style="background:#fee2e2;color:#b91c1c">نوعها مختلف عن الجدول</span>`:''} <span class="s">— ${esc(b[1])} ${esc(b[2])}</span>
+        <button class="bbtn sm" data-busedit="${esc(it.duty)}">تغيير</button>`
+      :`<input class="bbus" list="bBusList" inputmode="numeric" placeholder="مثال: 4012" data-busin="${esc(it.duty)}" style="width:120px;font:inherit;padding:6px 9px;border-radius:9px;border:1px solid var(--nw-line);background:var(--nw-card);color:var(--nw-ink)">
+        <button class="bbtn sm p" data-bussave="${esc(it.duty)}">حفظ</button><span class="s">مطلوب قبل إرسال البطاقة</span>`}</div>`;
+  }
+  async function saveBus(duty,val){
+    const it=dayItems().find(x=>x.duty===duty); if(!it) return;
+    val=String(val||'').trim();
+    if(val&&BUSL.length&&!BUSL.some(x=>x[0]===val||x[1]===val)&&!confirm('رقم الحافلة '+val+' مو موجود في قائمة الحافلات — تحفظه كذا؟')) return;
+    const hit=BUSL.find(x=>x[1]===val&&x[0]!==val); if(hit) val=hit[0];   // كتب رقم اللوحة بدل رقم الحافلة
+    const old=BUSES[it.duty]; BUSES[it.duty]=[val,auth.name||'','الحين…']; draw();
+    try{ const j=await auth.call('routeBus',{date:it.date,duty:it.duty,bus:val}); if(!j||!j.ok) throw new Error((j&&j.error)||'ERR'); BUSES[it.duty]=j.bus; }
+    catch(e){ BUSES[it.duty]=old; alert('ما انحفظ رقم الحافلة: '+(e.message||e)); }
+    draw();
   }
   function busKey(b){ b=String(b||'').toUpperCase(); return b.includes('VIP')?'VIP':b.includes('WHEEL')||b.includes('كراسي')?'WHEELCHAIR':'STANDARD'; }
   function card(it){
@@ -1477,10 +1523,15 @@ applyUILang();
     const drv=it.off?`<div class="bdrv"><span class="s">${it.inRoster?'بدون سائق في الروستر':'مو موجود في روستر هذا اليوم'}${/daily/i.test(it.days)?'':' · '+esc(it.days)}</span></div>`
       : it.drivers.map((iq,i)=>{ const r=DRV[iq]||[], S=sentOf(it,iq), m=S.filter(x=>x.kind==='مسار'), c=S.filter(x=>x.kind==='بطاقة');
         return `<div class="bdrv"><div><div class="n">${esc(r[1]||iq)}${it.drivers.length>1?` <span class="s">(السائق ${i+1})</span>`:''}</div><div class="s">${esc(iq)}${r[3]?' · '+esc(r[3]):' · <span style="color:#dc2626">مو في قائمة السائقين</span>'}</div>
-          ${m.length?`<div class="bok">✓ المسار انرسل — ${esc(m[m.length-1].by)} · ${esc(m[m.length-1].at)}</div>`:'<div class="bno">✗ لم يُرسل المسار</div>'}${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}">🪪 البطاقة</button></div></div>`; }).join('');
+          ${(()=>{ const tg=timing(it,iq), dl=dlTs(it);
+            if(tg==='ok') return `<div class="bok">✓ المسار انرسل — ${esc(m[0].by)} · ${esc(m[0].at)}</div>`;
+            if(tg==='late') return `<div class="bok" style="color:#d97706">⚠️ انرسل متأخر — ${esc(m[0].by)} · ${esc(m[0].at)} <span class="s">(الموعد ${fmtTs(dl)})</span></div>`;
+            if(tg==='over') return `<div class="bno">🔴 لم يُرسل — فات الموعد ${fmtTs(dl)}</div>`;
+            return `<div class="bno" style="color:#b45309">⏳ لم يُرسل — آخر موعد ${fmtTs(dl)} (باقي ${left(dl-Date.now())})</div>`; })()}
+          ${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button></div></div>`; }).join('');
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
-      <div class="tm">🏁 الخروج ${esc(it.disp.dt||it.disp.t0)}${prev?' (الليلة اللي قبل)':''} · ${esc(it.garage)}</div></div><div class="btrips">${trips}</div>${drv}</div>`;
+      <div class="tm">🏁 الخروج ${esc(it.disp.dt||it.disp.t0)}${prev?' (الليلة اللي قبل)':''} · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}</div>`;
   }
 
   /* ---------- الرسالة ---------- */
@@ -1494,6 +1545,7 @@ applyUILang();
     m+=(ar?'واجبك: ':'Your duty: ')+it.duty+'\n';
     m+=(ar?'التاريخ: ':'Date: ')+dateTxt(it.date,lang)+'\n';
     m+=(ar?'نوع الباص: ':'Bus type: ')+(ar?B[3]:busKey(it.bus).replace('WHEELCHAIR','Wheelchair').replace('STANDARD','Standard'))+'\n';
+    if(busOf(it)) m+=(ar?'رقم الحافلة: ':'Bus number: ')+busOf(it)+'\n';
     if(it.disp.dt) m+=(ar?'وقت الحضور للكراج لاستلام الباص: ':'Report to depot (bus pickup): ')+fmt12(it.disp.dt)+(prev?(ar?' (الليلة اللي قبل الرحلة)':' (the night before)'):'')+'\n';
     if(it.trips.length>1) m+=(ar?'عدد الرحلات في الواجب: ':'Trips in this duty: ')+it.trips.length+'\n';
     let last=t0, nd=false;
@@ -1519,9 +1571,10 @@ applyUILang();
     const it=dayItems().find(x=>x.duty===duty); if(!it) return;
     const r=DRV[iq]||[], lang=langOf(iq);
     let text;
+    if(kind==='card'&&!busOf(it)){ alert('حدد رقم الحافلة للواجب أول — البطاقة تنرسل بعد تعيين الحافلة'); return; }
     if(kind==='card'){
       const P=it.drivers.map(x=>{ const d=DRV[x]||[]; return d.length?{name:d[1],iqama:d[0],mobile:d[3]}:null; });
-      const link=(window.cardLink&&cardLink({code:it.duty,trip:it.trips[0].trip,date:it.date,bus:'',p1:P[0]||null,p2:P[1]||null}))||'';
+      const link=(window.cardLink&&cardLink({code:it.duty,trip:it.trips[0].trip,date:it.date,bus:busOf(it),p1:P[0]||null,p2:P[1]||null}))||'';
       text=lang==='ar'?'مرحباً '+(r[1]||'')+'،\nبطاقة جدول الرحلة لواجبك '+it.duty+' بتاريخ '+dateTxt(it.date,'ar')+':\n'+link+'\n\nاضغط الرابط لعرض البطاقة وتحميلها.'
                       :'Hello '+(r[1]||'')+',\nYour trip schedule card for duty '+it.duty+' on '+dateTxt(it.date,'en')+':\n'+link+'\n\nTap the link to view and download the card.';
     } else text=compose(it,iq,lang);
@@ -1625,6 +1678,12 @@ applyUILang();
   $('bQ').addEventListener('search',()=>{ if(!$('bQ').value){ $('bSug').style.display='none'; draw(); } });
   $('bRefresh').onclick=()=>{ loadSched(true).then(loadDay); };
   $('bChips').onclick=e=>{ const b=e.target.closest('[data-f]'); if(b){ FILTER=b.dataset.f; draw(); } };
+  $('bList').addEventListener('click',e=>{ const sv=e.target.closest('[data-bussave]'), ed=e.target.closest('[data-busedit]');
+    if(sv){ const inp=document.querySelector('[data-busin="'+CSS.escape(sv.dataset.bussave)+'"]'); if(inp&&inp.value.trim()) saveBus(sv.dataset.bussave,inp.value); else if(inp) inp.focus(); }
+    else if(ed){ const it=dayItems().find(x=>x.duty===ed.dataset.busedit); const v=prompt('رقم الحافلة الجديد لـ '+ed.dataset.busedit+' (اتركه فاضي للإلغاء):',busOf(it)||''); if(v!==null) saveBus(ed.dataset.busedit,v); } });
+  $('bList').addEventListener('keydown',e=>{ const inp=e.target.closest('[data-busin]'); if(inp&&e.key==='Enter'&&inp.value.trim()) saveBus(inp.dataset.busin,inp.value); });
+  { const dl=document.createElement('datalist'); dl.id='bBusList'; dl.innerHTML=BUSL.map(b=>`<option value="${esc(b[0])}">${esc(b[1])} · ${esc(b[2])}</option>`).join(''); document.body.appendChild(dl); }
+  setInterval(()=>{ if(document.visibilityState==='visible'&&!document.querySelector('.bmod')&&!(document.activeElement&&document.activeElement.matches('input'))) draw(); },60e3);   // تحديث العدّاد كل دقيقة
   $('bList').onclick=e=>{ const s=e.target.closest('[data-send]'), c=e.target.closest('[data-card]'); if(s) openSend(s.dataset.send,s.dataset.iq,'msg'); else if(c) openSend(c.dataset.card,c.dataset.iq,'card'); };
   if(canUp){ $('bUpSched').style.display=''; $('bUpRoster').style.display=''; }
   $('bUpSched').onclick=openSchedUp;
