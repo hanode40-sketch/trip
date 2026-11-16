@@ -1378,7 +1378,8 @@ applyUILang();
   const nk=s=>String(s||'').toUpperCase().replace(/\s+/g,'');
   const canUp=auth.role==='مدير'||auth.role==='مدير تنفيذي'||auth.role==='مشرف';
   const MYG=(auth.garages||[]).map(g=>String(g).replace(/كراج/g,'').trim()).filter(Boolean);
-  const canSwap=it=>canUp||(auth.role==='مرحل'&&(!MYG.length||MYG.includes(it.garage)));   // المرحّل يبدّل في واجبات كراجه
+  const isDisp=String(auth.role||'').replace(/\u0651/g,'').trim()==='مرحل';   // الدور مكتوب «مرحّل» بالشدة
+  const canSwap=it=>canUp||(isDisp&&(!MYG.length||MYG.includes(it.garage)));   // المرحّل يبدّل في واجبات كراجه
   const BUS={ 'VIP':['#d4a017','#fef3c7','#92400e','VIP'], 'WHEELCHAIR':['#0ea5e9','#e0f2fe','#075985','كراسي متحركة'], 'STANDARD':['#94a3b8','#f1f5f9','#334155','عادي'] };
   const GAR=[[/shumays|yanbu/i,'الشميسي'],[/riyadh/i,'الرياض'],[/madinah|medina/i,'المدينة'],[/tabuk|haql/i,'تبوك'],[/jazan|jizan/i,'جازان'],[/khamis/i,'خميس مشيط'],[/hail|rafha/i,'حائل'],[/bashayer/i,'البشائر'],[/buraydah|qassim/i,'بريدة']];
   const garOf=s=>{ for(const [re,g] of GAR) if(re.test(s||'')) return g; return ''; };
