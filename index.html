@@ -1390,7 +1390,7 @@ applyUILang();
 
   let SCHED=null, META={}, DUTIES=[], ROSTER=null, SENT={}, BUSES={}, SUBS=[], FILTER='miss', LOADING=0;
   const REASONS=['رفض الرحلة','مريض','غياب','ظرف طارئ','تأخر','أخرى'];
-  const LEAD_H=10;   // المسار لازم يوصل السائق قبل الرحلة بـ 10 ساعات كأقل حد
+  const LEAD_H=6;    // المسار لازم يوصل السائق قبل الرحلة بـ 6 ساعات كأقل حد
   const BUSL=(typeof BUS_DATA!=='undefined'?BUS_DATA:[]);   // [رقم الحافلة، اللوحة، النوع VIP/WCR/STD]
   const DRV={}; (typeof DRIVER_DATA!=='undefined'?DRIVER_DATA:[]).forEach(r=>DRV[String(r[0])]=r);   // [إقامة، اسم، جنسية، جوال، واتساب]
   const WAFIX=JSON.parse(localStorage.getItem('nwBoardWa')||'{}');          // أرقام واتساب صُححت من هذا الجهاز
@@ -1462,7 +1462,7 @@ applyUILang();
   const sentOf=(it,iq)=>(SENT[it.duty+'|'+iq]||[]);
   const isSent=(it,iq)=>sentOf(it,iq).some(x=>x.kind==='مسار');
   const dutyDone=it=>!it.off&&it.drivers.every(iq=>isSent(it,iq));
-  /* ---- موعد الإرسال: أول مغادرة في الواجب − 10 ساعات ---- */
+  /* ---- موعد الإرسال: أول مغادرة في الواجب − LEAD_H ساعات ---- */
   const tsOf=s=>{ const m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})/); return m?new Date(+m[1],m[2]-1,+m[3],+m[4],+m[5]).getTime():NaN; };
   const depTs=it=>tsOf(it.date+' '+(it.disp.t0||'00:00'));
   const dlTs=it=>depTs(it)-LEAD_H*3600e3;
