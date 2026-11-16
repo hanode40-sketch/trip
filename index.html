@@ -1377,6 +1377,8 @@ applyUILang();
   const mins=t=>{ const m=String(t||'').match(/^(\d{1,2}):(\d{2})/); return m?(+m[1])*60+(+m[2]):null; };
   const nk=s=>String(s||'').toUpperCase().replace(/\s+/g,'');
   const canUp=auth.role==='مدير'||auth.role==='مدير تنفيذي'||auth.role==='مشرف';
+  const MYG=(auth.garages||[]).map(g=>String(g).replace(/كراج/g,'').trim()).filter(Boolean);
+  const canSwap=it=>canUp||(auth.role==='مرحل'&&(!MYG.length||MYG.includes(it.garage)));   // المرحّل يبدّل في واجبات كراجه
   const BUS={ 'VIP':['#d4a017','#fef3c7','#92400e','VIP'], 'WHEELCHAIR':['#0ea5e9','#e0f2fe','#075985','كراسي متحركة'], 'STANDARD':['#94a3b8','#f1f5f9','#334155','عادي'] };
   const GAR=[[/shumays|yanbu/i,'الشميسي'],[/riyadh/i,'الرياض'],[/madinah|medina/i,'المدينة'],[/tabuk|haql/i,'تبوك'],[/jazan|jizan/i,'جازان'],[/khamis/i,'خميس مشيط'],[/hail|rafha/i,'حائل'],[/bashayer/i,'البشائر'],[/buraydah|qassim/i,'بريدة']];
   const garOf=s=>{ for(const [re,g] of GAR) if(re.test(s||'')) return g; return ''; };
@@ -1397,10 +1399,11 @@ applyUILang();
     $('bBoard').style.display=t==='board'?'':'none'; if(wrap) wrap.style.display=t==='board'?'none':'';
     try{ localStorage.setItem('nwTripTab',t); }catch(e){}
   }
-  document.querySelector('.btabs').onclick=e=>{ const b=e.target.closest('[data-bt]'); if(b) tab(b.dataset.bt); };
+  document.querySelector('.btabs').onclick=e=>{ const b=e.target.closest('[data-bt]'); if(b&&(canUp||b.dataset.bt==='board')) tab(b.dataset.bt); };
+  if(!canUp){ const mb=document.querySelector('[data-bt="manual"]'); if(mb) mb.remove(); }   // الإرسال اليدوي للمدير والمشرف فقط
   if(wrap) wrap.parentNode.insertBefore($('bWrap'),wrap);
   $('bWrap').style.display='';
-  tab(localStorage.getItem('nwTripTab')||'board');
+  tab(canUp?(localStorage.getItem('nwTripTab')||'board'):'board');
 
   /* ---------- الجدول ---------- */
   async function loadSched(force){
@@ -1528,9 +1531,25 @@ applyUILang();
     m.querySelector('#swR').onchange=chk; m.querySelector('#swN').oninput=chk;
     m.querySelector('#swGo').onclick=async e=>{ e.target.disabled=true; e.target.textContent='جاري التبديل...';
       try{ const j=await auth.call('driverSwap',{swap:{date:it.date,trip:it.disp.trip,orig:iq,rep,reason:m.querySelector('#swR').value,note:m.querySelector('#swN').value.trim(),exchange:!!busy[rep]}});
-        if(!j||!j.ok) throw new Error({REP_BUSY:'البديل عنده رحلة',NOT_IN_ROSTER:'السائق مو في روستر اليوم',NEED_REASON:'السبب والملاحظة مطلوبة',FORBIDDEN:'التبديل للمدير والمشرف فقط',SAME_TRIP:'نفس الرحلة'}[j&&j.error]||(j&&j.error)||'ERR');
+        if(!j||!j.ok) throw new Error({REP_BUSY:'البديل عنده رحلة',NOT_IN_ROSTER:'السائق مو في روستر اليوم',NEED_REASON:'السبب والملاحظة مطلوبة',FORBIDDEN:'ما عندك صلاحية تبديل هذا الواجب (مو من كراجك أو التبديل مو حقك)',SAME_TRIP:'نفس الرحلة'}[j&&j.error]||(j&&j.error)||'ERR');
         m.remove(); loadDay();
       }catch(err){ alert(L('ما تم التبديل: ','Swap failed: ')+(err.message||err)); e.target.disabled=false; e.target.textContent='تبديل'; } };
+  }
+  async function viewCard(duty){
+    const it=dayItems().find(x=>x.duty===duty); if(!it) return;
+    const P=it.drivers.map(x=>{ const d=DRV[x]||[]; return d.length?{name:d[1],iqama:d[0],mobile:d[3]}:{name:'',iqama:x,mobile:''}; });
+    const m=modal(`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><h3 style="margin:0">🖼️ ${esc(it.duty)} · ${esc(it.date)}</h3><button class="bbtn sm" data-close>✕</button></div>
+      ${busOf(it)?'':'<div class="bwarn" style="margin:0 0 10px">⚠️ رقم الحافلة ما تعيّن بعد — البطاقة تطلع بدون رقم حافلة</div>'}
+      <div id="cvBox" class="bmsg">جاري تجهيز البطاقة...</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><a class="bbtn p" id="cvDl" style="display:none;text-decoration:none">⬇ حفظ الصورة</a><button class="bbtn" data-close>إغلاق</button></div>`);
+    m.firstElementChild.style.maxWidth='820px';
+    try{
+      if(typeof buildDutyPdfFrom!=='function'||typeof pdfBlobToJpg!=='function') throw new Error('nolib');
+      const d=await buildDutyPdfFrom({code:it.duty,trip:it.trips[0].trip,date:it.date,bus:busOf(it),p1:P[0]||null,p2:P[1]||null});
+      const r=await pdfBlobToJpg(d.blob), url=URL.createObjectURL(r.jpg);
+      m.querySelector('#cvBox').outerHTML=`<img src="${url}" alt="" style="width:100%;border-radius:10px;border:1px solid var(--nw-line);background:#fff">`;
+      const a=m.querySelector('#cvDl'); a.href=url; a.download=it.duty+'_'+it.date+'.jpg'; a.style.display='';
+    }catch(e){ m.querySelector('#cvBox').textContent=L(e.message==='nofile'?'ما لقيت ملف البطاقة لهذا الواجب ('+it.duty+')':'تعذّر تجهيز البطاقة — تأكد من الإنترنت', e.message==='nofile'?'Card file not found for this duty ('+it.duty+')':'Could not build the card — check the connection'); }
   }
   async function unSub(duty,iq){
     const it=dayItems().find(x=>x.duty===duty), sb=it&&subOf(it,iq); if(!sb) return;
@@ -1569,16 +1588,17 @@ applyUILang();
       : it.drivers.map((iq,i)=>{ const r=DRV[iq]||[], S=sentOf(it,iq), m=S.filter(x=>x.kind==='مسار'), c=S.filter(x=>x.kind==='بطاقة');
         const sb=subOf(it,iq), was=sb&&sentOf(it,sb.orig).some(x=>x.kind==='مسار');
         return `<div class="bdrv"><div><div class="n">${esc(r[1]||iq)}${it.drivers.length>1?` <span class="s">(السائق ${i+1})</span>`:''}${sb?` <span class="btag" style="background:#ede9fe;color:#5b21b6">🔁 بديل</span>`:''}</div>
-          ${sb?`<div class="s">بدل <b>${esc(sb.origName||sb.orig)}</b> — ${esc(sb.reason)}${sb.note?' · '+esc(sb.note):''} <span>(${esc(sb.by)} ${esc(sb.at)})</span>${canUp?` <a href="#" data-unsub="${esc(it.duty)}" data-iq="${esc(iq)}" style="color:#dc2626">إلغاء التبديل</a>`:''}</div>${was?'<div class="s" style="color:#b45309">⚠️ المسار كان انرسل للسائق الأصلي — بلّغه إنه انشال من الواجب</div>':''}`:''}<div class="s">${esc(iq)}${r[3]?' · '+esc(r[3]):' · <span style="color:#dc2626">مو في قائمة السائقين</span>'}</div>
+          ${sb?`<div class="s">بدل <b>${esc(sb.origName||sb.orig)}</b> — ${esc(sb.reason)}${sb.note?' · '+esc(sb.note):''} <span>(${esc(sb.by)} ${esc(sb.at)})</span>${canUp||sb.by===auth.name?` <a href="#" data-unsub="${esc(it.duty)}" data-iq="${esc(iq)}" style="color:#dc2626">إلغاء التبديل</a>`:''}</div>${was?'<div class="s" style="color:#b45309">⚠️ المسار كان انرسل للسائق الأصلي — بلّغه إنه انشال من الواجب</div>':''}`:''}<div class="s">${esc(iq)}${r[3]?' · '+esc(r[3]):' · <span style="color:#dc2626">مو في قائمة السائقين</span>'}</div>
           ${(()=>{ const tg=timing(it,iq), dl=dlTs(it);
             if(tg==='ok') return `<div class="bok">✓ المسار انرسل — ${esc(m[0].by)} · ${esc(m[0].at)}</div>`;
             if(tg==='late') return `<div class="bok" style="color:#d97706">⚠️ انرسل متأخر — ${esc(m[0].by)} · ${esc(m[0].at)} <span class="s">(الموعد ${fmtTs(dl)})</span></div>`;
             if(tg==='over') return `<div class="bno">🔴 لم يُرسل — فات الموعد ${fmtTs(dl)}</div>`;
             return `<div class="bno" style="color:#b45309">⏳ لم يُرسل — آخر موعد ${fmtTs(dl)} (باقي ${left(dl-Date.now())})</div>`; })()}
           ${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button>${canUp?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="السائق متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="السائق متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
+    const viewBtn=it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض البطاقة</button>`;
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
-      <div class="tm">🏁 الخروج ${esc(it.disp.dt||it.disp.t0)}${prev?' (الليلة اللي قبل)':''} · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}</div>`;
+      <div class="tm">🏁 الخروج ${esc(it.disp.dt||it.disp.t0)}${prev?' (الليلة اللي قبل)':''} · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}${viewBtn}</div>`;
   }
 
   /* ---------- الرسالة ---------- */
@@ -1721,7 +1741,7 @@ applyUILang();
     ['(السائق 1)','(Driver 1)'],['(السائق 2)','(Driver 2)'],['مو في قائمة السائقين','not in driver list'],['🔁 بديل','🔁 Substitute'],['بدل','replacing'],['إلغاء التبديل','Cancel swap'],
     ['⚠️ المسار كان انرسل للسائق الأصلي — بلّغه إنه انشال من الواجب','⚠️ The route was sent to the original driver — tell him he was removed'],
     ['✓ المسار انرسل —','✓ Route sent —'],['⚠️ انرسل متأخر —','⚠️ Sent late —'],['(الموعد','(deadline'],['باقي','left'],['🪪 البطاقة انرسلت','🪪 Card sent'],
-    ['📤 إرسال المسار','📤 Send route'],['↻ إعادة','↻ Resend'],['🪪 البطاقة','🪪 Card'],['🔁 تبديل','🔁 Swap'],['حدد رقم الحافلة أول','Set the bus number first'],['السائق متعذر؟ بدّله','Driver unavailable? Swap'],
+    ['📤 إرسال المسار','📤 Send route'],['🖼️ عرض البطاقة','🖼️ View card'],['⬇ حفظ الصورة','⬇ Save image'],['جاري تجهيز البطاقة...','Preparing card...'],['إغلاق','Close'],['⚠️ رقم الحافلة ما تعيّن بعد — البطاقة تطلع بدون رقم حافلة','⚠️ Bus number not set yet — the card will show without it'],['↻ إعادة','↻ Resend'],['🪪 البطاقة','🪪 Card'],['🔁 تبديل','🔁 Swap'],['حدد رقم الحافلة أول','Set the bus number first'],['السائق متعذر؟ بدّله','Driver unavailable? Swap'],
     ['بدون سائق في الروستر','no driver in roster'],['مو موجود في روستر هذا اليوم','not in today\'s roster'],
     ['✅ كل المسارات انرسلت','✅ All routes sent'],['✅ ما فيه مسارات فات موعدها','✅ No overdue routes'],['لا توجد واجبات','No duties'],['ما فيه نتائج','No results'],['⚪ لا يعمل','⚪ not running'],
     ['جاري تحميل الروستر وحالة الإرسال...','Loading roster and send status...'],['جاري التحميل...','Loading...'],
@@ -1788,6 +1808,7 @@ applyUILang();
   $('bRefresh').onclick=()=>{ loadSched(true).then(loadDay); };
   $('bChips').onclick=e=>{ const b=e.target.closest('[data-f]'); if(b){ FILTER=b.dataset.f; draw(); } };
   $('bList').addEventListener('click',e=>{ const sw=e.target.closest('[data-swap]'), us=e.target.closest('[data-unsub]');
+    const vw=e.target.closest('[data-view]'); if(vw){ viewCard(vw.dataset.view); return; }
     if(sw){ openSwap(sw.dataset.swap,sw.dataset.iq); return; } if(us){ e.preventDefault(); unSub(us.dataset.unsub,us.dataset.iq); return; } });
   $('bList').addEventListener('click',e=>{ const sv=e.target.closest('[data-bussave]'), ed=e.target.closest('[data-busedit]');
     if(sv){ const inp=document.querySelector('[data-busin="'+CSS.escape(sv.dataset.bussave)+'"]'); if(inp&&inp.value.trim()) saveBus(sv.dataset.bussave,inp.value); else if(inp) inp.focus(); }
