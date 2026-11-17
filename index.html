@@ -1607,6 +1607,7 @@ applyUILang();
       BUSES=(s&&s.ok&&s.buses)||{};
     }catch(e){ if(my===LOADING) $('bList').innerHTML='<div class="bmsg">تعذّر التحميل: '+esc(e.message||e)+'</div>'; return; }
     draw();
+    try{ const iqs=[...new Set(dayItems().flatMap(it=>it.drivers||[]))]; FINES={}; if(iqs.length){ FINES=await finesPending(iqs); if(my===LOADING) draw(); } }catch(_){}
   }
   function dayItems(){
     const date=$('bDate').value, out=[];
@@ -1756,7 +1757,7 @@ applyUILang();
             if(tg==='late') return `<div class="bok" style="color:#d97706">⚠️ انرسل متأخر — ${esc(m[0].by)} · ${esc(m[0].at)} <span class="s">(الموعد ${fmtTs(dl)})</span></div>`;
             if(tg==='over') return `<div class="bno">🔴 لم يُرسل — فات الموعد ${fmtTs(dl)}</div>`;
             return `<div class="bno" style="color:#b45309">⏳ لم يُرسل — آخر موعد ${fmtTs(dl)} (باقي ${left(dl-Date.now())})</div>`; })()}
-          ${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}</div>
+          ${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}${finesRow(it,iq)}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="السائق متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
     const viewBtn=it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض البطاقة</button>`;
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
@@ -1822,6 +1823,40 @@ applyUILang();
   async function finesPending(iqs){
     try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(window.NWAuth.attach({action:'pendingFor',iqamas:iqs}))});
       const j=await r.json(); return j&&j.ok?j.drivers||{}:{}; }catch(e){ return {}; } }
+  let FINES={};
+  function finesRow(it,iq){ const p=FINES[iq]; if(!p) return '';
+    const unsent=p.notSent?`<div style="border:1px solid #d97706;background:rgba(217,119,6,.08);border-radius:10px;padding:6px 8px;margin-top:6px">
+      <div style="color:#d97706;font-weight:700;font-size:13px">🟠 عليه ${p.notSent} مخالفة مرورية لم تُرسل له بعد</div>
+      <button class="bbtn sm wa" data-fnsend="${esc(iq)}" data-duty="${esc(it.duty)}" style="margin-top:4px">📲 إرسال المخالفات للسائق</button></div>`:'';
+    if(!p.count) return unsent;
+    const dl=String(p.deadline||'').replace('T',' ').slice(0,16);
+    return `<div style="border:1px solid #dc2626;background:rgba(220,38,38,.08);border-radius:10px;padding:6px 8px;margin-top:6px">
+      <div style="color:#dc2626;font-weight:700;font-size:13px">⚠️ عليه ${p.count} مخالفة مرورية بانتظار إقراره أو اعتراضه — حتى <span dir="ltr">${esc(dl)}</span></div>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:4px;cursor:pointer;font-size:12.5px;font-weight:600">
+        <input type="checkbox" data-fnok="${esc(iq)}" data-duty="${esc(it.duty)}" ${p.noted?'checked disabled':''} style="width:18px;height:18px">
+        ${p.noted?`✅ تم التنبيه والتحدث مع السائق — ${esc(p.noted.by)} · ${esc(p.noted.at)}`:'شفت التنبيه وتحدثت مع السائق ليفتح الرسالة ويقرّ أو يعترض'}</label>
+      ${p.token?`<button class="bbtn sm" data-fnlink="${esc(iq)}" style="margin-top:4px">📲 رابط المخالفات</button>`:''}</div>`+unsent; }
+  async function finesSend(iq,duty,btn){ const p=FINES[iq]; if(!p) return;
+    const r=DRV[iq]||[]; const num=prompt('رقم واتساب السائق '+(r[1]||'')+' — سيتم إرسال '+p.notSent+' مخالفة مع رابط الإقرار أو الاعتراض:', window.waShow?waShow(waNum(iq)):waNum(iq)); if(!num) return;
+    const d=window.waDigits?waDigits(num):String(num).replace(/\D/g,''); if(d.length<9){ alert('الرقم غير صحيح'); return; }
+    btn&&(btn.disabled=true);
+    try{ const res=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(window.NWAuth.attach({action:'dispatchSend',iqama:iq,phone:d,duty}))});
+      const j=await res.json(); if(!j||!j.ok) throw new Error((j&&(j.message||j.error))||'ERR');
+      const dl=String(j.deadline||'').replace('T',' ').slice(0,16), mny=n=>Number(n||0).toLocaleString('en-US');
+      const txt='السيد/ '+j.name+' — رقم الهوية '+iq+'\nسُجّلت عليك المخالفات التالية ('+j.items.length+') بإجمالي '+mny(j.total)+' ريال:\n'+
+        j.items.map((x,i)=>(i+1)+') '+x.vno+' — '+x.descAr+' — '+x.dateG+' — '+mny(x.amount)+' ريال').join('\n')+
+        '\n\nللاطلاع على التفاصيل والإقرار بالمخالفات أو الاعتراض عليها خلال '+j.objHours+' ساعة (حتى '+dl+') افتح الرابط:\n'+FINES_OBJ+encodeURIComponent(j.token)+
+        '\n*وفي حال عدم الاعتراض خلال المدة المحددة تُعتبر المخالفة ثابتة بحقك.*\n\nDear '+j.name+', '+j.items.length+' traffic violation(s) totaling '+mny(j.total)+' SAR have been recorded against you.\nTo view the details and acknowledge or object, open the link above within '+j.objHours+' hours. If no objection is received within this period, the violation will be considered confirmed.\n— Northwest Bus';
+      waGo(d,txt);
+      const F=await finesPending([iq]); FINES[iq]=F[iq]; draw();
+    }catch(e){ alert('ما تم الإرسال: '+(e.message||e)); btn&&(btn.disabled=false); } }
+  async function finesNote(iq,duty){ const p=FINES[iq]; if(!p) return;
+    try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(window.NWAuth.attach({action:'pendingNote',iqama:iq,duty,vnos:p.items.map(x=>x.vno).join(',')}))}); const j=await r.json();
+      if(j&&j.ok){ p.noted={by:j.by||auth.name||'',at:j.at||''}; } else alert('ما انحفظ التأكيد: '+((j&&(j.message||j.error))||''));
+    }catch(e){ alert('ما انحفظ التأكيد — تأكد من الاتصال'); } draw(); }
+  function finesLink(iq){ const p=FINES[iq]; if(!p||!p.token) return; const dl=String(p.deadline||'').replace('T',' ').slice(0,16);
+    waGo(String(waNum(iq)).replace(/\D/g,''),'السيد/ '+(p.name||'')+'\nلديك '+p.count+' مخالفة مرورية بانتظار إقرارك أو اعتراضك حتى '+dl+':\n'+FINES_OBJ+encodeURIComponent(p.token)+'\n\nYou have '+p.count+' traffic violation(s) awaiting your acknowledgement or objection. Please open the link above.'); }
   function finesAlert(m,it,iq,kind,num){
     const box=document.createElement('div'); m.firstElementChild.insertBefore(box,m.firstElementChild.children[2]||null);
     finesPending([iq]).then(D=>{ const p=D[iq]; if(!p||!m.isConnected) return;
@@ -1835,10 +1870,10 @@ applyUILang();
         ${p.token?`<button class="bbtn" id="fnResend" style="margin:4px 0">📲 إعادة إرسال رابط المخالفات للسائق</button>`:''}
         <label class="bnote" style="display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-weight:700"><input type="checkbox" id="fnTalk"> تحدثت مع السائق ونبهته على المخالفات${must?' (مطلوب قبل إرسال البطاقة)':''}</label></div>`;
       m.dataset.fines=must?'1':'';
+      if(FINES[iq]&&FINES[iq].noted){ const t=box.querySelector('#fnTalk'); t.checked=true; t.disabled=true; t.parentElement.insertAdjacentHTML('beforeend',' <span class="bnote">('+esc(FINES[iq].noted.by)+' · '+esc(FINES[iq].noted.at)+')</span>'); }
       const rs=box.querySelector('#fnResend'); if(rs) rs.onclick=()=>{ const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
         waGo(d,'السيد/ '+(p.name||'')+'\nلديك '+p.count+' مخالفة مرورية بانتظار إقرارك أو اعتراضك حتى '+dl+':\n'+FINES_OBJ+encodeURIComponent(p.token)+'\n\nYou have '+p.count+' traffic violation(s) awaiting your acknowledgement or objection. Please open the link above.',isMobile?'wa':m.querySelector('#bmHow').value); };
-      box.querySelector('#fnTalk').onchange=e=>{ if(e.target.checked) try{ fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify(window.NWAuth.attach({action:'pendingNote',iqama:iq,duty:it.duty,vnos:p.items.map(x=>x.vno).join(',')}))}); }catch(_){} };
+      box.querySelector('#fnTalk').onchange=e=>{ if(e.target.checked&&!e.target.disabled){ FINES[iq]=FINES[iq]||p; finesNote(iq,it.duty); } };
     });
   }
   const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2018,6 +2053,8 @@ applyUILang();
   $('bQ').addEventListener('search',()=>{ if(!$('bQ').value){ $('bSug').style.display='none'; draw(); } });
   $('bRefresh').onclick=()=>{ loadSched(true).then(loadDay); };
   $('bChips').onclick=e=>{ const b=e.target.closest('[data-f]'); if(b){ FILTER=b.dataset.f; draw(); } };
+  $('bList').addEventListener('change',e=>{ const c=e.target.closest('[data-fnok]'); if(c&&c.checked){ c.disabled=true; finesNote(c.dataset.fnok,c.dataset.duty); } });
+  $('bList').addEventListener('click',e=>{ const l=e.target.closest('[data-fnlink]'); if(l){ e.preventDefault(); finesLink(l.dataset.fnlink); } const sd=e.target.closest('[data-fnsend]'); if(sd){ e.preventDefault(); finesSend(sd.dataset.fnsend,sd.dataset.duty,sd); } });
   $('bList').addEventListener('click',e=>{ const sw=e.target.closest('[data-swap]'), us=e.target.closest('[data-unsub]');
     const vw=e.target.closest('[data-view]'); if(vw){ viewCard(vw.dataset.view); return; }
     if(sw){ openSwap(sw.dataset.swap,sw.dataset.iq); return; } if(us){ e.preventDefault(); unSub(us.dataset.unsub,us.dataset.iq); return; } });
