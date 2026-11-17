@@ -1409,6 +1409,11 @@ applyUILang();
   .bdh{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
   .bdh .t{font-size:17px;font-weight:800;direction:ltr}
   .bdh .tm{font-size:13px;color:var(--nw-muted);font-weight:700}
+  .bexit{display:inline-flex;align-items:baseline;gap:6px;background:#fff4e5;color:#b45309;border:1.5px solid #f59e0b;border-radius:10px;padding:3px 10px;margin-bottom:4px}
+  .bexit b{font-size:20px;font-weight:900;color:#c2410c;letter-spacing:.5px}
+  .bexit small{font-size:11.5px;font-weight:800}
+  [data-theme="dark"] .bexit,.dark .bexit{background:rgba(245,158,11,.14);color:#fbbf24;border-color:#f59e0b}
+  [data-theme="dark"] .bexit b,.dark .bexit b{color:#fdba74}
   .btag{display:inline-block;font-size:11.5px;font-weight:800;border-radius:6px;padding:2px 7px;margin-inline-start:4px;white-space:nowrap}
   .btrips{margin:8px 0;font-size:13.5px;line-height:1.7}
   .btrips .tc{font-weight:800;direction:ltr;unicode-bidi:isolate}
@@ -1419,6 +1424,13 @@ applyUILang();
   .bsug b{direction:ltr;unicode-bidi:isolate}
   .bsug small{display:block;color:var(--nw-muted);font-size:12px;margin-top:2px}
   .btrips .btr{padding:3px 0}
+  .btm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px}
+  .bt0,.bt1{display:inline-flex;align-items:baseline;gap:5px;border-radius:9px;padding:2px 9px;font-size:12px;font-weight:800}
+  .bt0 b,.bt1 b{font-size:17px;font-weight:900;letter-spacing:.3px}
+  .bt0{background:#e8f5ee;color:#15803d;border:1.5px solid #22c55e}.bt0 b{color:#166534}
+  .bt1{background:#eaf1ff;color:#1d4ed8;border:1.5px solid #60a5fa}.bt1 b{color:#1e40af}
+  [data-theme="dark"] .bt0{background:rgba(34,197,94,.13);color:#86efac}[data-theme="dark"] .bt0 b{color:#bbf7d0}
+  [data-theme="dark"] .bt1{background:rgba(96,165,250,.13);color:#93c5fd}[data-theme="dark"] .bt1 b{color:#dbeafe}
   .btrips .btr+.btr{border-top:1px dotted var(--nw-line)}
   .btrips .s{font-size:12.5px;color:var(--nw-muted)}
   .bbar input[type=search],.bbar input[type=date],.bbar select{font:inherit;font-size:14px;padding:9px 11px;border-radius:10px;border:1px solid var(--nw-line,#d6d9de);background:var(--nw-card,#fff);color:var(--nw-ink)}
@@ -1484,6 +1496,9 @@ applyUILang();
   const pad=n=>String(n).padStart(2,'0');
   const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
   const addDays=(s,n)=>{ const d=new Date(s+'T12:00:00'); d.setDate(d.getDate()+n); return iso(d); };
+  /* الخروج من الكراج أبكر من وقت الجدول: [الكراج، دقائق] — كراج الشميسي 30 دقيقة قبل الوقت المكتوب في الجدول */
+  const EXIT_EARLY=[[/shuma?ys|shumais|الشميسي/i,30]];
+  const hhmm=m=>{ m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); };
   const mins=t=>{ const m=String(t||'').match(/^(\d{1,2}):(\d{2})/); return m?(+m[1])*60+(+m[2]):null; };
   const nk=s=>String(s||'').toUpperCase().replace(/\s+/g,'');
   const canUp=auth.role==='مدير'||auth.role==='مدير تنفيذي'||auth.role==='مشرف';
@@ -1562,7 +1577,9 @@ applyUILang();
     DUTIES=Object.keys(by).map(k=>{
       const L=by[k], d0=L.find(t=>!NODISP(t.disp))||L[0], st=mins(d0.t0)||0;
       const trips=L.slice().sort((a,b)=>((mins(a.t0)-st+1440)%1440)-((mins(b.t0)-st+1440)%1440));
-      return { duty:k, disp:d0, trips, garage:garOf(d0.disp)||garOf(d0.fr), bus:d0.bus, days:d0.days };
+      const early=EXIT_EARLY.find(x=>x[0].test(d0.disp||'')), dm=mins(d0.dt);
+      const disp=(early&&dm!=null)?Object.assign({},d0,{dt:hhmm(dm-early[1]),dtOrig:d0.dt}):d0;   // خروج أبكر من وقت الجدول
+      return { duty:k, disp, trips, garage:garOf(d0.disp)||garOf(d0.fr), bus:d0.bus, days:d0.days };
     }).sort((a,b)=>dispSort(a)-dispSort(b));
     const gs=[...new Set(DUTIES.map(d=>d.garage).filter(Boolean))], sel=$('bGar'), v=sel.value;
     sel.innerHTML='<option value="">كل الكراجات</option>'+gs.map(g=>`<option value="${g}"${g===v?' selected':''}>${g}</option>`).join('');
@@ -1728,7 +1745,7 @@ applyUILang();
     const B=BUS[busKey(it.bus)], dt=mins(it.disp.dt), t0=mins(it.disp.t0), prev=dt!=null&&dt>t0;
     let last=t0, nextDay=false;
     const trips=it.trips.map(t=>{ const m=mins(t.t0); if(m!=null&&last!=null&&m<last) nextDay=true; last=m;
-      return `<div class="btr"><span class="tc">${esc(t.trip)}</span> <bdi>${esc(t.fr)}</bdi> ← <bdi>${esc(t.to)}</bdi><div class="s">مغادرة <b>${esc(t.t0)}</b>${t.t1?' · وصول '+esc(t.t1):''}${nextDay?' <span class="nx">(اليوم التالي)</span>':''}</div></div>`; }).join('');
+      return `<div class="btr"><span class="tc">${esc(t.trip)}</span> <bdi>${esc(t.fr)}</bdi> ← <bdi>${esc(t.to)}</bdi><div class="s btm"><span class="bt0"><span>مغادرة</span> <b dir="ltr">${esc(t.t0)}</b></span>${t.t1?`<span class="bt1"><span>وصول</span> <b dir="ltr">${esc(t.t1)}</b></span>`:''}${nextDay?' <span class="nx">(اليوم التالي)</span>':''}</div></div>`; }).join('');
     const drv=it.off?`<div class="bdrv"><span class="s">${it.inRoster?'بدون سائق في الروستر':'مو موجود في روستر هذا اليوم'}${/daily/i.test(it.days)?'':' · '+esc(it.days)}</span></div>`
       : it.drivers.map((iq,i)=>{ const r=DRV[iq]||[], S=sentOf(it,iq), m=S.filter(x=>x.kind==='مسار'), c=S.filter(x=>x.kind==='بطاقة');
         const sb=subOf(it,iq), was=sb&&sentOf(it,sb.orig).some(x=>x.kind==='مسار');
@@ -1743,7 +1760,7 @@ applyUILang();
           <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="السائق متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
     const viewBtn=it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض البطاقة</button>`;
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
-      <div class="tm">🏁 الخروج ${esc(it.disp.dt||it.disp.t0)}${prev?' (الليلة اللي قبل)':''} · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}${viewBtn}</div>`;
+      <div class="tm"><span class="bexit"><span>🏁 الخروج</span> <b dir="ltr">${esc(it.disp.dt||it.disp.t0)}</b>${prev?'<small>(الليلة اللي قبل)</small>':''}</span> · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}${viewBtn}</div>`;
   }
 
   /* ---------- الرسالة ---------- */
@@ -1779,14 +1796,14 @@ applyUILang();
     const r=DRV[iq]||[], name=r[1]||iq, X=ML[lang]||ML.en, dt=mins(it.disp.dt), t0=mins(it.disp.t0), prev=dt!=null&&dt>t0;
     let m=X.hi+name+X.hi2+'\n'+X.duty+it.duty+'\n'+X.date+dateTxt(it.date,lang)+'\n'+X.bt+X.types[busKey(it.bus)]+'\n';
     if(busOf(it)) m+=X.bus+busFull(it)+'\n';
-    if(it.disp.dt) m+=X.rep+fmt12(it.disp.dt)+(prev?X.night:'')+'\n';
+    if(it.disp.dt) m+='\n⏰ *'+X.rep.trim()+' '+fmt12(it.disp.dt)+(prev?X.night:'')+'*\n';   // بخط عريض في واتساب
     if(it.trips.length>1) m+=X.n+it.trips.length+'\n';
     let last=t0, nd=false;
     it.trips.forEach((t,i)=>{
       const tm=mins(t.t0); if(tm!=null&&last!=null&&tm<last) nd=true; last=tm;
       m+='\n'+(it.trips.length>1?X.tripN(i+1):X.trip)+t.trip+'\n';
       m+=X.route+t.fr+X.ar+t.to+'\n';
-      m+=X.dep+fmt12(t.t0)+(nd?X.next:'')+(t.t1?X.arr+fmt12(t.t1):'')+'\n';
+      m+='🕐 *'+X.dep.trim()+' '+fmt12(t.t0)+(nd?X.next:'')+(t.t1?X.arr+fmt12(t.t1):'')+'*\n';   // بخط عريض في واتساب
       const S=(t.stops||[]).filter(s=>String(s[3]).toUpperCase()!=='INACTIVE');
       if(S.length){ m+=X.stops+'\n';
         S.forEach((s,k)=>{ const rest=String(s[3]).toUpperCase()==='REST', tt=[s[1]&&X.a+s[1], s[2]&&X.d+s[2]].filter(Boolean).join(' / '), lk=mapLink(t.trip.split('-').slice(0,2).join('-'),s[0]);
