@@ -1825,10 +1825,12 @@ applyUILang();
   function finesAlert(m,it,iq,kind,num){
     const box=document.createElement('div'); m.firstElementChild.insertBefore(box,m.firstElementChild.children[2]||null);
     finesPending([iq]).then(D=>{ const p=D[iq]; if(!p||!m.isConnected) return;
+      if(!p.count){ if(p.notSent) box.innerHTML=`<div style="border:1px solid #d97706;background:rgba(217,119,6,.08);border-radius:12px;padding:8px 12px;margin:0 0 10px" class="bnote">🟠 السائق عليه <b>${p.notSent}</b> مخالفة مرورية لم تُرسل له بعد — تُرسل من «نظام المخالفات».</div>`; return; }
       const dl=String(p.deadline||'').replace('T',' ').slice(0,16), must=kind==='card';
       box.innerHTML=`<div style="border:2px solid #dc2626;background:rgba(220,38,38,.08);border-radius:12px;padding:10px 12px;margin:0 0 10px">
         <b style="color:#dc2626">⚠️ السائق لديه ${p.count} مخالفة مرورية مُرسلة له ولم يقرّ أو يعترض بعد</b>
         <div class="bnote" style="margin:4px 0">المهلة حتى <b dir="ltr">${esc(dl)}</b> — تحدّث مع السائق قبل المغادرة: يفتح رسالة المخالفات على الواتساب ويؤكد <b>الإقرار</b> أو <b>الاعتراض</b>.</div>
+        ${p.notSent?`<div class="bnote" style="color:#b7791f">وعليه أيضاً ${p.notSent} مخالفة لم تُرسل له بعد.</div>`:''}
         <div class="bnote" style="max-height:90px;overflow:auto;margin:4px 0">${p.items.map(x=>`• ${esc(x.vno)} — ${esc(x.descAr)} — ${esc(x.dateG)}`).join('<br>')}</div>
         ${p.token?`<button class="bbtn" id="fnResend" style="margin:4px 0">📲 إعادة إرسال رابط المخالفات للسائق</button>`:''}
         <label class="bnote" style="display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-weight:700"><input type="checkbox" id="fnTalk"> تحدثت مع السائق ونبهته على المخالفات${must?' (مطلوب قبل إرسال البطاقة)':''}</label></div>`;
