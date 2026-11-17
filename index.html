@@ -1833,7 +1833,7 @@ applyUILang();
     return `<div style="border:1px solid #dc2626;background:rgba(220,38,38,.08);border-radius:10px;padding:6px 8px;margin-top:6px">
       <div style="color:#dc2626;font-weight:700;font-size:13px">${finesHead(p)}</div>
       <label style="display:flex;align-items:center;gap:6px;margin-top:4px;cursor:pointer;font-size:12.5px;font-weight:600">
-        <input type="checkbox" data-fnok="${esc(iq)}" data-duty="${esc(it.duty)}" ${p.noted?'checked disabled':''} style="width:18px;height:18px">
+        <input type="checkbox" data-fnok="${esc(iq)}" data-duty="${esc(it.duty)}" ${p.noted?'checked':''} style="width:18px;height:18px">
         ${p.noted?`✅ تم التنبيه والتحدث مع السائق — ${esc(p.noted.by)} · ${esc(p.noted.at)}`:'شفت التنبيه وتحدثت مع السائق عن المخالفات'}</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
       ${p.token?`<button class="bbtn sm" data-fnlink="${esc(iq)}">📲 رابط المخالفات</button>`:''}
@@ -1843,6 +1843,11 @@ applyUILang();
         body:JSON.stringify(window.NWAuth.attach({action:'pendingNote',iqama:iq,duty,vnos:p.vnos||p.items.map(x=>x.vno).join(',')}))}); const j=await r.json();
       if(j&&j.ok){ p.noted={by:j.by||auth.name||'',at:j.at||''}; } else alert('ما انحفظ التأكيد: '+((j&&(j.message||j.error))||''));
     }catch(e){ alert('ما انحفظ التأكيد — تأكد من الاتصال'); } draw(); }
+  async function finesUnnote(iq,duty){ const p=FINES[iq]; if(!p) return false;
+    if(!confirm('إلغاء علامة «تم التنبيه والتحدث مع السائق»؟\nبعد الإلغاء ما ينفتح إرسال البطاقة إلا بوضع العلامة من جديد.')){ draw(); return false; }
+    try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(window.NWAuth.attach({action:'pendingUnnote',iqama:iq,duty}))}); const j=await r.json();
+      if(j&&j.ok){ p.noted=null; draw(); return true; } alert('ما انلغى التأكيد: '+((j&&(j.message||j.error))||''));
+    }catch(e){ alert('ما انلغى التأكيد — تأكد من الاتصال'); } draw(); return false; }
   function finesLink(iq){ const p=FINES[iq]; if(!p||!p.token) return; const dl=String(p.deadline||'').replace('T',' ').slice(0,16);
     waGo(String(waNum(iq)).replace(/\D/g,''),'السيد/ '+(p.name||'')+'\nلديك '+p.count+' مخالفة مرورية بانتظار إقرارك أو اعتراضك حتى '+dl+':\n'+FINES_OBJ+encodeURIComponent(p.token)+'\n\nYou have '+p.count+' traffic violation(s) awaiting your acknowledgement or objection. Please open the link above.'); }
   function finesAlert(m,it,iq,kind,num){
@@ -1858,10 +1863,13 @@ applyUILang();
         ${p.notSent?`<a class="bbtn wa" href="${FINES_SYS+encodeURIComponent(iq)}" target="_blank" rel="noopener" style="text-decoration:none">🗂️ إرسال المخالفات من نظام المخالفات</a>`:''}</div>
         <label class="bnote" style="display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-weight:700"><input type="checkbox" id="fnTalk"> شفت التنبيه وتحدثت مع السائق عن المخالفات${must?' (مطلوب قبل إرسال البطاقة)':''}</label></div>`;
       m.dataset.fines=must?'1':'';
-      if(p.noted){ const t=box.querySelector('#fnTalk'); t.checked=true; t.disabled=true; t.parentElement.insertAdjacentHTML('beforeend',' <span class="bnote">('+esc(p.noted.by)+' · '+esc(p.noted.at)+')</span>'); }
+      if(p.noted){ const t=box.querySelector('#fnTalk'); t.checked=true; t.parentElement.insertAdjacentHTML('beforeend',' <span class="bnote" id="fnBy">('+esc(p.noted.by)+' · '+esc(p.noted.at)+')</span>'); }
       const rs=box.querySelector('#fnResend'); if(rs) rs.onclick=()=>{ const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
         waGo(d,'السيد/ '+(p.name||'')+'\nلديك '+p.count+' مخالفة مرورية بانتظار إقرارك أو اعتراضك حتى '+dl+':\n'+FINES_OBJ+encodeURIComponent(p.token)+'\n\nYou have '+p.count+' traffic violation(s) awaiting your acknowledgement or objection. Please open the link above.',isMobile?'wa':m.querySelector('#bmHow').value); };
-      box.querySelector('#fnTalk').onchange=e=>{ if(e.target.checked&&!e.target.disabled) finesNote(iq,it.duty); };
+      box.querySelector('#fnTalk').onchange=async e=>{ const t=e.target; t.disabled=true;
+        if(t.checked){ await finesNote(iq,it.duty); t.checked=!!(FINES[iq]&&FINES[iq].noted); }
+        else { const ok=await finesUnnote(iq,it.duty); if(ok){ const b=box.querySelector('#fnBy'); if(b) b.remove(); } else t.checked=true; }
+        t.disabled=false; };
     });
   }
   const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -2041,7 +2049,7 @@ applyUILang();
   $('bQ').addEventListener('search',()=>{ if(!$('bQ').value){ $('bSug').style.display='none'; draw(); } });
   $('bRefresh').onclick=()=>{ loadSched(true).then(loadDay); };
   $('bChips').onclick=e=>{ const b=e.target.closest('[data-f]'); if(b){ FILTER=b.dataset.f; draw(); } };
-  $('bList').addEventListener('change',e=>{ const c=e.target.closest('[data-fnok]'); if(c&&c.checked){ c.disabled=true; finesNote(c.dataset.fnok,c.dataset.duty); } });
+  $('bList').addEventListener('change',e=>{ const c=e.target.closest('[data-fnok]'); if(!c) return; c.disabled=true; if(c.checked) finesNote(c.dataset.fnok,c.dataset.duty); else finesUnnote(c.dataset.fnok,c.dataset.duty); });
   $('bList').addEventListener('click',e=>{ const l=e.target.closest('[data-fnlink]'); if(l){ e.preventDefault(); finesLink(l.dataset.fnlink); }  });
   $('bList').addEventListener('click',e=>{ const sw=e.target.closest('[data-swap]'), us=e.target.closest('[data-unsub]');
     const vw=e.target.closest('[data-view]'); if(vw){ viewCard(vw.dataset.view); return; }
