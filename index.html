@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script>
-/* نظام الدخول — ما يُطلب من السائق اللي يفتح رابط البطاقة من واتساب */
+/* نظام الدخول — ما يُطلب من الكابتن اللي يفتح رابط البطاقة من واتساب */
 if(!/[?&]card=/.test(location.search)){document.write('<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="trip"><\/script>');}
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نورث ويست باص - إرسال مسار الرحلة للسائق</title>
+<title>نورث ويست باص - إرسال مسار الرحلة للكابتن</title>
 <style>
   :root {
     --border: #e0e0e0; --border-strong: #bbb; --surface-1: #f7f7f7; --surface-2: #ffffff;
@@ -51,7 +51,7 @@ if(!/[?&]card=/.test(location.search)){document.write('<script src="https://hano
   html[data-theme="dark"] .wrap > div:first-child img { background:rgba(255,255,255,.88); }
   html[data-theme="dark"] #cv-preview { background:#fff; }
 
-  /* ألوان احتياطية: صفحة بطاقة السائق (?card=) تفتح بدون auth.js — بدونها النص يطلع غامق على خلفية غامقة */
+  /* ألوان احتياطية: صفحة بطاقة الكابتن (?card=) تفتح بدون auth.js — بدونها النص يطلع غامق على خلفية غامقة */
   :root{--nw-bg:#eef2f8;--nw-card:#ffffff;--nw-ink:#0f1e3d;--nw-muted:#64748b;--nw-line:#e2e8f0;--nw-soft:#f6f8fc;--nw-navy:#13274f}
   html[data-theme="dark"]{--nw-bg:#0b1220;--nw-card:#141c2e;--nw-ink:#e6ecf7;--nw-muted:#8b9ab5;--nw-line:#24304a;--nw-soft:#0f1626}
   /* ===== التصميم الموحد (ألوان auth.js --nw-*) ===== */
@@ -87,7 +87,7 @@ window.waLink=function(num,text,how){ how=how||waHowGet(); var d=String(num||'')
   return 'https://wa.me/'+d+(t?'?text='+t:''); };
 window.waGo=function(num,text,how){ how=how||waHowGet(); var u=waLink(num,text,how);
   if(how==='app') location.href=u; else if(how==='web') window.open(u,'nwWaWeb'); else window.open(u,'_blank'); };
-/* ---- سكن السائقين: بعد انتهاء الواجب يتوجّه السائق لسكن المدينة اللي انتهت فيها آخر رحلة ---- */
+/* ---- سكن الكباتن: بعد انتهاء الواجب يتوجّه الكابتن لسكن المدينة اللي انتهت فيها آخر رحلة ---- */
 window.NW_ACC={
   'الشميسي':{en:'Shumaisi',re:/shumays|shumais|yanbu|jeddah|makkah|mecca/i,url:'https://maps.app.goo.gl/mDbrjJUU9y6jS8Pq5'},
   'الرياض':{en:'Riyadh',re:/riyadh/i,url:'https://maps.app.goo.gl/xNbPk569nzrL3R7x8'},
@@ -119,7 +119,7 @@ window.waAnchor=function(a,num){ var how=waHowGet(); a.href=waLink(num,'',how); 
   <span id="roster-info" style="flex:1;min-width:200px"></span>
   <button id="roster-up-btn" type="button" style="display:none;font-weight:700;background:#1F3864;color:#fff;border-color:#1F3864;white-space:nowrap">📤 رفع الروستر</button>
 </div>
-<h2 id="page-title" style="text-align:center;font-size:18px;margin:0 0 20px">إرسال مسار الرحلة للسائق عبر واتساب</h2>
+<h2 id="page-title" style="text-align:center;font-size:18px;margin:0 0 20px">إرسال مسار الرحلة للكابتن عبر واتساب</h2>
 
 <div style="background:var(--surface-2);border-radius:12px;border:1px solid var(--border);padding:1.25rem;margin-bottom:16px">
   <label id="label-trip" style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px">١. اختر رقم الرحلة</label>
@@ -144,7 +144,7 @@ window.waAnchor=function(a,num){ var how=waHowGet(); a.href=waLink(num,'',how); 
   <div style="margin-bottom:12px">
     <label id="label-msg-lang" style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px">لغة الرسالة</label>
     <select id="msg-lang-select" style="width:100%;box-sizing:border-box;padding:8px">
-      <option id="opt-auto" value="auto" selected>تلقائي (حسب جنسية السائق)</option>
+      <option id="opt-auto" value="auto" selected>تلقائي (حسب جنسية الكابتن)</option>
       <option id="opt-ar" value="ar">عربي</option>
       <option id="opt-en" value="en">English</option>
     </select>
@@ -163,7 +163,7 @@ window.waAnchor=function(a,num){ var how=waHowGet(); a.href=waLink(num,'',how); 
 </div>
 
 <div style="background:var(--surface-2);border-radius:12px;border:1px solid var(--border);padding:1.25rem;margin-bottom:16px">
-  <label id="label-driver" style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px">٣. اختر السائق</label>
+  <label id="label-driver" style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px">٣. اختر الكابتن</label>
   <div style="position:relative;margin-bottom:8px">
     <input id="driver-input" type="text" placeholder="ابحث برقم الإقامة أو الاسم" autocomplete="off" style="width:100%;box-sizing:border-box"/>
     <div id="driver-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:20;background:#fff;border:1px solid var(--border-strong);border-top:none;border-radius:0 0 var(--radius) var(--radius);max-height:220px;overflow-y:auto;box-shadow:0 4px 10px rgba(0,0,0,0.08)"></div>
@@ -175,7 +175,7 @@ window.waAnchor=function(a,num){ var how=waHowGet(); a.href=waLink(num,'',how); 
     <p id="hint-mobile-edit" style="font-size:11px;color:var(--text-muted);margin:4px 0 0">أدخل الرقم بدون صفر أو رمز الدولة (مثال: 597429166) — التعديل هنا يخص هذه الرسالة فقط ولا يغيّر الملف الأصلي.</p>
   </div>
     <div id="duty-c2-wrap" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border-strong)">
-    <label id="label-c2" style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;font-weight:600">👥 السائق الثاني (Captain #2)</label>
+    <label id="label-c2" style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:6px;font-weight:600">👥 الكابتن الثاني (Captain #2)</label>
     <div style="position:relative">
       <input id="driver2-input" type="text" autocomplete="off" style="width:100%;box-sizing:border-box"/>
       <div id="driver2-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:20;background:#fff;border:1px solid var(--border-strong);border-top:none;border-radius:0 0 var(--radius) var(--radius);max-height:220px;overflow-y:auto;box-shadow:0 4px 10px rgba(0,0,0,0.08)"></div>
@@ -298,11 +298,11 @@ window.waAnchor=function(a,num){ var how=waHowGet(); a.href=waLink(num,'',how); 
 // ---------- UI language (form interface) ----------
 const UI_TEXT = {
   ar: {
-    title: 'إرسال مسار الرحلة للسائق عبر واتساب',
+    title: 'إرسال مسار الرحلة للكابتن عبر واتساب',
     label_trip: '١. اختر رقم الرحلة',
     trip_placeholder: 'مثال: NW15-O-1',
     label_route_preview: 'معاينة المسار',
-    label_driver: '٣. اختر السائق',
+    label_driver: '٣. اختر الكابتن',
     driver_placeholder: 'ابحث برقم الإقامة أو الاسم',
     label_mobile_edit: 'رقم الجوال (تقدر تعدّله لو كان خطأ)',
     mobile_edit_placeholder: 'مثال: 597429166',
@@ -310,7 +310,7 @@ const UI_TEXT = {
     label_section3: '٢. تاريخ الرحلة وأوقات الحضور والمغادرة',
     label_trip_date: 'تاريخ الرحلة (يُعبّأ تلقائياً باليوم التالي لوقت الإرسال)',
     label_msg_lang: 'لغة الرسالة',
-    opt_auto: 'تلقائي (حسب جنسية السائق)',
+    opt_auto: 'تلقائي (حسب جنسية الكابتن)',
     opt_ar: 'عربي',
     opt_en: 'English',
     label_arrival: 'وقت الحضور للمكتب (استلام الحافلة)',
@@ -588,7 +588,7 @@ document.addEventListener('click',(e)=>{
 
 // ---------- Trip Schedule Card (بطاقة جدول الرحلة) ----------
 // ملفات البطاقات في مجلد duty/ بنفس اسم الوردية، مثل duty/NW01-1-1.pdf
-// DUTY_INDEX: [عدد السائقين, شكل النموذج]
+// DUTY_INDEX: [عدد الكباتن, شكل النموذج]
 const DUTY_INDEX={"NW01-1-1":[2,"A"],"NW01-1-2":[2,"A"],"NW01-2-1":[2,"A"],"NW01-3-1":[2,"A"],"NW02-1-2":[1,"A"],"NW02-2-1":[1,"A"],"NW02-2-2":[1,"A"],"NW02-3-1":[1,"A"],"NW02-3-2":[1,"A"],"NW02-4-2":[1,"A"],"NW02-5-1":[1,"A"],"NW02-5-2":[1,"A"],"NW02-6-1":[1,"A"],"NW02-6-2":[1,"A"],"NW03-12-1":[2,"A"],"NW03-5-1":[2,"A"],"NW04-1-1":[2,"A"],"NW04-10-1":[2,"A"],"NW04-11-1":[2,"A"],"NW04-2-1":[2,"A"],"NW04-3-1":[2,"A"],"NW04-4-1":[2,"A"],"NW04-6-1":[2,"A"],"NW04-7-1":[2,"A"],"NW04-8-1":[2,"A"],"NW04-9-1":[2,"A"],"NW05-1-1":[2,"A"],"NW05-2-1":[2,"A"],"NW06-1-1":[1,"A"],"NW06-2-1":[1,"A"],"NW07-1-1":[2,"A"],"NW07-10-1":[2,"A"],"NW07-2-1":[2,"A"],"NW07-3-1":[2,"A"],"NW07-4-1":[2,"A"],"NW07-7-1":[2,"A"],"NW07-8-1":[2,"A"],"NW07-9-1":[2,"A"],"NW08-11-1":[2,"A"],"NW08-12-1":[2,"A"],"NW08-5-1":[2,"A"],"NW08-6-1":[2,"A"],"NW10-1-1":[2,"A"],"NW10-4-1":[2,"A"],"NW10-9-1":[2,"A"],"NW11-3-1":[2,"A"],"NW11-5-1":[2,"A"],"NW14-1-1":[2,"A"],"NW14-1-2":[2,"A"],"NW14-2-1":[2,"A"],"NW14-3-1":[2,"A"],"NW15-1-1":[2,"A"],"NW15-2-1":[2,"A"],"NW15-3-1":[2,"A"],"NW15-4-1":[2,"A"],"NW15B-1-1":[1,"C"],"NW15B-2-1":[1,"C"],"NW15B-3-1":[1,"C"],"NW15B-4-1":[1,"C"],"NW16-1-1":[2,"A"],"NW16-2-1":[2,"A"],"NW16-3-1":[2,"A"],"NW16-4-1":[2,"A"],"NW17-1-1":[2,"A"],"NW17-2-1":[2,"A"],"NW17-3-1":[2,"A"],"NW17-4-1":[2,"A"],"NW17B-1-1":[1,"A"],"NW17B-2-1":[1,"A"],"NW17B-3-1":[1,"A"],"NW17B-4-1":[1,"A"],"NW18-1-1":[2,"A"],"NW18-10-1":[2,"A"],"NW18-11-1":[2,"A"],"NW18-12-1":[2,"A"],"NW18-2-1":[2,"A"],"NW18-3-1":[2,"A"],"NW18-4-1":[2,"A"],"NW18-5-1":[2,"A"],"NW18-6-1":[2,"A"],"NW18-7-1":[2,"A"],"NW18-8-1":[2,"A"],"NW18-9-1":[2,"A"],"NW21-1-1":[2,"A"],"NW21-2-1":[2,"A"],"NW22-1-1":[1,"A"],"NW22-1-2":[1,"A"],"NW22-2-1":[1,"A"],"NW22-3-1":[1,"A"],"NW23-1-1":[2,"C"],"NW26-1-1":[1,"A"],"NW27-1-2":[2,"A"],"NW27-3-1":[2,"A"],"NW28-1-1":[1,"B"],"NW28-1-2":[1,"B"],"NW28-2-1":[1,"B"],"NW28-2-2":[1,"B"],"NW28-3-1":[1,"B"],"NW28-4-1":[1,"B"],"NW28-5-1":[1,"B"],"NW28-6-1":[1,"B"],"NW28-7-1":[1,"B"],"NW29-1-1":[2,"A"],"NW29-2-1":[2,"A"],"NW30-2-1":[2,"A"],"NW30-5-2":[2,"A"],"NW30-6-1":[2,"A"],"NW30-7-1":[2,"A"],"NW30-8-1":[2,"A"],"NW31-1-1":[2,"A"],"NW31-2-1":[2,"A"],"NW32-1-1":[2,"A"],"NW32-2-1":[2,"A"],"NW32-3-1":[2,"A"],"NW32-4-1":[2,"A"],"NW33-1-1":[2,"A"],"NW33-2-1":[2,"A"],"NW13+NW19-1-1":[2,"C"],"NW13+NW19-6-1":[2,"C"],"NW13+NW19-7-1":[2,"C"],"NW13+NW19-9-1":[2,"C"],"NW13+NW20-10-1":[2,"C"],"NW13+NW20-11-1":[2,"C"],"NW13+NW20-12-1":[2,"C"],"NW13+NW20-2-1":[2,"C"],"NW13+NW20-3-1":[2,"C"],"NW13+NW20-4-1":[2,"C"],"NW13+NW20-5-1":[2,"C"],"NW13+NW20-8-1":[2,"C"]};
 const DUTY_LAYOUT={
   A:{rows:[[309.2,339.5],[340.0,370.4]],name:[23.3,227.8],iq:[228.3,334.1],mob:[334.6,436.9],bus:[480,327.7,577.8],date:[476,358.5,577.8]},
@@ -596,10 +596,10 @@ const DUTY_LAYOUT={
   C:{rows:[[292,322],[322,350]],name:[23.5,216.5],iq:[217,280.8],mob:[348,444.5],bus:[482,311,577.8],date:[482,340.5,577.8]}   // نموذج البطاقات الجديد (NW15B و NW13+NW19/20 و NW23 — 11/2026) · الإقامة في الخانة الأولى لأن خانة Iqama مقسومة بخط
 };
 const DUTY_TXT={
-  ar:{label:'٥. بطاقة جدول الرحلة (Trip Schedule Card)',two:n=>'👥 الوردية '+n+' — بسائقين (Double driver)',one:n=>'👤 الوردية '+n+' — بسائق واحد',none:n=>'⚠️ لا توجد بطاقة جدول رحلة للوردية '+n,
-      pick1:'اختر السائق في الخطوة ٣',c2lbl:'👥 السائق الثاني — الرحلة بسائقين (Captain #2)',c2opt:'👥 السائق الثاني (اختياري — إذا فيه سائق ثاني) Captain #2',pick2:'اختر السائق الثاني في الخطوة ٣',extra2:' + سائق ثاني إضافي',c2ph:'ابحث عن السائق الثاني برقم الإقامة أو الاسم',mob2:'جوال السائق الثاني',bus:'رقم الحافلة / رقم اللوحة BUS # (اختياري — يُترك فارغاً إذا غير معروف)',busph:'اضغط للقائمة أو ابحث برقم الحافلة أو اللوحة',plate:'لوحة',
-      share:'🔗 رابط البطاقة للسائق',share1:'🔗 رابط البطاقة للسائق الأول',share2:'🔗 رابط البطاقة للسائق الثاني',file:'📎 ملف PDF',fmTitle:'إرسال بطاقة جدول الرحلة كصورة',fmMob:'رقم واتساب السائق (تأكد منه أو عدّله)',bad:'الرقم غير صحيح — سعودي 9 أرقام يبدأ بـ 5، أو دولي يبدأ بـ + ومفتاح الدولة',copyImg:'📋 نسخ الصورة',openChat:'💬 فتح محادثة السائق',pasteHint:'في واتساب: اضغط مطوّلاً على خانة الكتابة ← لصق ← إرسال',imgReady:'الصورة جاهزة — اضغط «نسخ الصورة» ثم افتح محادثة السائق',copiedImg:'✓ تم نسخ الصورة — افتح المحادثة والصقها',noClip:'جهازك ما يسمح بنسخ الصور — استخدم «مشاركة الصورة» واختر السائق',shareImg:'مشاركة الصورة…',fmBusy:'جاري تجهيز الملف...',fmReady:'الملف جاهز — اضغط "مشاركة الملف" ثم اختر واتساب وهذا السائق',fmShare:'مشاركة الملف',fmCancel:'إغلاق',copy:'نسخ الرقم',copied:'تم النسخ ✓',fmDl:'جهازك ما يدعم المشاركة — تم تحميل الملف، أرسله من واتساب كمرفق',r1:'السائق الأول — Captain #1',r2:'السائق الثاني — Captain #2',dl:'📄 تحميل PDF',dljpg:'🖼️ تحميل صورة',imgBusy:'جاري تحويل البطاقة لصورة...',imgFail:'تعذّر تحويل البطاقة لصورة — استخدم PDF',nolink:'رابط البطاقة يشتغل بس لما تفتح البرنامج من رابط GitHub',busy:'جاري تجهيز البطاقة...',ready:'البطاقة جاهزة — اضغط مشاركة مرة ثانية',done:'تم تجهيز البطاقة ✓',
-      nofile:'تعذّر فتح ملف البطاقة — تأكد إن مجلد duty مرفوع على GitHub وإنك فاتح البرنامج من رابط GitHub',nolib:'تعذّر تحميل أداة PDF — تأكد من الإنترنت',no2:'تنبيه: ما اخترت السائق الثاني — خانته بتطلع فاضية'},
+  ar:{label:'٥. بطاقة جدول الرحلة (Trip Schedule Card)',two:n=>'👥 الوردية '+n+' — بكابتنين (Double driver)',one:n=>'👤 الوردية '+n+' — بكابتن واحد',none:n=>'⚠️ لا توجد بطاقة جدول رحلة للوردية '+n,
+      pick1:'اختر الكابتن في الخطوة ٣',c2lbl:'👥 الكابتن الثاني — الرحلة بكابتنين (Captain #2)',c2opt:'👥 الكابتن الثاني (اختياري — إذا فيه كابتن ثاني) Captain #2',pick2:'اختر الكابتن الثاني في الخطوة ٣',extra2:' + كابتن ثاني إضافي',c2ph:'ابحث عن الكابتن الثاني برقم الإقامة أو الاسم',mob2:'جوال الكابتن الثاني',bus:'رقم الحافلة / رقم اللوحة BUS # (اختياري — يُترك فارغاً إذا غير معروف)',busph:'اضغط للقائمة أو ابحث برقم الحافلة أو اللوحة',plate:'لوحة',
+      share:'🔗 رابط البطاقة للكابتن',share1:'🔗 رابط البطاقة للكابتن الأول',share2:'🔗 رابط البطاقة للكابتن الثاني',file:'📎 ملف PDF',fmTitle:'إرسال بطاقة جدول الرحلة كصورة',fmMob:'رقم واتساب الكابتن (تأكد منه أو عدّله)',bad:'الرقم غير صحيح — سعودي 9 أرقام يبدأ بـ 5، أو دولي يبدأ بـ + ومفتاح الدولة',copyImg:'📋 نسخ الصورة',openChat:'💬 فتح محادثة الكابتن',pasteHint:'في واتساب: اضغط مطوّلاً على خانة الكتابة ← لصق ← إرسال',imgReady:'الصورة جاهزة — اضغط «نسخ الصورة» ثم افتح محادثة الكابتن',copiedImg:'✓ تم نسخ الصورة — افتح المحادثة والصقها',noClip:'جهازك ما يسمح بنسخ الصور — استخدم «مشاركة الصورة» واختر الكابتن',shareImg:'مشاركة الصورة…',fmBusy:'جاري تجهيز الملف...',fmReady:'الملف جاهز — اضغط "مشاركة الملف" ثم اختر واتساب وهذا الكابتن',fmShare:'مشاركة الملف',fmCancel:'إغلاق',copy:'نسخ الرقم',copied:'تم النسخ ✓',fmDl:'جهازك ما يدعم المشاركة — تم تحميل الملف، أرسله من واتساب كمرفق',r1:'الكابتن الأول — Captain #1',r2:'الكابتن الثاني — Captain #2',dl:'📄 تحميل PDF',dljpg:'🖼️ تحميل صورة',imgBusy:'جاري تحويل البطاقة لصورة...',imgFail:'تعذّر تحويل البطاقة لصورة — استخدم PDF',nolink:'رابط البطاقة يشتغل بس لما تفتح البرنامج من رابط GitHub',busy:'جاري تجهيز البطاقة...',ready:'البطاقة جاهزة — اضغط مشاركة مرة ثانية',done:'تم تجهيز البطاقة ✓',
+      nofile:'تعذّر فتح ملف البطاقة — تأكد إن مجلد duty مرفوع على GitHub وإنك فاتح البرنامج من رابط GitHub',nolib:'تعذّر تحميل أداة PDF — تأكد من الإنترنت',no2:'تنبيه: ما اخترت الكابتن الثاني — خانته بتطلع فاضية'},
   en:{label:'5. Trip Schedule Card',two:n=>'👥 Shift '+n+' — Double driver',one:n=>'👤 Shift '+n+' — Single driver',none:n=>'⚠️ No trip schedule card for shift '+n,
       pick1:'Select the driver in step 3',c2lbl:'👥 Second driver — double-driver trip (Captain #2)',c2opt:'👥 Second driver (optional — if there is one) Captain #2',pick2:'Select the second driver in step 3',extra2:' + extra second driver',c2ph:'Search second driver by Iqama or name',mob2:'Second driver mobile',bus:'Bus # / Plate # (optional — leave blank if unknown)',busph:'Tap for the list or search by bus or plate number',plate:'Plate',
       share:'🔗 Card link to driver',share1:'🔗 Card link to first driver',share2:'🔗 Card link to second driver',file:'📎 PDF file',fmTitle:'Send Trip Schedule Card as image',fmMob:'Driver WhatsApp number (check or edit)',bad:'Invalid number — Saudi 9 digits starting with 5, or international starting with + and country code',copyImg:'📋 Copy image',openChat:'💬 Open driver chat',pasteHint:'In WhatsApp: long-press the message box → Paste → Send',imgReady:'Image ready — tap “Copy image”, then open the driver chat',copiedImg:'✓ Image copied — open the chat and paste it',noClip:'Your device can’t copy images — use “Share image” and pick the driver',shareImg:'Share image…',fmBusy:'Preparing the file...',fmReady:'File ready — tap "Share file", choose WhatsApp, then this driver',fmShare:'Share file',fmCancel:'Close',copy:'Copy number',copied:'Copied ✓',fmDl:'Sharing not supported — the file was downloaded, attach it in WhatsApp',r1:'First driver — Captain #1',r2:'Second driver — Captain #2',dl:'📄 Download PDF',dljpg:'🖼️ Download image',imgBusy:'Converting the card to an image...',imgFail:'Could not convert to an image — use PDF',nolink:'The card link only works when the tool is opened from its GitHub link',busy:'Preparing the card...',ready:'Card ready — tap Share again',done:'Card ready ✓',
@@ -616,7 +616,7 @@ function renderDuty(){
   const T=DUTY_TXT[UI_LANG];
   if(typeof renderSendButtons==='function') renderSendButtons();
   if(!selectedTrip){ dutySection.style.display='none'; dutyC2Wrap.style.display='none'; return; }
-  // خانة السائق الثاني تظهر دائماً تحت السائق الأول: إلزامية في رحلات السائقين، واختيارية في غيرها
+  // خانة الكابتن الثاني تظهر دائماً تحت الكابتن الأول: إلزامية في رحلات الكباتن، واختيارية في غيرها
   const dbl=isDoubleTrip();
   document.getElementById('label-c2').textContent=dbl?T.c2lbl:T.c2opt;
   dutyC2Wrap.style.display='block';
@@ -761,7 +761,7 @@ async function dutyAsJpg(d){
   return d.jpg;
 }
 function downloadBlob(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); }
-// ---- إرسال البطاقة كصورة: نسخ الصورة + فتح محادثة السائق على رقمه ----
+// ---- إرسال البطاقة كصورة: نسخ الصورة + فتح محادثة الكابتن على رقمه ----
 const fileModal=document.getElementById('file-modal'), fmShare=document.getElementById('fm-share'), fmStatus=document.getElementById('fm-status');
 const fmCopy=document.getElementById('fm-copy'), fmOpen=document.getElementById('fm-open'), fmMobile=document.getElementById('fm-mobile'), fmWarn=document.getElementById('fm-warn'), fmHint=document.getElementById('fm-hint');
 let fmFile=null, fmToken=0, fmWhich=1;
@@ -933,9 +933,9 @@ function updateSendState(){
 // ---------- WhatsApp send with number confirmation ----------
 const send2Btn=document.getElementById('send2-btn');
 const WA_TXT={
-  ar:{one:'إرسال للسائق',first:'إرسال للسائق الأول',second:'إرسال للسائق الثاني',scT1:'إرسال للسائق الأول',scT2:'إرسال للسائق الثاني',scT:'إرسال للسائق',scMsg:'رسالة نصية',scMsgS:'رسالة المسار والأوقات ونقاط التوقف',scLink:'بطاقة جدول الرحلة — رابط',scLinkS:'رسالة فيها رابط على الرقم المسجّل، والسائق يفتح صورة البطاقة من الرابط',scCard:'بطاقة جدول الرحلة — صورة',scCardS:'تُنسخ الصورة وتنفتح محادثة السائق على رقمه — تلصقها وترسل',scNoCard:'لا توجد بطاقة لهذه الوردية',scCancel:'إلغاء',title:'تأكيد رقم الجوال قبل الإرسال',titleCard:'تأكيد الرقم — إرسال بطاقة جدول الرحلة',cardSent:'تم فتح واتساب برابط البطاقة — اضغط إرسال داخل المحادثة.',
-      r1:'السائق الأول — Captain #1',r2:'السائق الثاني — Captain #2',mob:'رقم الواتساب (تأكد منه أو عدّله)',ok:'تأكيد وإرسال',cancel:'إلغاء',
-      bad:'الرقم غير صحيح — سعودي 9 أرقام يبدأ بـ 5 (5XXXXXXXX) أو دولي يبدأ بـ + (مثال: +92 3XX XXXXXXX)',sent1:'تم فتح واتساب للسائق الأول — اضغط إرسال داخل المحادثة.',sent2:'تم فتح واتساب للسائق الثاني — اضغط إرسال داخل المحادثة.'},
+  ar:{one:'إرسال للكابتن',first:'إرسال للكابتن الأول',second:'إرسال للكابتن الثاني',scT1:'إرسال للكابتن الأول',scT2:'إرسال للكابتن الثاني',scT:'إرسال للكابتن',scMsg:'رسالة نصية',scMsgS:'رسالة المسار والأوقات ونقاط التوقف',scLink:'بطاقة جدول الرحلة — رابط',scLinkS:'رسالة فيها رابط على الرقم المسجّل، والكابتن يفتح صورة البطاقة من الرابط',scCard:'بطاقة جدول الرحلة — صورة',scCardS:'تُنسخ الصورة وتنفتح محادثة الكابتن على رقمه — تلصقها وترسل',scNoCard:'لا توجد بطاقة لهذه الوردية',scCancel:'إلغاء',title:'تأكيد رقم الجوال قبل الإرسال',titleCard:'تأكيد الرقم — إرسال بطاقة جدول الرحلة',cardSent:'تم فتح واتساب برابط البطاقة — اضغط إرسال داخل المحادثة.',
+      r1:'الكابتن الأول — Captain #1',r2:'الكابتن الثاني — Captain #2',mob:'رقم الواتساب (تأكد منه أو عدّله)',ok:'تأكيد وإرسال',cancel:'إلغاء',
+      bad:'الرقم غير صحيح — سعودي 9 أرقام يبدأ بـ 5 (5XXXXXXXX) أو دولي يبدأ بـ + (مثال: +92 3XX XXXXXXX)',sent1:'تم فتح واتساب للكابتن الأول — اضغط إرسال داخل المحادثة.',sent2:'تم فتح واتساب للكابتن الثاني — اضغط إرسال داخل المحادثة.'},
   en:{one:'Send to driver',first:'Send to first driver',second:'Send to second driver',scT1:'Send to first driver',scT2:'Send to second driver',scT:'Send to driver',scMsg:'Text message',scMsgS:'Route, times and stops',scLink:'Trip Schedule Card — link',scLinkS:'Sent straight to the registered number; the driver opens the card from the link',scCard:'Trip Schedule Card — image',scCardS:'The image is copied and the driver’s chat opens on his number — paste and send',scNoCard:'No trip schedule card for this shift',scCancel:'Cancel',title:'Confirm mobile number before sending',titleCard:'Confirm number — send Trip Schedule Card',cardSent:'WhatsApp opened with the card link — press send in the chat.',
       r1:'First driver — Captain #1',r2:'Second driver — Captain #2',mob:'WhatsApp number (check or edit)',ok:'Confirm & send',cancel:'Cancel',
       bad:'Invalid number — Saudi 9 digits starting with 5 (5XXXXXXXX) or international starting with + (e.g. +92 3XX XXXXXXX)',sent1:'WhatsApp opened for the first driver — press send in the chat.',sent2:'WhatsApp opened for the second driver — press send in the chat.'}
@@ -1091,13 +1091,13 @@ send2Btn.addEventListener('click',()=>openChooser(2));
 applyUILang();
 </script>
 
-<!-- ================= تأكيد المرحّل إن السائق صحيح (قبل أي إرسال) ================= -->
+<!-- ================= تأكيد المرحّل إن الكابتن صحيح (قبل أي إرسال) ================= -->
 <script>
 (function(){
   const CT={
-    ar:{one:'☐ أؤكد إن السائق صحيح',two:'☐ أؤكد إن السائقين صحيحين',ok1:'✅ تم التأكد من السائق',ok2:'✅ تم التأكد من السائقين',
+    ar:{one:'☐ أؤكد إن الكابتن صحيح',two:'☐ أؤكد إن الكابتنين صحيحين',ok1:'✅ تم التأكد من الكابتن',ok2:'✅ تم التأكد من الكابتنين',
         hint:'راجع الاسم ورقم الجوال قبل الإرسال — الإرسال ما يشتغل قبل التأكيد',hintOk:'اضغط مرة ثانية لإلغاء التأكيد',
-        need:'⚠️ أكّد إن السائق صحيح أولاً (الخطوة ٣)'},
+        need:'⚠️ أكّد إن الكابتن صحيح أولاً (الخطوة ٣)'},
     en:{one:'☐ I confirm the driver is correct',two:'☐ I confirm both drivers are correct',ok1:'✅ Driver confirmed',ok2:'✅ Drivers confirmed',
         hint:'Check the name and mobile before sending — sending is locked until you confirm',hintOk:'Tap again to undo',
         need:'⚠️ Confirm the driver first (step 3)'}
@@ -1105,7 +1105,7 @@ applyUILang();
   const T=()=>CT[UI_LANG]||CT.ar;
   const wrap=document.getElementById('drv-confirm-wrap'), btn=document.getElementById('drv-confirm-btn'), hint=document.getElementById('drv-confirm-hint');
   let confirmedKey=null;
-  // أي تغيير في الرحلة أو السائق أو الجوال يلغي التأكيد
+  // أي تغيير في الرحلة أو الكابتن أو الجوال يلغي التأكيد
   const keyNow=()=>selectedTrip&&selectedDriver?[selectedTrip.code,selectedDriver.iqama,selectedDriver.mobile,driver2?driver2.iqama:'',driver2?driver2.mobile:''].join('|'):null;
   const isOk=()=>{ const k=keyNow(); return !!k&&k===confirmedKey; };
   window.driverConfirmed=isOk;
@@ -1133,14 +1133,14 @@ applyUILang();
 })();
 </script>
 
-<!-- ================= الروستر: رفع (للمشرف) + تعبئة السائقين تلقائياً ================= -->
+<!-- ================= الروستر: رفع (للمشرف) + تعبئة الكباتن تلقائياً ================= -->
 <div id="roster-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(8,15,30,.55);align-items:flex-start;justify-content:center;padding:5vh 12px;overflow:auto">
   <div style="background:var(--surface-1,#fff);color:inherit;border-radius:16px;width:100%;max-width:640px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.35)">
     <h3 id="rm-title" style="margin:0 0 4px"></h3>
     <p id="rm-hint" style="margin:0 0 14px;font-size:12px;color:var(--text-muted)"></p>
     <label id="rm-l-date" style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px"></label>
     <input id="rm-date" type="date" style="width:100%;box-sizing:border-box;margin-bottom:12px"/>
-    <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px" id="rm-l-paste">📋 الصق هويات السائقين هنا</label>
+    <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px" id="rm-l-paste">📋 الصق هويات الكباتن هنا</label>
     <textarea id="rm-paste" rows="9" dir="ltr" placeholder="2559064015	2565876923
 2558350316
 2554827267" style="width:100%;box-sizing:border-box;margin-bottom:6px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:inherit;resize:vertical;white-space:pre;tab-size:14"></textarea>
@@ -1162,14 +1162,14 @@ applyUILang();
 <script>
 (function(){
   const RT={
-    ar:{none:d=>'📋 لا يوجد روستر مرفوع لتاريخ '+d+' — اختر السائقين يدوياً',has:(d,n,by,at)=>'📋 روستر '+d+': '+n+' رحلة'+(by?' — رفعه '+by+' ('+at+')':''),loading:'📋 جاري تحميل الروستر...',
-      err:'📋 تعذّر تحميل الروستر — اختر السائقين يدوياً',up:'📤 رفع الروستر',title:'📤 رفع روستر السائقين',
+    ar:{none:d=>'📋 لا يوجد روستر مرفوع لتاريخ '+d+' — اختر الكباتن يدوياً',has:(d,n,by,at)=>'📋 روستر '+d+': '+n+' رحلة'+(by?' — رفعه '+by+' ('+at+')':''),loading:'📋 جاري تحميل الروستر...',
+      err:'📋 تعذّر تحميل الروستر — اختر الكباتن يدوياً',up:'📤 رفع الروستر',title:'📤 رفع روستر الكباتن',
       hint:'الواجبات والرحلات ثابتة في البرنامج بنفس ترتيب ملف الروستر — انسخ عمودي الهويات بس والصقها تحت، وكل صف ينربط برحلته بالترتيب. (لو لصقت معها عمود الرحلة يقرأها بعد) — الحفظ يستبدل روستر التاريخ المختار للكل.',
       lDate:'تاريخ الروستر (تاريخ الرحلات)',lFile:'ملف الروستر (Excel أو CSV)',cancel:'إلغاء',save:'حفظ للكل',saving:'جاري الحفظ...',
-      reading:'جاري قراءة الملف...',badFile:'تعذّر قراءة الملف — تأكد إنه Excel أو CSV بنفس شكل الروستر',noCols:'ما لقيت عمود الرحلة (trip) أو السائق الأول (D1) في الملف',
-      sum:(n,d2)=>'✅ '+n+' رحلة — منها '+d2+' بسائقين',unkTrip:n=>'⚠️ '+n+' رحلة غير موجودة في البرنامج (بتنحفظ لكن ما تنختار):',unkDrv:n=>'⚠️ '+n+' إقامة غير موجودة في قائمة السائقين:',
+      reading:'جاري قراءة الملف...',badFile:'تعذّر قراءة الملف — تأكد إنه Excel أو CSV بنفس شكل الروستر',noCols:'ما لقيت عمود الرحلة (trip) أو الكابتن الأول (D1) في الملف',
+      sum:(n,d2)=>'✅ '+n+' رحلة — منها '+d2+' بكابتنين',unkTrip:n=>'⚠️ '+n+' رحلة غير موجودة في البرنامج (بتنحفظ لكن ما تنختار):',unkDrv:n=>'⚠️ '+n+' إقامة غير موجودة في قائمة الكباتن:',
       saved:(n,d)=>'✅ تم حفظ روستر '+d+' ('+n+' رحلة) — يظهر الحين لكل المرحّلين',saveErr:'❌ تعذّر الحفظ: ',forbidden:'رفع الروستر للمشرف والمدير فقط',
-      filled:'📋 تعبّى السائقين من الروستر',notIn:d=>'📋 الرحلة غير موجودة في روستر '+d},
+      filled:'📋 تعبّى الكباتن من الروستر',notIn:d=>'📋 الرحلة غير موجودة في روستر '+d},
     en:{none:d=>'📋 No roster uploaded for '+d+' — pick drivers manually',has:(d,n,by,at)=>'📋 Roster '+d+': '+n+' trips'+(by?' — uploaded by '+by+' ('+at+')':''),loading:'📋 Loading roster...',
       err:'📋 Could not load the roster — pick drivers manually',up:'📤 Upload roster',title:'📤 Upload driver roster',
       hint:'Duties and trips are fixed in the program in the roster file order — copy only the two Iqama columns and paste below; each row is matched to its trip by order. (Pasting with the Trip column also works.) Saving replaces that date\'s roster for everyone.',
@@ -1183,7 +1183,7 @@ applyUILang();
   const $=id=>document.getElementById(id);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const auth=window.NWAuth;
-  if(!auth||!auth.call) return;                      // رابط البطاقة للسائق: بدون روستر
+  if(!auth||!auth.call) return;                      // رابط البطاقة للكابتن: بدون روستر
   const canUp=auth.role==='مدير'||auth.role==='مشرف';
   const cache={};                                     // date -> {map, n, by, at}
   let filled={d1:null,d2:null,date:null};
@@ -1223,13 +1223,13 @@ applyUILang();
     driver2Input.value=r[1]+' ('+r[0]+')'; driver2Mobile.value=r[3]; driver2Mobile.style.display='block';
     dutyCache=null; return true;
   }
-  /** بعد اختيار الرحلة أو تغيير التاريخ: يعبّي السائقين من الروستر (إلا لو المرحّل غيّرهم يدوياً) */
+  /** بعد اختيار الرحلة أو تغيير التاريخ: يعبّي الكباتن من الروستر (إلا لو المرحّل غيّرهم يدوياً) */
   window.rosterAfterTrip=async function(){
     const r=await showBar();
     if(!selectedTrip) return;
     const date=tripDateInput.value, e=r && findInRoster(r.map, selectedTrip.code);
     if(!e){
-      // السائقين اللي تعبّوا من روستر يوم ثاني ينشالون (اللي اختارهم المرحّل يدوياً يبقون)
+      // الكباتن اللي تعبّوا من روستر يوم ثاني ينشالون (اللي اختارهم المرحّل يدوياً يبقون)
       if(filled.date && filled.date!==date){
         if(selectedDriver && selectedDriver.iqama===filled.d1){ selectedDriver=null; driverInput.value=''; driverStatus.textContent=''; mobileEditWrap.style.display='none'; }
         if(driver2 && driver2.iqama===filled.d2){ driver2=null; driver2Input.value=''; driver2Mobile.value=''; driver2Mobile.style.display='none'; }
@@ -1262,7 +1262,7 @@ applyUILang();
     $('rm-cancel').textContent=t.cancel; $('rm-save').textContent=t.save; $('rm-save').disabled=true;
     $('rm-date').value=tripDateInput.value||getTomorrowISO(); $('rm-file').value=''; $('rm-paste').value=''; $('rm-preview').innerHTML=''; $('rm-table').style.display='none';
     const en=(typeof UI_LANG!=='undefined'&&UI_LANG==='en');
-    $('rm-l-paste').textContent=en?'📋 Paste the driver Iqamas here (columns C and D from row 2 to row '+(ROSTER_TPL.length+1)+')':'📋 الصق هويات السائقين هنا — عمودي السائق الأول والثاني (C و D) من الصف 2 إلى الصف '+(ROSTER_TPL.length+1);
+    $('rm-l-paste').textContent=en?'📋 Paste the driver Iqamas here (columns C and D from row 2 to row '+(ROSTER_TPL.length+1)+')':'📋 الصق هويات الكباتن هنا — عمودي الكابتن الأول والثاني (C و D) من الصف 2 إلى الصف '+(ROSTER_TPL.length+1);
     $('rm-or').textContent=en?'or upload a file instead:':'أو ارفع ملف بدل اللصق:'; $('rm-clear').textContent=en?'Clear':'مسح';
     setTimeout(()=>$('rm-paste').focus(),50);
     $('roster-modal').style.display='flex';
@@ -1292,18 +1292,18 @@ applyUILang();
   /* ---- قالب الروستر الثابت: نفس ترتيب صفوف ملف الروستر (Driver Duty + Trip) — يتعدل لما يتحدث الجدول ---- */
   const ROSTER_TPL=[["NW15-1-1","NW15-O-1"],["NW22-1-2","NW22-I-1"],["NW28-1-2","NW28-I-1"],["NW15B-4-1","NW15B-I-1"],["NW04-7-1","NW04-I-1"],["NW18-1-1","NW18-O-1"],["NW28-6-1","NW28-O-1"],["NW15-3-1","NW15-I-1"],["NW22-1-1","NW22-O-1"],["NW28-5-1","NW28-I-2"],["NW04-1-1","NW04-O-1"],["NW18-7-1","NW18B-I-1"],["NW28-7-1","NW28-O-2"],["NW13+NW19-9-1","NW13-I-1"],["NW28-2-2","NW28-I-3"],["NW28-1-2","NW28-O-3"],["NW28-6-1","NW28-I-4"],["NW28-1-1","NW28-O-4"],["NW13+NW19-1-1","NW13-O-1"],["NW28-7-1","NW28-I-5"],["NW04-8-1","NW04-I-2"],["NW13+NW20-10-1","NW13-I-2"],["NW28-2-2","NW28-O-5"],["NW28-1-2","NW28-I-6"],["NW04-2-1","NW04-O-2"],["NW01-1-1","NW01-O-1"],["NW13+NW19-7-1","NW19-I-1"],["NW13+NW19-1-1","NW19-O-1"],["NW28-1-1","NW28-I-7"],["NW30-6-1","NW30-I-1"],["NW11-5-1","NW11-I-1"],["NW18-2-1","NW18B-O-1"],["NW28-2-1","NW28-O-7"],["NW22-2-1","NW22-O-2"],["NW07-7-1","NW07-I-1"],["NW17-3-1","NW17-I-1"],["NW17-1-1","NW17-O-1"],["NW22-1-1","NW22-I-2"],["NW28-2-2","NW28-I-8"],["NW13+NW20-2-1","NW13-O-2"],["NW07-1-1","NW07-O-1"],["NW14-3-1","NW14-I-1"],["NW14-1-1","NW14-O-1"],["NW21-1-1","NW21-O-1"],["NW23-1-1","NW23-O-1"],["NW32-1-1","NW32-O-1"],["NW13+NW20-11-1","NW13-I-3"],["NW18-8-1","NW18-I-1"],["NW29-1-1","NW29-O-1"],["NW32-3-1","NW32-I-1"],["NW04-9-1","NW04-I-3"],["NW16-1-1","NW16B-O-1"],["NW21-2-1","NW21-I-1"],["NW28-1-1","NW28-O-9"],["NW29-2-1","NW29-I-1"],["NW30-2-1","NW30-O-1"],["NW05-1-1","NW05-O-1"],["NW28-2-1","NW28-I-10"],["NW02-5-1","NW02-I-3"],["NW02-2-1","NW02-O-3"],["NW04-3-1","NW04-O-3"],["NW13+NW20-8-1","NW20-I-1"],["NW13+NW20-2-1","NW20-O-1"],["NW01-3-1","NW01-I-1"],["NW05-2-1","NW05-I-1"],["NW07-8-1","NW07-I-2"],["NW16-3-1","NW16B-I-1"],["NW13+NW20-12-1","NW13-I-4"],["NW18-3-1","NW18-O-2"],["NW28-3-1","NW28-O-11"],["NW18-9-1","NW18B-I-2"],["NW28-1-1","NW28-I-12"],["NW30-7-1","NW30-I-2"],["NW13+NW20-3-1","NW13-O-3"],["NW07-2-1","NW07-O-2"],["NW10-1-1","NW10-O-1"],["NW22-2-1","NW22-I-3"],["NW04-10-1","NW04-I-4"],["NW13+NW19-9-1","NW19-I-2"],["NW22-3-1","NW22-O-3"],["NW28-2-1","NW28-O-13"],["NW02-6-1","NW02-I-5"],["NW02-3-1","NW02-O-5"],["NW28-3-1","NW28-I-14"],["NW04-4-1","NW04-O-4"],["NW07-9-1","NW07-I-3"],["NW15-2-1","NW15-O-2"],["NW13+NW20-3-1","NW20-O-2"],["NW28-4-1","NW28-O-14"],["NW11-3-1","NW11-O-1"],["NW18-4-1","NW18-O-3"],["NW28-2-1","NW28-I-16"],["NW26-1-1","NW26-O-1"],["NW13+NW20-4-1","NW13-O-4"],["NW23-1-1","NW23-I-1"],["NW02-1-2","NW02-I-7"],["NW02-4-2","NW02-O-7"],["NW07-3-1","NW07-O-3"],["NW17-2-1","NW17-O-2"],["NW13+NW20-10-1","NW20-I-2"],["NW28-3-1","NW28-O-16"],["NW32-4-1","NW32-I-2"],["NW17-4-1","NW17-I-2"],["NW28-4-1","NW28-I-17"],["NW31-1-1","NW31-O-1"],["NW04-11-1","NW04-I-5"],["NW06-2-1","NW06-I-1"],["NW06-1-1","NW06-O-1"],["NW07-10-1","NW07-I-4"],["NW33-2-1","NW33-I-1"],["NW03-5-1","NW03-O-1"],["NW01-2-1","NW01-O-2"],["NW18-10-1","NW18-I-2"],["NW22-3-1","NW22-I-4"],["NW30-8-1","NW30-I-3"],["NW32-2-1","NW32-O-2"],["NW10-4-1","NW10-O-2"],["NW14-2-1","NW14-O-2"],["NW15-4-1","NW15-I-2"],["NW13+NW20-4-1","NW20-O-3"],["NW28-5-1","NW28-O-18"],["NW07-4-1","NW07-O-4"],["NW22-1-2","NW22-O-4"],["NW28-3-1","NW28-I-19"],["NW18-5-1","NW18-O-4"],["NW27-3-1","NW27-O-1"],["NW28-4-1","NW28-O-19"],["NW31-2-1","NW31-I-1"],["NW15B-4-1","NW15B-O-4"],["NW13+NW20-5-1","NW13-O-5"],["NW16-2-1","NW16-O-1"],["NW13+NW20-11-1","NW20-I-3"],["NW02-2-2","NW02-I-9"],["NW02-5-2","NW02-O-9"],["NW08-11-1","NW08-I-1"],["NW13+NW19-7-1","NW13-I-5"],["NW26-1-1","NW26-I-1"],["NW28-6-1","NW28-O-20"],["NW27-1-2","NW27-I-1"],["NW28-5-1","NW28-I-21"],["NW33-1-1","NW33-O-1"],["NW08-5-1","NW08-O-1"],["NW10-9-1","NW10-I-1"],["NW14-1-2","NW14-I-2"],["NW18-6-1","NW18B-O-2"],["NW18-11-1","NW18-I-3"],["NW28-7-1","NW28-O-21"],["NW03-12-1","NW03-I-1"],["NW13+NW19-6-1","NW13-O-6"],["NW13+NW20-5-1","NW20-O-4"],["NW28-4-1","NW28-I-22"],["NW04-6-1","NW04-O-5"],["NW16-4-1","NW16-I-1"],["NW13+NW20-12-1","NW20-I-4"],["NW28-1-2","NW28-O-22"],["NW28-6-1","NW28-I-23"],["NW30-5-2","NW30-O-2"],["NW13+NW20-8-1","NW13-I-6"],["NW28-5-1","NW28-O-23"],["NW01-1-2","NW01-I-2"],["NW08-12-1","NW08-I-2"],["NW08-6-1","NW08-O-2"],["NW18-12-1","NW18-I-4"],["NW28-7-1","NW28-I-24"],["NW13+NW19-6-1","NW19-O-2"],["NW02-3-2","NW02-I-11"],["NW02-6-2","NW02-O-11"],["NW28-2-2","NW28-O-24"]];   // جدول 19/11/2026: انشالت 6 رحلات NW15B
   function idsToOut(lines){
-    // كل سطر = صف في الملف بنفس ترتيب القالب: هوية السائق الأول [+ هوية الثاني]. السطر الفاضي = رحلة بدون سائق
+    // كل سطر = صف في الملف بنفس ترتيب القالب: هوية الكابتن الأول [+ هوية الثاني]. السطر الفاضي = رحلة بدون كابتن
     const out=[];
     lines.forEach((l,i)=>{ const tr=ROSTER_TPL[i]; if(!tr) return; const c=l.split('\t').map(digits).filter(Boolean); if(c[0]) out.push([tr[1],c[0],c[1]||'']); });
     return out;
   }
   const TRIP_RE=/^NW\d+[A-Z]?(\+NW\d+[A-Z]?)*-[IO]-\d+$/i;
-  /* جدول (صفوف وأعمدة) → [رحلة، سائق1، سائق2]: بالعناوين لو موجودة، وإلا بالشكل (رقم رحلة + أرقام هوية 10 خانات) */
+  /* جدول (صفوف وأعمدة) → [رحلة، كابتن1، كابتن2]: بالعناوين لو موجودة، وإلا بالشكل (رقم رحلة + أرقام هوية 10 خانات) */
   function rowsToOut(rows){
     let h=-1, ct=-1, c1=-1, c2=-1;
     for(let i=0;i<Math.min(rows.length,15)&&h<0;i++){
       const r=rows[i].map(x=>String(x).trim().toLowerCase());
-      const t_=r.findIndex(x=>/^trip$|trip ?(no|code|#)?$|رقم الرحلة|^الرحلة$/.test(x)), a=r.findIndex(x=>/d1|driver ?1|1_?ro?a?ste?r|ro?a?ster_?1|سائق ?(1|الأول)/.test(x)), b=r.findIndex(x=>/d2|driver ?2|2_?ro?a?ste?r|ro?a?ster_?2|سائق ?(2|الثاني)/.test(x));
+      const t_=r.findIndex(x=>/^trip$|trip ?(no|code|#)?$|رقم الرحلة|^الرحلة$/.test(x)), a=r.findIndex(x=>/d1|driver ?1|1_?ro?a?ste?r|ro?a?ster_?1|(?:سائق|كابتن) ?(1|الأول)/.test(x)), b=r.findIndex(x=>/d2|driver ?2|2_?ro?a?ste?r|ro?a?ster_?2|(?:سائق|كابتن) ?(2|الثاني)/.test(x));
       if(t_>-1&&a>-1){ h=i; ct=t_; c1=a; c2=b; }
     }
     const out=[], seen=new Set();
@@ -1372,7 +1372,7 @@ applyUILang();
   showBar();
 })();
 </script>
-<!-- ================= لوحة الإرسال اليومية (على أساس واجب السائق) ================= -->
+<!-- ================= لوحة الإرسال اليومية (على أساس واجب الكابتن) ================= -->
 <style>
   .bwrap{max-width:1240px;margin:0 auto 14px;padding:0 4px}
   .btabs{display:flex;gap:8px;margin:0 auto 14px;max-width:640px}
@@ -1437,6 +1437,10 @@ applyUILang();
   .btrips .nx{font-size:11.5px;color:#b45309;font-weight:700}
   .bdrv{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap;border-top:1px dashed var(--nw-line);padding-top:8px;margin-top:6px}
   .bdrv .n{font-weight:700}
+  .bdrv.d1,.bdrv.d2{border-inline-start:4px solid var(--cap);padding-inline-start:10px;border-radius:0 0 0 0}
+  .bdrv.d1{--cap:#2563eb}.bdrv.d2{--cap:#9333ea}
+  .bcap{display:inline-block;font-size:12.5px;font-weight:800;color:#fff;background:var(--cap);border-radius:999px;padding:2px 10px;margin-bottom:4px}
+  .bcap::before{content:"👨‍✈️ "}
   .bdrv .s{font-size:12px;color:var(--nw-muted)}
   .bok{color:#16a34a;font-weight:800;font-size:13px}
   .bno{color:#dc2626;font-weight:800;font-size:13px}
@@ -1475,7 +1479,7 @@ applyUILang();
         <label>تاريخ الرحلات <input type="date" id="bDate"></label>
         <button class="bbtn sm" data-bd="0">اليوم</button><button class="bbtn sm" data-bd="1">بكرة</button>
         <label>الكراج <select id="bGar"><option value="">كل الكراجات</option></select></label>
-        <label class="bgrow" style="position:relative">بحث برقم الواجب أو الرحلة <input type="search" id="bQ" autocomplete="off" placeholder="مثال: NW04 أو NW28-1-1 أو اسم السائق..."><div id="bSug" class="bsug" style="display:none"></div></label>
+        <label class="bgrow" style="position:relative">بحث برقم الواجب أو الرحلة <input type="search" id="bQ" autocomplete="off" placeholder="مثال: NW04 أو NW28-1-1 أو اسم الكابتن..."><div id="bSug" class="bsug" style="display:none"></div></label>
         <button class="bbtn" id="bRefresh">🔄 تحديث</button>
         <button class="bbtn" id="bUpSched" style="display:none">📤 رفع الجدول</button>
         <button class="bbtn" id="bUpRoster" style="display:none">📤 رفع الروستر</button>
@@ -1489,7 +1493,7 @@ applyUILang();
 </div>
 <script>
 (function(){
-  if(/[?&]card=/.test(location.search)) return;            // صفحة بطاقة السائق
+  if(/[?&]card=/.test(location.search)) return;            // صفحة بطاقة الكابتن
   const auth=window.NWAuth; if(!auth||!auth.call) return;
   const $=id=>document.getElementById(id);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1515,7 +1519,7 @@ applyUILang();
 
   let SCHED=null, META={}, DUTIES=[], ROSTER=null, SENT={}, BUSES={}, SUBS=[], FILTER='miss', LOADING=0;
   const REASONS=['رفض الرحلة','مريض','غياب','ظرف طارئ','تأخر','أخرى'];
-  const LEAD_H=6;    // المسار لازم يوصل السائق قبل الرحلة بـ 6 ساعات كأقل حد
+  const LEAD_H=6;    // المسار لازم يوصل الكابتن قبل الرحلة بـ 6 ساعات كأقل حد
   const BUSL=(typeof BUS_DATA!=='undefined'?BUS_DATA:[]);   // [رقم الحافلة، اللوحة، النوع VIP/WCR/STD]
   const DRV={}; (typeof DRIVER_DATA!=='undefined'?DRIVER_DATA:[]).forEach(r=>DRV[String(r[0])]=r);   // [إقامة، اسم، جنسية، جوال، واتساب]
   const WAFIX=JSON.parse(localStorage.getItem('nwBoardWa')||'{}');          // أرقام واتساب صُححت من هذا الجهاز
@@ -1611,7 +1615,7 @@ applyUILang();
       if(my!==LOADING) return;
       ROSTER={}; ((r&&r.ok&&r.rows)||[]).forEach(x=>{ const k=nk(x[0]), v=[String(x[1]||''),String(x[2]||'')]; ROSTER[k]=v;
         if(k.includes('+')) k.split('+').forEach(p=>{ if(p&&!ROSTER[p]) ROSTER[p]=v; }); });   // روستر قديم بأرقام مدموجة (A + B)
-      // التبديلات (من إدارة السائقين أو من هنا): الخادم يطبقها على رحلة وحدة — نطبقها على رحلة الخروج حق نفس الواجب
+      // التبديلات (من إدارة الكباتن أو من هنا): الخادم يطبقها على رحلة وحدة — نطبقها على رحلة الخروج حق نفس الواجب
       SUBS=(r&&r.subs)||[];
       const T2D={}; (SCHED||[]).forEach(t=>T2D[nk(t.trip)]=t.duty);
       SUBS.forEach(x=>{ const du=DUTIES.find(d=>d.duty===T2D[nk(x.trip)]); if(!du) return; const e=ROSTER[nk(du.disp.trip)];
@@ -1642,7 +1646,7 @@ applyUILang();
   const fmtTs=t=>{ const d=new Date(t); return pad(d.getDate())+'/'+pad(d.getMonth()+1)+' '+pad(d.getHours())+':'+pad(d.getMinutes()); };
   const left=ms=>{ const h=Math.floor(ms/3600e3), m=Math.floor(ms%3600e3/60e3); return h?h+' س '+m+' د':m+' د'; };
   const firstSent=(it,iq)=>{ const L=sentOf(it,iq).filter(x=>x.kind==='مسار').map(x=>tsOf(x.at)).filter(x=>!isNaN(x)); return L.length?Math.min(...L):NaN; };
-  /** حالة السائق: ok في الوقت · late انرسل متأخر · over ما انرسل والموعد فات · wait باقي وقت */
+  /** حالة الكابتن: ok في الوقت · late انرسل متأخر · over ما انرسل والموعد فات · wait باقي وقت */
   function timing(it,iq){ const dl=dlTs(it), st=firstSent(it,iq);
     if(isSent(it,iq)) return isNaN(st)||st<=dl?'ok':'late';
     return Date.now()>dl?'over':'wait'; }
@@ -1660,7 +1664,7 @@ applyUILang();
     $('bPct').textContent=drvN?pct+'%':'—'; $('bBar').style.width=pct+'%'; $('bBar').style.background=pct>=95?'#16a34a':pct>=60?'#f59e0b':'#dc2626';
     const n={miss:act.filter(it=>!dutyDone(it)).length, over:act.filter(dutyOver).length, done:act.filter(dutyDone).length, all:act.length, off:all.length-act.length};
     const lateN=act.reduce((a,it)=>a+it.drivers.filter(iq=>timing(it,iq)==='late').length,0);
-    $('bCnt').textContent=`${act.length} واجب · ${sentN} من ${drvN} سائق وصلهم المسار`+(lateN?` · ${lateN} انرسل متأخر (أقل من ${LEAD_H} ساعات)`:'')+(all.length-act.length?` · ${all.length-act.length} واجب ما يشتغل/مو في الروستر`:'');
+    $('bCnt').textContent=`${act.length} واجب · ${sentN} من ${drvN} كابتن وصلهم المسار`+(lateN?` · ${lateN} انرسل متأخر (أقل من ${LEAD_H} ساعات)`:'')+(all.length-act.length?` · ${all.length-act.length} واجب ما يشتغل/مو في الروستر`:'');
     $('bChips').innerHTML=[['miss','لم يُرسل'],['over','🔴 فات موعده'],['done','تم الإرسال'],['all','الكل'],['off','لا يعمل اليوم']].map(([k,t])=>`<button class="bchip${FILTER===k?' on':''}" data-f="${k}">${t} (${n[k]})</button>`).join('');
     const info=[];
     info.push(`<div class="bnote">📅 الجدول${META.__prev?' <b style="color:#b7791f">(السابق — هذا اليوم قبل بداية الجدول الجديد)</b>':''}: ${esc(META.valid||'—')}${META.by?' · رفعه '+esc(META.by)+' ('+esc(META.at)+')':''} · 📋 روستر ${esc($('bDate').value)}: ${ROSTER&&ROSTER.__n?ROSTER.__n+' رحلة'+(ROSTER.__by?' · رفعه '+esc(ROSTER.__by)+' ('+esc(ROSTER.__at)+')':''):'<b style="color:#dc2626">غير مرفوع</b>'}</div>`);
@@ -1683,9 +1687,9 @@ applyUILang();
     const it=dayItems().find(x=>x.duty===duty); if(!it) return;
     const busy={}; Object.keys(ROSTER||{}).forEach(k=>{ if(k.startsWith('__')) return; (ROSTER[k]||[]).forEach(x=>{ if(x) busy[x]=k; }); });
     const o=DRV[iq]||[];
-    const m=modal(`<h3 style="margin:0 0 4px">🔁 تبديل سائق — ${esc(it.duty)}</h3>
-      <div class="bnote" style="margin:0 0 12px">السائق المتعذر: <b>${esc(o[1]||iq)}</b> (${esc(iq)}) · ${esc(it.date)} · الخروج ${esc(it.disp.dt||it.disp.t0)}</div>
-      <label class="bnote" style="display:block;font-weight:700;margin:0 0 4px">السائق البديل (اسم أو إقامة)</label>
+    const m=modal(`<h3 style="margin:0 0 4px">🔁 تبديل كابتن — ${esc(it.duty)}</h3>
+      <div class="bnote" style="margin:0 0 12px">الكابتن المتعذر: <b>${esc(o[1]||iq)}</b> (${esc(iq)}) · ${esc(it.date)} · الخروج ${esc(it.disp.dt||it.disp.t0)}</div>
+      <label class="bnote" style="display:block;font-weight:700;margin:0 0 4px">الكابتن البديل (اسم أو إقامة)</label>
       <div style="position:relative"><input id="swQ" autocomplete="off" style="width:100%;box-sizing:border-box" placeholder="ابحث..."><div id="swS" class="bsug" style="display:none"></div></div>
       <div id="swPick" class="bnote" style="margin:6px 0 0"></div>
       <label class="bnote" style="display:block;font-weight:700;margin:12px 0 4px">السبب</label>
@@ -1707,7 +1711,7 @@ applyUILang();
     m.querySelector('#swR').onchange=chk; m.querySelector('#swN').oninput=chk;
     m.querySelector('#swGo').onclick=async e=>{ e.target.disabled=true; e.target.textContent='جاري التبديل...';
       try{ const j=await auth.call('driverSwap',{swap:{date:it.date,trip:it.disp.trip,orig:iq,rep,reason:m.querySelector('#swR').value,note:m.querySelector('#swN').value.trim(),exchange:!!busy[rep]}});
-        if(!j||!j.ok) throw new Error({REP_BUSY:'البديل عنده رحلة',NOT_IN_ROSTER:'السائق مو في روستر اليوم',NEED_REASON:'السبب والملاحظة مطلوبة',FORBIDDEN:'ما عندك صلاحية تبديل هذا الواجب (مو من كراجك أو التبديل مو حقك)',SAME_TRIP:'نفس الرحلة'}[j&&j.error]||(j&&j.error)||'ERR');
+        if(!j||!j.ok) throw new Error({REP_BUSY:'البديل عنده رحلة',NOT_IN_ROSTER:'الكابتن مو في روستر اليوم',NEED_REASON:'السبب والملاحظة مطلوبة',FORBIDDEN:'ما عندك صلاحية تبديل هذا الواجب (مو من كراجك أو التبديل مو حقك)',SAME_TRIP:'نفس الرحلة'}[j&&j.error]||(j&&j.error)||'ERR');
         m.remove(); loadDay();
       }catch(err){ alert(L('ما تم التبديل: ','Swap failed: ')+(err.message||err)); e.target.disabled=false; e.target.textContent='تبديل'; } };
   }
@@ -1761,18 +1765,18 @@ applyUILang();
     let last=t0, nextDay=false;
     const trips=it.trips.map(t=>{ const m=mins(t.t0); if(m!=null&&last!=null&&m<last) nextDay=true; last=m;
       return `<div class="btr"><span class="tc">${esc(t.trip)}</span> <bdi>${esc(t.fr)}</bdi> ← <bdi>${esc(t.to)}</bdi><div class="s btm"><span class="bt0"><span>مغادرة</span> <b dir="ltr">${esc(t.t0)}</b></span>${t.t1?`<span class="bt1"><span>وصول</span> <b dir="ltr">${esc(t.t1)}</b></span>`:''}${nextDay?' <span class="nx">(اليوم التالي)</span>':''}</div></div>`; }).join('');
-    const drv=it.off?`<div class="bdrv"><span class="s">${it.inRoster?'بدون سائق في الروستر':'مو موجود في روستر هذا اليوم'}${/daily/i.test(it.days)?'':' · '+esc(it.days)}</span></div>`
+    const drv=it.off?`<div class="bdrv"><span class="s">${it.inRoster?'بدون كابتن في الروستر':'مو موجود في روستر هذا اليوم'}${/daily/i.test(it.days)?'':' · '+esc(it.days)}</span></div>`
       : it.drivers.map((iq,i)=>{ const r=DRV[iq]||[], S=sentOf(it,iq), m=S.filter(x=>x.kind==='مسار'), c=S.filter(x=>x.kind==='بطاقة');
         const sb=subOf(it,iq), was=sb&&sentOf(it,sb.orig).some(x=>x.kind==='مسار');
-        return `<div class="bdrv"><div><div class="n">${esc(r[1]||iq)}${it.drivers.length>1?` <span class="s">(السائق ${i+1})</span>`:''}${sb?` <span class="btag" style="background:#ede9fe;color:#5b21b6">🔁 بديل</span>`:''}</div>
-          ${sb?`<div class="s">بدل <b>${esc(sb.origName||sb.orig)}</b> — ${esc(sb.reason)}${sb.note?' · '+esc(sb.note):''} <span>(${esc(sb.by)} ${esc(sb.at)})</span>${canUp||sb.by===auth.name?` <a href="#" data-unsub="${esc(it.duty)}" data-iq="${esc(iq)}" style="color:#dc2626">إلغاء التبديل</a>`:''}</div>${was?'<div class="s" style="color:#b45309">⚠️ المسار كان انرسل للسائق الأصلي — بلّغه إنه انشال من الواجب</div>':''}`:''}<div class="s">${esc(iq)}${r[3]?' · '+esc(r[3]):' · <span style="color:#dc2626">مو في قائمة السائقين</span>'}</div>
+        return `<div class="bdrv${it.drivers.length>1?' d'+(i+1):''}"><div>${it.drivers.length>1?`<div class="bcap c${i+1}">${i?'الكابتن الثاني':'الكابتن الأول'}</div>`:''}<div class="n">${esc(r[1]||iq)}${sb?` <span class="btag" style="background:#ede9fe;color:#5b21b6">🔁 بديل</span>`:''}</div>
+          ${sb?`<div class="s">بدل <b>${esc(sb.origName||sb.orig)}</b> — ${esc(sb.reason)}${sb.note?' · '+esc(sb.note):''} <span>(${esc(sb.by)} ${esc(sb.at)})</span>${canUp||sb.by===auth.name?` <a href="#" data-unsub="${esc(it.duty)}" data-iq="${esc(iq)}" style="color:#dc2626">إلغاء التبديل</a>`:''}</div>${was?'<div class="s" style="color:#b45309">⚠️ المسار كان انرسل للكابتن الأصلي — بلّغه إنه انشال من الواجب</div>':''}`:''}<div class="s">${esc(iq)}${r[3]?' · '+esc(r[3]):' · <span style="color:#dc2626">مو في قائمة الكباتن</span>'}</div>
           ${(()=>{ const tg=timing(it,iq), dl=dlTs(it);
             if(tg==='ok') return `<div class="bok">✓ المسار انرسل — ${esc(m[0].by)} · ${esc(m[0].at)}</div>`;
             if(tg==='late') return `<div class="bok" style="color:#d97706">⚠️ انرسل متأخر — ${esc(m[0].by)} · ${esc(m[0].at)} <span class="s">(الموعد ${fmtTs(dl)})</span></div>`;
             if(tg==='over') return `<div class="bno">🔴 لم يُرسل — فات الموعد ${fmtTs(dl)}</div>`;
             return `<div class="bno" style="color:#b45309">⏳ لم يُرسل — آخر موعد ${fmtTs(dl)} (باقي ${left(dl-Date.now())})</div>`; })()}
           ${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}${finesRow(it,iq)}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="السائق متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="الكابتن متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
     const viewBtn=it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض البطاقة</button>`;
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
       <div class="tm"><span class="bexit"><span>🏁 الخروج</span> <b dir="ltr">${esc(it.disp.dt||it.disp.t0)}</b>${prev?'<small>(الليلة اللي قبل)</small>':''}</span> · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}${viewBtn}</div>`;
@@ -1789,7 +1793,7 @@ applyUILang();
     if(f) return f[1];
     for(const r in RS){ const g=RS[r].find(s=>normS(s[0])===k); if(g) return g[1]; }   // نفس المحطة باسمها في مسار ثاني
     return ''; };
-  /* نصوص رسالة السائق: عربي، إنجليزي، أردو، هندي، إندونيسي — أسماء المحطات تبقى مثل ما هي */
+  /* نصوص رسالة الكابتن: عربي، إنجليزي، أردو، هندي، إندونيسي — أسماء المحطات تبقى مثل ما هي */
   const ML={
     ar:{acc:(a)=>'🏠 بعد انتهاء الرحلة توجّه إلى سكن '+a.ar+':',name:'العربية',rtl:1,loc:'ar-SA-u-ca-gregory-nu-latn',hi:'مرحباً ',hi2:'،',duty:'واجبك: ',date:'التاريخ: ',bt:'نوع الباص: ',types:{VIP:'VIP',WHEELCHAIR:'كراسي متحركة',STANDARD:'عادي'},bus:'رقم الحافلة / اللوحة: ',rep:'وقت الحضور للكراج لاستلام الباص: ',night:' (الليلة اللي قبل الرحلة)',n:'عدد الرحلات في الواجب: ',trip:'الرحلة: ',tripN:i=>'الرحلة '+i+': ',route:'المسار: ',ar:' ← ',dep:'المغادرة: ',arr:' — الوصول: ',next:' (اليوم التالي)',stops:'نقاط التوقف:',rest:' (استراحة فقط)',a:'وصول ',d:'مغادرة ',bye:'الرجاء الحضور بالوقت المحدد. قيادة آمنة.',
         card:(n,du,dt,l)=>'مرحباً '+n+'،\nبطاقة جدول الرحلة لواجبك '+du+' بتاريخ '+dt+':\n'+l+'\n\nاضغط الرابط لعرض البطاقة وتحميلها.'},
@@ -1804,7 +1808,7 @@ applyUILang();
   };
   const NAT_LANG=[[/saudi|yemen|egypt|sudan|jordan|syria|arab|سعود|يمن|مصر/i,'ar'],[/pakistan|باكستان/i,'ur'],[/india|الهند/i,'hi'],[/indonesia|اندونيسيا|إندونيسيا/i,'id']];
   const langOf=iq=>{ const n=String((DRV[iq]||[])[2]||''); for(const [re,l] of NAT_LANG) if(re.test(n)) return l; return 'en'; };
-  const LANG_KEY='nwMsgLang';   // اختيار يدوي للغة سائق معيّن (يتذكره هذا الجهاز)
+  const LANG_KEY='nwMsgLang';   // اختيار يدوي للغة كابتن معيّن (يتذكره هذا الجهاز)
   const langPref=JSON.parse(localStorage.getItem(LANG_KEY)||'{}');
   function dateTxt(d,lang){ try{ return new Date(d+'T12:00:00').toLocaleDateString((ML[lang]||ML.en).loc,{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }catch(e){ return d; } }
   function compose(it,iq,lang){
@@ -1848,7 +1852,7 @@ applyUILang();
       <div style="color:#dc2626;font-weight:700;font-size:13px">${finesHead(p)}</div>
       <label style="display:flex;align-items:center;gap:6px;margin-top:4px;cursor:pointer;font-size:12.5px;font-weight:600">
         <input type="checkbox" data-fnok="${esc(iq)}" data-duty="${esc(it.duty)}" ${p.noted?'checked':''} style="width:18px;height:18px">
-        ${p.noted?`✅ تم التنبيه والتحدث مع السائق — ${esc(p.noted.by)} · ${esc(p.noted.at)}`:'شفت التنبيه وتحدثت مع السائق عن المخالفات'}</label>
+        ${p.noted?`✅ تم التنبيه والتحدث مع الكابتن — ${esc(p.noted.by)} · ${esc(p.noted.at)}`:'شفت التنبيه وتحدثت مع الكابتن عن المخالفات'}</label>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
       ${p.token?`<button class="bbtn sm" data-fnlink="${esc(iq)}">📲 رابط المخالفات</button>`:''}
       ${p.notSent?`<a class="bbtn sm wa" href="${FINES_SYS+encodeURIComponent(iq)}" target="_blank" rel="noopener" style="text-decoration:none">🗂️ إرسال المخالفات من نظام المخالفات</a>`:''}</div></div>`; }
@@ -1858,7 +1862,7 @@ applyUILang();
       if(j&&j.ok){ p.noted={by:j.by||auth.name||'',at:j.at||''}; } else alert('ما انحفظ التأكيد: '+((j&&(j.message||j.error))||''));
     }catch(e){ alert('ما انحفظ التأكيد — تأكد من الاتصال'); } draw(); }
   async function finesUnnote(iq,duty){ const p=FINES[iq]; if(!p) return false;
-    if(!confirm('إلغاء علامة «تم التنبيه والتحدث مع السائق»؟\nبعد الإلغاء ما ينفتح إرسال البطاقة إلا بوضع العلامة من جديد.')){ draw(); return false; }
+    if(!confirm('إلغاء علامة «تم التنبيه والتحدث مع الكابتن»؟\nبعد الإلغاء ما ينفتح إرسال البطاقة إلا بوضع العلامة من جديد.')){ draw(); return false; }
     try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(window.NWAuth.attach({action:'pendingUnnote',iqama:iq,duty}))}); const j=await r.json();
       if(j&&j.ok){ p.noted=null; draw(); return true; } alert('ما انلغى التأكيد: '+((j&&(j.message||j.error))||''));
     }catch(e){ alert('ما انلغى التأكيد — تأكد من الاتصال'); } draw(); return false; }
@@ -1870,12 +1874,12 @@ applyUILang();
       const dl=String(p.deadline||'').replace('T',' ').slice(0,16), must=kind==='card';
       box.innerHTML=`<div style="border:2px solid #dc2626;background:rgba(220,38,38,.08);border-radius:12px;padding:10px 12px;margin:0 0 10px">
         <b style="color:#dc2626">${finesHead(p)}</b>
-        <div class="bnote" style="margin:4px 0">تحدّث مع السائق قبل المغادرة${p.count?': يفتح رسالة المخالفات على الواتساب ويؤكد <b>الإقرار</b> أو <b>الاعتراض</b>':''}${p.notSent?(p.count?'، و':': ')+'المخالفات غير المُرسلة تُرسل له من <b>نظام المخالفات</b>':''}.</div>
+        <div class="bnote" style="margin:4px 0">تحدّث مع الكابتن قبل المغادرة${p.count?': يفتح رسالة المخالفات على الواتساب ويؤكد <b>الإقرار</b> أو <b>الاعتراض</b>':''}${p.notSent?(p.count?'، و':': ')+'المخالفات غير المُرسلة تُرسل له من <b>نظام المخالفات</b>':''}.</div>
         ${p.items.length?`<div class="bnote" style="max-height:90px;overflow:auto;margin:4px 0">${p.items.map(x=>`• ${esc(x.vno)} — ${esc(x.descAr)} — ${esc(x.dateG)}`).join('<br>')}</div>`:''}
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0">
-        ${p.token?`<button class="bbtn" id="fnResend">📲 إعادة إرسال رابط المخالفات للسائق</button>`:''}
+        ${p.token?`<button class="bbtn" id="fnResend">📲 إعادة إرسال رابط المخالفات للكابتن</button>`:''}
         ${p.notSent?`<a class="bbtn wa" href="${FINES_SYS+encodeURIComponent(iq)}" target="_blank" rel="noopener" style="text-decoration:none">🗂️ إرسال المخالفات من نظام المخالفات</a>`:''}</div>
-        <label class="bnote" style="display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-weight:700"><input type="checkbox" id="fnTalk"> شفت التنبيه وتحدثت مع السائق عن المخالفات${must?' (مطلوب قبل إرسال البطاقة)':''}</label></div>`;
+        <label class="bnote" style="display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-weight:700"><input type="checkbox" id="fnTalk"> شفت التنبيه وتحدثت مع الكابتن عن المخالفات${must?' (مطلوب قبل إرسال البطاقة)':''}</label></div>`;
       m.dataset.fines=must?'1':'';
       if(p.noted){ const t=box.querySelector('#fnTalk'); t.checked=true; t.parentElement.insertAdjacentHTML('beforeend',' <span class="bnote" id="fnBy">('+esc(p.noted.by)+' · '+esc(p.noted.at)+')</span>'); }
       const rs=box.querySelector('#fnResend'); if(rs) rs.onclick=()=>{ const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
@@ -1904,8 +1908,8 @@ applyUILang();
       <label class="bnote" style="display:block;margin:0 0 4px;font-weight:700">رقم الواتساب</label>
       <input id="bmNum" type="tel" dir="ltr" style="width:100%;box-sizing:border-box;margin-bottom:4px" value="${esc(window.waShow?waShow(waNum(iq)):waNum(iq))}">
       <div id="bmBad" class="bno" style="display:none;margin-bottom:6px">الرقم غير صحيح</div>
-      <div id="bmFix" class="bnote" style="display:${WAFIX[iq]?'flex':'none'};align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 4px;color:#b7791f">⚠️ هذا رقم معدّل على هذا الجهاز — رقم السائق الأصلي: <b dir="ltr">${esc(origShow||'—')}</b> <button type="button" class="bbtn" id="bmReset" style="padding:3px 10px">رجّع الأصلي</button></div>
-      <label class="bnote" id="bmSaveL" style="display:none;align-items:center;gap:6px;margin:4px 0 0;cursor:pointer"><input type="checkbox" id="bmSave"> احفظ هذا الرقم للسائق (بدّل رقمه المسجل على هذا الجهاز)</label>
+      <div id="bmFix" class="bnote" style="display:${WAFIX[iq]?'flex':'none'};align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 4px;color:#b7791f">⚠️ هذا رقم معدّل على هذا الجهاز — رقم الكابتن الأصلي: <b dir="ltr">${esc(origShow||'—')}</b> <button type="button" class="bbtn" id="bmReset" style="padding:3px 10px">رجّع الأصلي</button></div>
+      <label class="bnote" id="bmSaveL" style="display:none;align-items:center;gap:6px;margin:4px 0 0;cursor:pointer"><input type="checkbox" id="bmSave"> احفظ هذا الرقم للكابتن (بدّل رقمه المسجل على هذا الجهاز)</label>
       <label class="bnote" style="display:block;margin:8px 0 4px;font-weight:700">طريقة الفتح</label>
       <select id="bmHow" style="width:100%">${[['app','تطبيق واتساب على الكمبيوتر — مباشرة'],['web','واتساب ويب']].map(([k,v])=>`<option value="${k}"${k===waHow()?' selected':''}>${v}</option>`).join('')}</select>
       <label class="bnote" style="display:block;margin:8px 0 4px;font-weight:700">لغة الرسالة</label>
@@ -1924,7 +1928,7 @@ applyUILang();
       if(lang===langOf(iq)) delete langPref[iq]; else langPref[iq]=lang; try{ localStorage.setItem(LANG_KEY,JSON.stringify(langPref)); }catch(_){} };
     m.querySelector('#bmGo').onclick=async()=>{
       if(!ok()) return;
-      if(m.dataset.fines==='1' && !(m.querySelector('#fnTalk')||{}).checked){ alert('السائق عليه مخالفات مرورية — تحدّث معه وضع علامة «شفت التنبيه وتحدثت مع السائق» أولاً'); return; }
+      if(m.dataset.fines==='1' && !(m.querySelector('#fnTalk')||{}).checked){ alert('الكابتن عليه مخالفات مرورية — تحدّث معه وضع علامة «شفت التنبيه وتحدثت مع الكابتن» أولاً'); return; }
       const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
       if(m.querySelector('#bmSave').checked && saveL.style.display!=='none'){ if(same(d,orig)) delete WAFIX[iq]; else WAFIX[iq]=d; try{ localStorage.setItem('nwBoardWa',JSON.stringify(WAFIX)); }catch(e){} }   // التعديل لهالمرة بس، إلا لو اختار الحفظ
       const how=m.querySelector('#bmHow').value, tx=encodeURIComponent(m.querySelector('#bmTxt').value);
@@ -1986,10 +1990,10 @@ applyUILang();
   /* ---------- لغة اللوحة: ترجمة إنجليزية لما المستخدم يختار English (نفس زر اللغة في البرنامج) ---------- */
   const EN=[
     ['📋 لوحة الإرسال','📋 Dispatch board'],['✍️ إرسال يدوي','✍️ Manual send'],['تاريخ الرحلات','Trip date'],['اليوم التالي','next day'],['اليوم','Today'],['بكرة','Tomorrow'],
-    ['بحث برقم الواجب أو الرحلة','Search by duty or trip'],['مثال: NW04 أو NW28-1-1 أو اسم السائق...','e.g. NW04, NW28-1-1 or driver name...'],
+    ['بحث برقم الواجب أو الرحلة','Search by duty or trip'],['مثال: NW04 أو NW28-1-1 أو اسم الكابتن...','e.g. NW04, NW28-1-1 or driver name...'],
     ['كل الكراجات','All depots'],['الكراج','Depot'],['🔄 تحديث','🔄 Refresh'],['📤 رفع الجدول','📤 Upload schedule'],['📤 رفع الروستر','📤 Upload roster'],
     ['🔴 فات موعده','🔴 Overdue'],['لم يُرسل — فات الموعد','Not sent — deadline passed'],['لم يُرسل — آخر موعد','Not sent — deadline'],['لم يُرسل','Not sent'],['تم الإرسال','Sent'],['لا يعمل اليوم','Not running today'],['الكل','All'],
-    ['سائق وصلهم المسار','drivers received the route'],['انرسل متأخر (أقل من','sent late (less than'],['ساعات)','hours)'],['واجب ما يشتغل/مو في الروستر','duties not running / not in roster'],
+    ['كابتن وصلهم المسار','drivers received the route'],['انرسل متأخر (أقل من','sent late (less than'],['ساعات)','hours)'],['واجب ما يشتغل/مو في الروستر','duties not running / not in roster'],
     [' واجب · ',' duties · '],[' من ',' of '],
     ['📅 الجدول:','📅 Schedule:'],['رفعه','uploaded by'],['📋 روستر','📋 Roster'],['غير مرفوع','not uploaded'],[' رحلة',' trips'],
     ['ما فيه روستر مرفوع لهذا التاريخ — الواجبات تطلع «لا يعمل اليوم» لين يترفع.','No roster uploaded for this date — duties show as "Not running" until it is uploaded.'],
@@ -1998,16 +2002,16 @@ applyUILang();
     ['🏁 الخروج','🏁 Depot out'],[' · الخروج ',' · depot out '],['الخروج','depot out'],[' عنده رحلة ',' has trip '],['الليلة اللي قبل الرحلة','the night before'],['الليلة اللي قبل','night before'],['⏰ إرسال المسار قبل','⏰ Send route before'],
     ['كراسي متحركة','Wheelchair'],['عادي','Standard'],[' رحلات',' trips'],['مغادرة','Dep'],['وصول','Arr'],
     ['🚌 رقم الحافلة:','🚌 Bus number:'],['مطلوب قبل إرسال البطاقة','required before sending the card'],['مثال: 4012','e.g. 4012'],['نوعها مختلف عن الجدول','type differs from schedule'],['لوحة','plate'],['تغيير','Change'],['حفظ للكل','Save for everyone'],['حفظ','Save'],
-    ['(السائق 1)','(Driver 1)'],['(السائق 2)','(Driver 2)'],['مو في قائمة السائقين','not in driver list'],['🔁 بديل','🔁 Substitute'],['بدل','replacing'],['إلغاء التبديل','Cancel swap'],
-    ['⚠️ المسار كان انرسل للسائق الأصلي — بلّغه إنه انشال من الواجب','⚠️ The route was sent to the original driver — tell him he was removed'],
+    ['الكابتن الأول','Captain 1'],['الكابتن الثاني','Captain 2'],['مو في قائمة الكباتن','not in driver list'],['🔁 بديل','🔁 Substitute'],['بدل','replacing'],['إلغاء التبديل','Cancel swap'],
+    ['⚠️ المسار كان انرسل للكابتن الأصلي — بلّغه إنه انشال من الواجب','⚠️ The route was sent to the original driver — tell him he was removed'],
     ['✓ المسار انرسل —','✓ Route sent —'],['⚠️ انرسل متأخر —','⚠️ Sent late —'],['(الموعد','(deadline'],['باقي','left'],['🪪 البطاقة انرسلت','🪪 Card sent'],
-    ['📤 إرسال المسار','📤 Send route'],['🖼️ عرض البطاقة','🖼️ View card'],['⬇ حفظ الصورة','⬇ Save image'],['جاري تجهيز البطاقة...','Preparing card...'],['إغلاق','Close'],['⚠️ رقم الحافلة ما تعيّن بعد — البطاقة تطلع بدون رقم حافلة','⚠️ Bus number not set yet — the card will show without it'],['↻ إعادة','↻ Resend'],['🪪 البطاقة','🪪 Card'],['🔁 تبديل','🔁 Swap'],['حدد رقم الحافلة أول','Set the bus number first'],['السائق متعذر؟ بدّله','Driver unavailable? Swap'],
-    ['بدون سائق في الروستر','no driver in roster'],['مو موجود في روستر هذا اليوم','not in today\'s roster'],
+    ['📤 إرسال المسار','📤 Send route'],['🖼️ عرض البطاقة','🖼️ View card'],['⬇ حفظ الصورة','⬇ Save image'],['جاري تجهيز البطاقة...','Preparing card...'],['إغلاق','Close'],['⚠️ رقم الحافلة ما تعيّن بعد — البطاقة تطلع بدون رقم حافلة','⚠️ Bus number not set yet — the card will show without it'],['↻ إعادة','↻ Resend'],['🪪 البطاقة','🪪 Card'],['🔁 تبديل','🔁 Swap'],['حدد رقم الحافلة أول','Set the bus number first'],['الكابتن متعذر؟ بدّله','Captain unavailable? Swap'],
+    ['بدون كابتن في الروستر','no driver in roster'],['مو موجود في روستر هذا اليوم','not in today\'s roster'],
     ['✅ كل المسارات انرسلت','✅ All routes sent'],['✅ ما فيه مسارات فات موعدها','✅ No overdue routes'],['لا توجد واجبات','No duties'],['ما فيه نتائج','No results'],['⚪ لا يعمل','⚪ not running'],
     ['جاري تحميل الروستر وحالة الإرسال...','Loading roster and send status...'],['جاري التحميل...','Loading...'],
     ['📤 إرسال المسار —','📤 Send route —'],['🪪 إرسال البطاقة —','🪪 Send card —'],['رقم الواتساب','WhatsApp number'],['طريقة الفتح','Open with'],['الرابط العادي (الجوال)','Standard link (phone)'],['تطبيق واتساب على الكمبيوتر — مباشرة','WhatsApp desktop app — direct'],['واتساب ويب','WhatsApp Web'],['الرقم غير صحيح','Invalid number'],['لغة الرسالة','Message language'],
     ['الرسالة (تقدر تعدّلها)','Message (you can edit it)'],['فتح واتساب وإرسال','Open WhatsApp & send'],['إلغاء','Cancel'],
-    ['🔁 تبديل سائق —','🔁 Swap driver —'],['السائق المتعذر:','Unavailable driver:'],['السائق البديل (اسم أو إقامة)','Replacement driver (name or Iqama)'],['ابحث...','Search...'],
+    ['🔁 تبديل كابتن —','🔁 Swap driver —'],['الكابتن المتعذر:','Unavailable driver:'],['الكابتن البديل (اسم أو إقامة)','Replacement driver (name or Iqama)'],['ابحث...','Search...'],
     ['السبب','Reason'],['— اختر —','— choose —'],['ملاحظة (إجباري)','Note (required)'],['مثال: اتصل الساعة 3 واعتذر بسبب...','e.g. called at 3 and excused because...'],['تبديل','Swap'],
     ['رفض الرحلة','Refused trip'],['مريض','Sick'],['غياب','Absent'],['ظرف طارئ','Emergency'],['تأخر','Late'],['أخرى','Other'],
     ['عنده رحلة اليوم','has a trip today'],['بيصير تبادل','will be an exchange'],['✓ متاح (مو في روستر اليوم)','✓ available (not in today\'s roster)'],
@@ -2035,7 +2039,7 @@ applyUILang();
   $('bDate').onchange=loadDay;
   document.querySelectorAll('[data-bd]').forEach(b=>b.onclick=()=>{ $('bDate').value=addDays(iso(new Date()),+b.dataset.bd); loadDay(); });
   $('bGar').onchange=draw;
-  /* ---- بحث بقائمة منسدلة: رقم الواجب / رقم الرحلة / السائق ---- */
+  /* ---- بحث بقائمة منسدلة: رقم الواجب / رقم الرحلة / الكابتن ---- */
   let tm, SUG=[], SI=-1;
   function sugs(){
     const q=$('bQ').value.trim().toLowerCase(), box=$('bSug'); SI=-1;
