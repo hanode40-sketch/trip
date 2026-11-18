@@ -1290,7 +1290,7 @@ applyUILang();
     }catch(e){ pv.innerHTML='<span style="color:var(--text-danger)">'+esc(t.badFile)+'</span>'; }
   });
   /* ---- قالب الروستر الثابت: نفس ترتيب صفوف ملف الروستر (Driver Duty + Trip) — يتعدل لما يتحدث الجدول ---- */
-  const ROSTER_TPL=[["NW15-1-1","NW15-O-1"],["NW22-1-2","NW22-I-1"],["NW28-1-2","NW28-I-1"],["NW15B-4-1","NW15B-I-1"],["NW04-7-1","NW04-I-1"],["NW18-1-1","NW18-O-1"],["NW28-6-1","NW28-O-1"],["NW15-3-1","NW15-I-1"],["NW22-1-1","NW22-O-1"],["NW28-5-1","NW28-I-2"],["NW04-1-1","NW04-O-1"],["NW18-7-1","NW18B-I-1"],["NW28-7-1","NW28-O-2"],["NW13+NW19-9-1","NW13-I-1"],["NW28-2-2","NW28-I-3"],["NW15B-1-1","NW15B-O-1"],["NW28-1-2","NW28-O-3"],["NW15B-2-1","NW15B-O-2"],["NW28-6-1","NW28-I-4"],["NW28-1-1","NW28-O-4"],["NW13+NW19-1-1","NW13-O-1"],["NW28-7-1","NW28-I-5"],["NW04-8-1","NW04-I-2"],["NW13+NW20-10-1","NW13-I-2"],["NW28-2-2","NW28-O-5"],["NW28-1-2","NW28-I-6"],["NW04-2-1","NW04-O-2"],["NW01-1-1","NW01-O-1"],["NW13+NW19-7-1","NW19-I-1"],["NW13+NW19-1-1","NW19-O-1"],["NW28-1-1","NW28-I-7"],["NW30-6-1","NW30-I-1"],["NW11-5-1","NW11-I-1"],["NW18-2-1","NW18B-O-1"],["NW28-2-1","NW28-O-7"],["NW22-2-1","NW22-O-2"],["NW07-7-1","NW07-I-1"],["NW17-3-1","NW17-I-1"],["NW17-1-1","NW17-O-1"],["NW22-1-1","NW22-I-2"],["NW28-2-2","NW28-I-8"],["NW15B-1-1","NW15B-I-2"],["NW13+NW20-2-1","NW13-O-2"],["NW07-1-1","NW07-O-1"],["NW14-3-1","NW14-I-1"],["NW14-1-1","NW14-O-1"],["NW21-1-1","NW21-O-1"],["NW23-1-1","NW23-O-1"],["NW32-1-1","NW32-O-1"],["NW15B-2-1","NW15B-I-3"],["NW13+NW20-11-1","NW13-I-3"],["NW18-8-1","NW18-I-1"],["NW29-1-1","NW29-O-1"],["NW32-3-1","NW32-I-1"],["NW04-9-1","NW04-I-3"],["NW16-1-1","NW16B-O-1"],["NW21-2-1","NW21-I-1"],["NW28-1-1","NW28-O-9"],["NW29-2-1","NW29-I-1"],["NW30-2-1","NW30-O-1"],["NW05-1-1","NW05-O-1"],["NW28-2-1","NW28-I-10"],["NW02-5-1","NW02-I-3"],["NW02-2-1","NW02-O-3"],["NW04-3-1","NW04-O-3"],["NW13+NW20-8-1","NW20-I-1"],["NW13+NW20-2-1","NW20-O-1"],["NW01-3-1","NW01-I-1"],["NW05-2-1","NW05-I-1"],["NW07-8-1","NW07-I-2"],["NW16-3-1","NW16B-I-1"],["NW13+NW20-12-1","NW13-I-4"],["NW18-3-1","NW18-O-2"],["NW28-3-1","NW28-O-11"],["NW18-9-1","NW18B-I-2"],["NW28-1-1","NW28-I-12"],["NW30-7-1","NW30-I-2"],["NW13+NW20-3-1","NW13-O-3"],["NW07-2-1","NW07-O-2"],["NW10-1-1","NW10-O-1"],["NW22-2-1","NW22-I-3"],["NW04-10-1","NW04-I-4"],["NW13+NW19-9-1","NW19-I-2"],["NW22-3-1","NW22-O-3"],["NW28-2-1","NW28-O-13"],["NW02-6-1","NW02-I-5"],["NW02-3-1","NW02-O-5"],["NW28-3-1","NW28-I-14"],["NW15B-3-1","NW15B-O-3"],["NW04-4-1","NW04-O-4"],["NW07-9-1","NW07-I-3"],["NW15-2-1","NW15-O-2"],["NW13+NW20-3-1","NW20-O-2"],["NW28-4-1","NW28-O-14"],["NW11-3-1","NW11-O-1"],["NW18-4-1","NW18-O-3"],["NW28-2-1","NW28-I-16"],["NW26-1-1","NW26-O-1"],["NW13+NW20-4-1","NW13-O-4"],["NW23-1-1","NW23-I-1"],["NW02-1-2","NW02-I-7"],["NW02-4-2","NW02-O-7"],["NW07-3-1","NW07-O-3"],["NW17-2-1","NW17-O-2"],["NW13+NW20-10-1","NW20-I-2"],["NW28-3-1","NW28-O-16"],["NW32-4-1","NW32-I-2"],["NW17-4-1","NW17-I-2"],["NW28-4-1","NW28-I-17"],["NW31-1-1","NW31-O-1"],["NW04-11-1","NW04-I-5"],["NW06-2-1","NW06-I-1"],["NW06-1-1","NW06-O-1"],["NW07-10-1","NW07-I-4"],["NW33-2-1","NW33-I-1"],["NW03-5-1","NW03-O-1"],["NW01-2-1","NW01-O-2"],["NW18-10-1","NW18-I-2"],["NW22-3-1","NW22-I-4"],["NW30-8-1","NW30-I-3"],["NW32-2-1","NW32-O-2"],["NW10-4-1","NW10-O-2"],["NW14-2-1","NW14-O-2"],["NW15-4-1","NW15-I-2"],["NW13+NW20-4-1","NW20-O-3"],["NW28-5-1","NW28-O-18"],["NW07-4-1","NW07-O-4"],["NW22-1-2","NW22-O-4"],["NW28-3-1","NW28-I-19"],["NW18-5-1","NW18-O-4"],["NW27-3-1","NW27-O-1"],["NW28-4-1","NW28-O-19"],["NW31-2-1","NW31-I-1"],["NW15B-4-1","NW15B-O-4"],["NW13+NW20-5-1","NW13-O-5"],["NW16-2-1","NW16-O-1"],["NW13+NW20-11-1","NW20-I-3"],["NW02-2-2","NW02-I-9"],["NW02-5-2","NW02-O-9"],["NW08-11-1","NW08-I-1"],["NW13+NW19-7-1","NW13-I-5"],["NW26-1-1","NW26-I-1"],["NW28-6-1","NW28-O-20"],["NW27-1-2","NW27-I-1"],["NW28-5-1","NW28-I-21"],["NW33-1-1","NW33-O-1"],["NW08-5-1","NW08-O-1"],["NW10-9-1","NW10-I-1"],["NW14-1-2","NW14-I-2"],["NW18-6-1","NW18B-O-2"],["NW18-11-1","NW18-I-3"],["NW28-7-1","NW28-O-21"],["NW15B-3-1","NW15B-I-4"],["NW03-12-1","NW03-I-1"],["NW13+NW19-6-1","NW13-O-6"],["NW13+NW20-5-1","NW20-O-4"],["NW28-4-1","NW28-I-22"],["NW04-6-1","NW04-O-5"],["NW16-4-1","NW16-I-1"],["NW13+NW20-12-1","NW20-I-4"],["NW28-1-2","NW28-O-22"],["NW28-6-1","NW28-I-23"],["NW30-5-2","NW30-O-2"],["NW13+NW20-8-1","NW13-I-6"],["NW28-5-1","NW28-O-23"],["NW01-1-2","NW01-I-2"],["NW08-12-1","NW08-I-2"],["NW08-6-1","NW08-O-2"],["NW18-12-1","NW18-I-4"],["NW28-7-1","NW28-I-24"],["NW13+NW19-6-1","NW19-O-2"],["NW02-3-2","NW02-I-11"],["NW02-6-2","NW02-O-11"],["NW28-2-2","NW28-O-24"]];
+  const ROSTER_TPL=[["NW15-1-1","NW15-O-1"],["NW22-1-2","NW22-I-1"],["NW28-1-2","NW28-I-1"],["NW15B-4-1","NW15B-I-1"],["NW04-7-1","NW04-I-1"],["NW18-1-1","NW18-O-1"],["NW28-6-1","NW28-O-1"],["NW15-3-1","NW15-I-1"],["NW22-1-1","NW22-O-1"],["NW28-5-1","NW28-I-2"],["NW04-1-1","NW04-O-1"],["NW18-7-1","NW18B-I-1"],["NW28-7-1","NW28-O-2"],["NW13+NW19-9-1","NW13-I-1"],["NW28-2-2","NW28-I-3"],["NW28-1-2","NW28-O-3"],["NW28-6-1","NW28-I-4"],["NW28-1-1","NW28-O-4"],["NW13+NW19-1-1","NW13-O-1"],["NW28-7-1","NW28-I-5"],["NW04-8-1","NW04-I-2"],["NW13+NW20-10-1","NW13-I-2"],["NW28-2-2","NW28-O-5"],["NW28-1-2","NW28-I-6"],["NW04-2-1","NW04-O-2"],["NW01-1-1","NW01-O-1"],["NW13+NW19-7-1","NW19-I-1"],["NW13+NW19-1-1","NW19-O-1"],["NW28-1-1","NW28-I-7"],["NW30-6-1","NW30-I-1"],["NW11-5-1","NW11-I-1"],["NW18-2-1","NW18B-O-1"],["NW28-2-1","NW28-O-7"],["NW22-2-1","NW22-O-2"],["NW07-7-1","NW07-I-1"],["NW17-3-1","NW17-I-1"],["NW17-1-1","NW17-O-1"],["NW22-1-1","NW22-I-2"],["NW28-2-2","NW28-I-8"],["NW13+NW20-2-1","NW13-O-2"],["NW07-1-1","NW07-O-1"],["NW14-3-1","NW14-I-1"],["NW14-1-1","NW14-O-1"],["NW21-1-1","NW21-O-1"],["NW23-1-1","NW23-O-1"],["NW32-1-1","NW32-O-1"],["NW13+NW20-11-1","NW13-I-3"],["NW18-8-1","NW18-I-1"],["NW29-1-1","NW29-O-1"],["NW32-3-1","NW32-I-1"],["NW04-9-1","NW04-I-3"],["NW16-1-1","NW16B-O-1"],["NW21-2-1","NW21-I-1"],["NW28-1-1","NW28-O-9"],["NW29-2-1","NW29-I-1"],["NW30-2-1","NW30-O-1"],["NW05-1-1","NW05-O-1"],["NW28-2-1","NW28-I-10"],["NW02-5-1","NW02-I-3"],["NW02-2-1","NW02-O-3"],["NW04-3-1","NW04-O-3"],["NW13+NW20-8-1","NW20-I-1"],["NW13+NW20-2-1","NW20-O-1"],["NW01-3-1","NW01-I-1"],["NW05-2-1","NW05-I-1"],["NW07-8-1","NW07-I-2"],["NW16-3-1","NW16B-I-1"],["NW13+NW20-12-1","NW13-I-4"],["NW18-3-1","NW18-O-2"],["NW28-3-1","NW28-O-11"],["NW18-9-1","NW18B-I-2"],["NW28-1-1","NW28-I-12"],["NW30-7-1","NW30-I-2"],["NW13+NW20-3-1","NW13-O-3"],["NW07-2-1","NW07-O-2"],["NW10-1-1","NW10-O-1"],["NW22-2-1","NW22-I-3"],["NW04-10-1","NW04-I-4"],["NW13+NW19-9-1","NW19-I-2"],["NW22-3-1","NW22-O-3"],["NW28-2-1","NW28-O-13"],["NW02-6-1","NW02-I-5"],["NW02-3-1","NW02-O-5"],["NW28-3-1","NW28-I-14"],["NW04-4-1","NW04-O-4"],["NW07-9-1","NW07-I-3"],["NW15-2-1","NW15-O-2"],["NW13+NW20-3-1","NW20-O-2"],["NW28-4-1","NW28-O-14"],["NW11-3-1","NW11-O-1"],["NW18-4-1","NW18-O-3"],["NW28-2-1","NW28-I-16"],["NW26-1-1","NW26-O-1"],["NW13+NW20-4-1","NW13-O-4"],["NW23-1-1","NW23-I-1"],["NW02-1-2","NW02-I-7"],["NW02-4-2","NW02-O-7"],["NW07-3-1","NW07-O-3"],["NW17-2-1","NW17-O-2"],["NW13+NW20-10-1","NW20-I-2"],["NW28-3-1","NW28-O-16"],["NW32-4-1","NW32-I-2"],["NW17-4-1","NW17-I-2"],["NW28-4-1","NW28-I-17"],["NW31-1-1","NW31-O-1"],["NW04-11-1","NW04-I-5"],["NW06-2-1","NW06-I-1"],["NW06-1-1","NW06-O-1"],["NW07-10-1","NW07-I-4"],["NW33-2-1","NW33-I-1"],["NW03-5-1","NW03-O-1"],["NW01-2-1","NW01-O-2"],["NW18-10-1","NW18-I-2"],["NW22-3-1","NW22-I-4"],["NW30-8-1","NW30-I-3"],["NW32-2-1","NW32-O-2"],["NW10-4-1","NW10-O-2"],["NW14-2-1","NW14-O-2"],["NW15-4-1","NW15-I-2"],["NW13+NW20-4-1","NW20-O-3"],["NW28-5-1","NW28-O-18"],["NW07-4-1","NW07-O-4"],["NW22-1-2","NW22-O-4"],["NW28-3-1","NW28-I-19"],["NW18-5-1","NW18-O-4"],["NW27-3-1","NW27-O-1"],["NW28-4-1","NW28-O-19"],["NW31-2-1","NW31-I-1"],["NW15B-4-1","NW15B-O-4"],["NW13+NW20-5-1","NW13-O-5"],["NW16-2-1","NW16-O-1"],["NW13+NW20-11-1","NW20-I-3"],["NW02-2-2","NW02-I-9"],["NW02-5-2","NW02-O-9"],["NW08-11-1","NW08-I-1"],["NW13+NW19-7-1","NW13-I-5"],["NW26-1-1","NW26-I-1"],["NW28-6-1","NW28-O-20"],["NW27-1-2","NW27-I-1"],["NW28-5-1","NW28-I-21"],["NW33-1-1","NW33-O-1"],["NW08-5-1","NW08-O-1"],["NW10-9-1","NW10-I-1"],["NW14-1-2","NW14-I-2"],["NW18-6-1","NW18B-O-2"],["NW18-11-1","NW18-I-3"],["NW28-7-1","NW28-O-21"],["NW03-12-1","NW03-I-1"],["NW13+NW19-6-1","NW13-O-6"],["NW13+NW20-5-1","NW20-O-4"],["NW28-4-1","NW28-I-22"],["NW04-6-1","NW04-O-5"],["NW16-4-1","NW16-I-1"],["NW13+NW20-12-1","NW20-I-4"],["NW28-1-2","NW28-O-22"],["NW28-6-1","NW28-I-23"],["NW30-5-2","NW30-O-2"],["NW13+NW20-8-1","NW13-I-6"],["NW28-5-1","NW28-O-23"],["NW01-1-2","NW01-I-2"],["NW08-12-1","NW08-I-2"],["NW08-6-1","NW08-O-2"],["NW18-12-1","NW18-I-4"],["NW28-7-1","NW28-I-24"],["NW13+NW19-6-1","NW19-O-2"],["NW02-3-2","NW02-I-11"],["NW02-6-2","NW02-O-11"],["NW28-2-2","NW28-O-24"]];   // جدول 19/11/2026: انشالت 6 رحلات NW15B
   function idsToOut(lines){
     // كل سطر = صف في الملف بنفس ترتيب القالب: هوية السائق الأول [+ هوية الثاني]. السطر الفاضي = رحلة بدون سائق
     const out=[];
@@ -1607,7 +1607,6 @@ applyUILang();
       BUSES=(s&&s.ok&&s.buses)||{};
     }catch(e){ if(my===LOADING) $('bList').innerHTML='<div class="bmsg">تعذّر التحميل: '+esc(e.message||e)+'</div>'; return; }
     draw();
-    try{ const iqs=[...new Set(dayItems().flatMap(it=>it.drivers||[]))]; FINES={}; if(iqs.length){ FINES=await finesPending(iqs); if(my===LOADING) draw(); } }catch(_){}
   }
   function dayItems(){
     const date=$('bDate').value, out=[];
@@ -1757,7 +1756,7 @@ applyUILang();
             if(tg==='late') return `<div class="bok" style="color:#d97706">⚠️ انرسل متأخر — ${esc(m[0].by)} · ${esc(m[0].at)} <span class="s">(الموعد ${fmtTs(dl)})</span></div>`;
             if(tg==='over') return `<div class="bno">🔴 لم يُرسل — فات الموعد ${fmtTs(dl)}</div>`;
             return `<div class="bno" style="color:#b45309">⏳ لم يُرسل — آخر موعد ${fmtTs(dl)} (باقي ${left(dl-Date.now())})</div>`; })()}
-          ${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}${finesRow(it,iq)}</div>
+          ${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="السائق متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
     const viewBtn=it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض البطاقة</button>`;
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
@@ -1810,7 +1809,7 @@ applyUILang();
         S.forEach((s,k)=>{ const rest=String(s[3]).toUpperCase()==='REST', tt=[s[1]&&X.a+s[1], s[2]&&X.d+s[2]].filter(Boolean).join(' / '), lk=mapLink(t.trip.split('-').slice(0,2).join('-'),s[0]);
           m+=(k+1)+'. '+s[0]+(rest?X.rest:'')+(tt?' — '+tt:'')+(lk?'\n   '+lk:'')+'\n'; }); }
     });
-    const lt=it.trips[it.trips.length-1], ac=window.accFor&&accFor(lt&&lt.to);
+    const lt=it.trips[it.trips.length-1], ac=window.accFor&&accFor(lt&&(lt.after&&!/keep bus/i.test(lt.after)?lt.after:lt.to));   // عمود "بعد الرحلة" في الجدول، وإلا محطة الوصول
     if(ac) m+='\n'+X.acc(ac)+'\n'+ac.url+'\n';
     return m+'\n'+X.bye;
   }
@@ -1818,60 +1817,6 @@ applyUILang();
   /* ---------- نافذة الإرسال ---------- */
   function modal(html){ const m=document.createElement('div'); m.className='bmod'; m.innerHTML='<div>'+html+'</div>'; document.body.appendChild(m); m.addEventListener('click',e=>{ if(e.target===m||e.target.closest('[data-close]')) m.remove(); }); return m; }
   function waNum(iq){ const r=DRV[iq]||[]; return WAFIX[iq]||r[4]||r[3]||''; }
-  /* ---------- تنبيه المخالفات المرورية (من نظام المخالفات) قبل إرسال البطاقة ---------- */
-  const FINES_API='https://script.google.com/macros/s/AKfycbyhMGws-oWKytVX3_tG_C9SsEwvf6cyLzCJmuiRpm4OyCS3xYcoFmjFfxuRcOrNDTmxfw/exec', FINES_OBJ='https://hanode40-sketch.github.io/fines/objection.html?t=';
-  async function finesPending(iqs){
-    try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(window.NWAuth.attach({action:'pendingFor',iqamas:iqs}))});
-      const j=await r.json(); return j&&j.ok?j.drivers||{}:{}; }catch(e){ return {}; } }
-  let FINES={};
-  const FINES_SYS='https://hanode40-sketch.github.io/fines/#driver=';
-  function finesHead(p){ const dl=String(p.deadline||'').replace('T',' ').slice(0,16), L=[];
-    if(p.count) L.push(`⚠️ عليه ${p.count} مخالفة مرورية بانتظار إقراره أو اعتراضه — حتى <span dir="ltr">${esc(dl)}</span>`);
-    if(p.notSent) L.push(`🟠 عليه ${p.notSent} مخالفة مرورية لم تُرسل له بعد`);
-    return L.join('<br>'); }
-  function finesRow(it,iq){ const p=FINES[iq]; if(!p||!(p.count||p.notSent)) return '';
-    return `<div style="border:1px solid #dc2626;background:rgba(220,38,38,.08);border-radius:10px;padding:6px 8px;margin-top:6px">
-      <div style="color:#dc2626;font-weight:700;font-size:13px">${finesHead(p)}</div>
-      <label style="display:flex;align-items:center;gap:6px;margin-top:4px;cursor:pointer;font-size:12.5px;font-weight:600">
-        <input type="checkbox" data-fnok="${esc(iq)}" data-duty="${esc(it.duty)}" ${p.noted?'checked':''} style="width:18px;height:18px">
-        ${p.noted?`✅ تم التنبيه والتحدث مع السائق — ${esc(p.noted.by)} · ${esc(p.noted.at)}`:'شفت التنبيه وتحدثت مع السائق عن المخالفات'}</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-      ${p.token?`<button class="bbtn sm" data-fnlink="${esc(iq)}">📲 رابط المخالفات</button>`:''}
-      ${p.notSent?`<a class="bbtn sm wa" href="${FINES_SYS+encodeURIComponent(iq)}" target="_blank" rel="noopener" style="text-decoration:none">🗂️ إرسال المخالفات من نظام المخالفات</a>`:''}</div></div>`; }
-  async function finesNote(iq,duty){ const p=FINES[iq]; if(!p) return;
-    try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify(window.NWAuth.attach({action:'pendingNote',iqama:iq,duty,vnos:p.vnos||p.items.map(x=>x.vno).join(',')}))}); const j=await r.json();
-      if(j&&j.ok){ p.noted={by:j.by||auth.name||'',at:j.at||''}; } else alert('ما انحفظ التأكيد: '+((j&&(j.message||j.error))||''));
-    }catch(e){ alert('ما انحفظ التأكيد — تأكد من الاتصال'); } draw(); }
-  async function finesUnnote(iq,duty){ const p=FINES[iq]; if(!p) return false;
-    if(!confirm('إلغاء علامة «تم التنبيه والتحدث مع السائق»؟\nبعد الإلغاء ما ينفتح إرسال البطاقة إلا بوضع العلامة من جديد.')){ draw(); return false; }
-    try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(window.NWAuth.attach({action:'pendingUnnote',iqama:iq,duty}))}); const j=await r.json();
-      if(j&&j.ok){ p.noted=null; draw(); return true; } alert('ما انلغى التأكيد: '+((j&&(j.message||j.error))||''));
-    }catch(e){ alert('ما انلغى التأكيد — تأكد من الاتصال'); } draw(); return false; }
-  function finesLink(iq){ const p=FINES[iq]; if(!p||!p.token) return; const dl=String(p.deadline||'').replace('T',' ').slice(0,16);
-    waGo(String(waNum(iq)).replace(/\D/g,''),'السيد/ '+(p.name||'')+'\nلديك '+p.count+' مخالفة مرورية بانتظار إقرارك أو اعتراضك حتى '+dl+':\n'+FINES_OBJ+encodeURIComponent(p.token)+'\n\nYou have '+p.count+' traffic violation(s) awaiting your acknowledgement or objection. Please open the link above.'); }
-  function finesAlert(m,it,iq,kind,num){
-    const box=document.createElement('div'); m.firstElementChild.insertBefore(box,m.firstElementChild.children[2]||null);
-    finesPending([iq]).then(D=>{ const p=D[iq]; if(!m.isConnected) return; if(!p){ delete FINES[iq]; return; } FINES[iq]=p;
-      const dl=String(p.deadline||'').replace('T',' ').slice(0,16), must=kind==='card';
-      box.innerHTML=`<div style="border:2px solid #dc2626;background:rgba(220,38,38,.08);border-radius:12px;padding:10px 12px;margin:0 0 10px">
-        <b style="color:#dc2626">${finesHead(p)}</b>
-        <div class="bnote" style="margin:4px 0">تحدّث مع السائق قبل المغادرة${p.count?': يفتح رسالة المخالفات على الواتساب ويؤكد <b>الإقرار</b> أو <b>الاعتراض</b>':''}${p.notSent?(p.count?'، و':': ')+'المخالفات غير المُرسلة تُرسل له من <b>نظام المخالفات</b>':''}.</div>
-        ${p.items.length?`<div class="bnote" style="max-height:90px;overflow:auto;margin:4px 0">${p.items.map(x=>`• ${esc(x.vno)} — ${esc(x.descAr)} — ${esc(x.dateG)}`).join('<br>')}</div>`:''}
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0">
-        ${p.token?`<button class="bbtn" id="fnResend">📲 إعادة إرسال رابط المخالفات للسائق</button>`:''}
-        ${p.notSent?`<a class="bbtn wa" href="${FINES_SYS+encodeURIComponent(iq)}" target="_blank" rel="noopener" style="text-decoration:none">🗂️ إرسال المخالفات من نظام المخالفات</a>`:''}</div>
-        <label class="bnote" style="display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-weight:700"><input type="checkbox" id="fnTalk"> شفت التنبيه وتحدثت مع السائق عن المخالفات${must?' (مطلوب قبل إرسال البطاقة)':''}</label></div>`;
-      m.dataset.fines=must?'1':'';
-      if(p.noted){ const t=box.querySelector('#fnTalk'); t.checked=true; t.parentElement.insertAdjacentHTML('beforeend',' <span class="bnote" id="fnBy">('+esc(p.noted.by)+' · '+esc(p.noted.at)+')</span>'); }
-      const rs=box.querySelector('#fnResend'); if(rs) rs.onclick=()=>{ const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
-        waGo(d,'السيد/ '+(p.name||'')+'\nلديك '+p.count+' مخالفة مرورية بانتظار إقرارك أو اعتراضك حتى '+dl+':\n'+FINES_OBJ+encodeURIComponent(p.token)+'\n\nYou have '+p.count+' traffic violation(s) awaiting your acknowledgement or objection. Please open the link above.',isMobile?'wa':m.querySelector('#bmHow').value); };
-      box.querySelector('#fnTalk').onchange=async e=>{ const t=e.target; t.disabled=true;
-        if(t.checked){ await finesNote(iq,it.duty); t.checked=!!(FINES[iq]&&FINES[iq].noted); }
-        else { const ok=await finesUnnote(iq,it.duty); if(ok){ const b=box.querySelector('#fnBy'); if(b) b.remove(); } else t.checked=true; }
-        t.disabled=false; };
-    });
-  }
   const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const waHow=()=>waHowGet();
   function openSend(duty,iq,kind){
@@ -1899,7 +1844,6 @@ applyUILang();
       <label class="bnote" style="display:block;margin:8px 0 4px;font-weight:700">الرسالة (تقدر تعدّلها)</label>
       <textarea id="bmTxt" dir="${ML[lang].rtl?'rtl':'ltr'}">${esc(text)}</textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="bbtn" data-close>إلغاء</button><button class="bbtn wa" id="bmGo">فتح واتساب وإرسال</button></div>`);
-    finesAlert(m,it,iq,kind,m.querySelector('#bmNum'));
     const num=m.querySelector('#bmNum'), ok=()=>{ const v=window.waValidNum?waValidNum(num.value):/\d{9,}/.test(num.value); m.querySelector('#bmBad').style.display=ok0(v); m.querySelector('#bmGo').disabled=!v; return v; }, ok0=v=>v?'none':'';
     const saveL=m.querySelector('#bmSaveL'), dOf=v=>window.waDigits?waDigits(v):String(v).replace(/\D/g,''), same=(x,y)=>x.slice(-9)===y.slice(-9);
     const chg=()=>{ saveL.style.display=(!same(dOf(num.value),orig)&&!same(dOf(num.value),WAFIX[iq]||orig))?'flex':'none'; };
@@ -1910,7 +1854,6 @@ applyUILang();
       if(lang===langOf(iq)) delete langPref[iq]; else langPref[iq]=lang; try{ localStorage.setItem(LANG_KEY,JSON.stringify(langPref)); }catch(_){} };
     m.querySelector('#bmGo').onclick=async()=>{
       if(!ok()) return;
-      if(m.dataset.fines==='1' && !(m.querySelector('#fnTalk')||{}).checked){ alert('السائق عليه مخالفات مرورية — تحدّث معه وضع علامة «شفت التنبيه وتحدثت مع السائق» أولاً'); return; }
       const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
       if(m.querySelector('#bmSave').checked && saveL.style.display!=='none'){ if(same(d,orig)) delete WAFIX[iq]; else WAFIX[iq]=d; try{ localStorage.setItem('nwBoardWa',JSON.stringify(WAFIX)); }catch(e){} }   // التعديل لهالمرة بس، إلا لو اختار الحفظ
       const how=m.querySelector('#bmHow').value, tx=encodeURIComponent(m.querySelector('#bmTxt').value);
@@ -1940,7 +1883,10 @@ applyUILang();
     ws.eachRow((row,i)=>{ if(i<=hr+1) return; const g=c=>row.getCell(c).value, code=cellTxt(g(3)); if(!/^NW/i.test(code)) return;
       const f=row.getCell(3).fill, argb=String((f&&f.fgColor&&f.fgColor.argb)||'').toUpperCase();
       const bus=argb.endsWith('FFC000')?'VIP':argb.endsWith('00B0F0')?'WHEELCHAIR':'STANDARD';
-      trips.push({trip:code,route:cellTxt(g(2)),duty:cellTxt(g(4)),disp:cellTxt(g(5)),dt:cellTime(g(6)),fr:cellTxt(g(7)),t0:cellTime(g(8)),to:cellTxt(g(9)),t1:cellTime(g(10)),days:cellTxt(g(11)),mod:cellTxt(g(12)),bus,stops:[]}); });
+      // من جدول 19/11: انضاف بعد عمود الوصول عمود "بعد الرحلة" (Riyadh Depot / Keep bus and drivers at Station…) وتأخر عمود الأيام خانة
+      const c11=cellTxt(g(11)), isDays=x=>/daily|only|except|everyday|sunday|monday|tuesday|wednesday|thursday|friday|saturday|يومي/i.test(x);
+      const hasAfter=c11&&!isDays(c11), after=hasAfter?c11:'', days=hasAfter?cellTxt(g(12)):c11, mod=cellTxt(g(hasAfter?13:12));
+      trips.push({trip:code,route:cellTxt(g(2)),duty:cellTxt(g(4)),disp:cellTxt(g(5)),dt:cellTime(g(6)),fr:cellTxt(g(7)),t0:cellTime(g(8)),to:cellTxt(g(9)),t1:cellTime(g(10)),after,days,mod,bus,stops:[]}); });
     const ss=wb.worksheets.find(w=>/stop/i.test(w.name)), T={}; trips.forEach(t=>T[t.trip]=t);
     if(ss) ss.eachRow((row,i)=>{ if(i===1) return; const g=c=>row.getCell(c).value, t=T[cellTxt(g(6))]; if(t) t.stops.push([cellTxt(g(4)),cellTime(g(2)),cellTime(g(3)),cellTxt(g(5)).toUpperCase()]); });
     return {trips,valid};
@@ -2049,8 +1995,6 @@ applyUILang();
   $('bQ').addEventListener('search',()=>{ if(!$('bQ').value){ $('bSug').style.display='none'; draw(); } });
   $('bRefresh').onclick=()=>{ loadSched(true).then(loadDay); };
   $('bChips').onclick=e=>{ const b=e.target.closest('[data-f]'); if(b){ FILTER=b.dataset.f; draw(); } };
-  $('bList').addEventListener('change',e=>{ const c=e.target.closest('[data-fnok]'); if(!c) return; c.disabled=true; if(c.checked) finesNote(c.dataset.fnok,c.dataset.duty); else finesUnnote(c.dataset.fnok,c.dataset.duty); });
-  $('bList').addEventListener('click',e=>{ const l=e.target.closest('[data-fnlink]'); if(l){ e.preventDefault(); finesLink(l.dataset.fnlink); }  });
   $('bList').addEventListener('click',e=>{ const sw=e.target.closest('[data-swap]'), us=e.target.closest('[data-unsub]');
     const vw=e.target.closest('[data-view]'); if(vw){ viewCard(vw.dataset.view); return; }
     if(sw){ openSwap(sw.dataset.swap,sw.dataset.iq); return; } if(us){ e.preventDefault(); unSub(us.dataset.unsub,us.dataset.iq); return; } });
