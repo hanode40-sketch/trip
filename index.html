@@ -1320,7 +1320,7 @@ applyUILang();
     const t=T(), pv=$('rm-preview'); parsed=null; $('rm-save').disabled=true;
     if(!out.length){ pv.innerHTML='<span style="color:var(--text-danger)">'+esc(t.noCols)+'</span>'; return false; }
     let known=new Set(Object.keys(TRIP_DB).flatMap(k=>[nk(k)].concat(k.split('+').map(nk))));
-    try{ const c=JSON.parse(localStorage.getItem('nwSched1')||'null'); if(c&&c.trips&&c.trips.length) known=new Set(c.trips.map(x=>nk(x.trip))); }catch(_){}   // نقارن بجدول الرحلات المرفوع (أحدث من قائمة البرنامج القديمة)
+    try{ const c=JSON.parse(localStorage.getItem('nwSched1')||'null'); if(c&&c.trips&&c.trips.length) known=new Set(c.trips.concat((c.prev&&c.prev.trips)||[]).map(x=>nk(x.trip))); }catch(_){}   // نقارن بجدول الرحلات المرفوع (أحدث من قائمة البرنامج القديمة)
     const unkT=out.filter(r=>!known.has(nk(r[0]))).map(r=>r[0]);
     const unkD=[...new Set(out.flatMap(r=>[r[1],r[2]]).filter(x=>x&&!DRIVER_DATA.some(d=>d[0]===x)))];
     let h2='<div style="color:var(--text-success);font-weight:700">'+esc(t.sum(out.length,out.filter(r=>r[2]).length))+'</div>';
@@ -1565,11 +1565,24 @@ applyUILang();
   tab((()=>{ const v=localStorage.getItem('nwTripTab')||'board'; return (v==='manual'&&!canUp)?'board':v; })());
 
   /* ---------- الجدول ---------- */
+  /* نسختين: الجدول الحالي + السابق. أي تاريخ قبل بداية الجدول الحالي يقرأ السابق */
+  let CUR=null, PREV=null;
+  const sStart=v=>{ const m=String(v||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m?m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'):''; };
+  function pickSched(){
+    const date=$('bDate').value; let use=CUR, old=false;
+    if(CUR&&PREV&&PREV.trips&&PREV.trips.length){ const cs=sStart(CUR.meta&&CUR.meta.valid); if(cs&&date&&date<cs){ use=PREV; old=true; } }
+    SCHED=use?use.trips:[]; META=Object.assign({},(use&&use.meta)||{},{__prev:old});
+  }
+  function setSched(j){
+    CUR={trips:j.trips||[],meta:j.meta||{}}; PREV=j.prev&&j.prev.trips&&j.prev.trips.length?{trips:j.prev.trips,meta:j.prev.meta||{}}:null;
+    try{ localStorage.setItem('nwSched1',JSON.stringify({trips:CUR.trips,meta:CUR.meta,prev:PREV})); }catch(e){}
+    pickSched(); buildDuties();
+  }
   async function loadSched(force){
-    if(SCHED&&!force) return;
-    try{ const c=JSON.parse(localStorage.getItem('nwSched1')||'null'); if(c&&!force){ SCHED=c.trips; META=c.meta||{}; buildDuties(); } }catch(e){}
+    if(CUR&&!force) return;
+    try{ const c=JSON.parse(localStorage.getItem('nwSched1')||'null'); if(c&&!force){ CUR={trips:c.trips||[],meta:c.meta||{}}; PREV=c.prev||null; pickSched(); buildDuties(); } }catch(e){}
     const j=await auth.call('scheduleGet',{});
-    if(j&&j.ok){ SCHED=j.trips||[]; META=j.meta||{}; try{ localStorage.setItem('nwSched1',JSON.stringify({trips:SCHED,meta:META})); }catch(e){} buildDuties(); }
+    if(j&&j.ok) setSched(j);
   }
   function buildDuties(){
     const by={};
@@ -1591,6 +1604,7 @@ applyUILang();
   /* ---------- اليوم: الروستر + حالة الإرسال ---------- */
   async function loadDay(){
     const date=$('bDate').value; if(!date) return;
+    if(CUR){ pickSched(); buildDuties(); }
     const my=++LOADING; $('bList').innerHTML='<div class="bmsg">جاري تحميل الروستر وحالة الإرسال...</div>';
     try{
       const [r,s]=await Promise.all([auth.call('rosterGet',{date}), auth.call('routeDay',{date}), loadSched()]);
@@ -1648,7 +1662,7 @@ applyUILang();
     $('bCnt').textContent=`${act.length} واجب · ${sentN} من ${drvN} سائق وصلهم المسار`+(lateN?` · ${lateN} انرسل متأخر (أقل من ${LEAD_H} ساعات)`:'')+(all.length-act.length?` · ${all.length-act.length} واجب ما يشتغل/مو في الروستر`:'');
     $('bChips').innerHTML=[['miss','لم يُرسل'],['over','🔴 فات موعده'],['done','تم الإرسال'],['all','الكل'],['off','لا يعمل اليوم']].map(([k,t])=>`<button class="bchip${FILTER===k?' on':''}" data-f="${k}">${t} (${n[k]})</button>`).join('');
     const info=[];
-    info.push(`<div class="bnote">📅 الجدول: ${esc(META.valid||'—')}${META.by?' · رفعه '+esc(META.by)+' ('+esc(META.at)+')':''} · 📋 روستر ${esc($('bDate').value)}: ${ROSTER&&ROSTER.__n?ROSTER.__n+' رحلة'+(ROSTER.__by?' · رفعه '+esc(ROSTER.__by)+' ('+esc(ROSTER.__at)+')':''):'<b style="color:#dc2626">غير مرفوع</b>'}</div>`);
+    info.push(`<div class="bnote">📅 الجدول${META.__prev?' <b style="color:#b7791f">(السابق — هذا اليوم قبل بداية الجدول الجديد)</b>':''}: ${esc(META.valid||'—')}${META.by?' · رفعه '+esc(META.by)+' ('+esc(META.at)+')':''} · 📋 روستر ${esc($('bDate').value)}: ${ROSTER&&ROSTER.__n?ROSTER.__n+' رحلة'+(ROSTER.__by?' · رفعه '+esc(ROSTER.__by)+' ('+esc(ROSTER.__at)+')':''):'<b style="color:#dc2626">غير مرفوع</b>'}</div>`);
     if(ROSTER&&!ROSTER.__n) info.push('<div class="bwarn">⚠️ ما فيه روستر مرفوع لهذا التاريخ — الواجبات تطلع «لا يعمل اليوم» لين يترفع.</div>');
     if(ROSTER&&ROSTER.__n){   // تطابق الروستر مع الجدول: رحلات في الروستر مو موجودة في الجدول = غالباً روستر قديم أو جدول قديم
       const known=new Set((SCHED||[]).map(t=>nk(t.trip)));
@@ -1906,7 +1920,8 @@ applyUILang();
       }catch(err){ pv.innerHTML='<span class="bno">تعذّر قراءة الملف: '+esc(err.message||err)+'</span>'; } };
     m.querySelector('#bsS').onclick=async e=>{ if(!P) return; e.target.disabled=true; e.target.textContent='جاري الحفظ...';
       try{ const j=await auth.call('scheduleSave',{trips:P.trips,valid:P.valid,file:P.file}); if(!j||!j.ok) throw new Error((j&&j.error)||'ERR');
-        SCHED=j.trips; META=j.meta||{}; try{ localStorage.setItem('nwSched1',JSON.stringify({trips:SCHED,meta:META})); }catch(_){} buildDuties(); m.remove(); draw();
+        setSched(j); m.remove(); draw();
+        if(j.savedAs==='prev') alert('تم حفظه كـ «الجدول السابق» لأن بدايته ('+sStart(P.valid)+') قبل الجدول الحالي — يُستخدم للأيام اللي قبل '+sStart(CUR.meta.valid));
       }catch(err){ alert(L('ما انحفظ: ','Not saved: ')+(err.message||err)); e.target.disabled=false; e.target.textContent='حفظ للكل'; } };
   }
 
