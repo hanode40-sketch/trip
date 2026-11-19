@@ -1054,7 +1054,11 @@ send2Btn.addEventListener('click',()=>openChooser(2));
     D.p1&&('Captain #1: '+esc(D.p1.name)),D.p2&&('Captain #2: '+esc(D.p2.name)),D.bus&&('Bus #: '+esc(D.bus))].filter(Boolean).join('<br>');
   // نقاط التوقف مع اللوكيشن لكل رحلة (ذهاب وعودة)
   (function(){
-    const rec=TRIP_DB[D.trip]; if(!rec) return;
+    // البحث عن الرحلة: بالرمز كما هو، أو كجزء من رحلة مزدوجة (A + B)، أو برمز الوردية
+    let tk=D.trip&&TRIP_DB[D.trip]?D.trip:'';
+    if(!tk&&D.trip) tk=Object.keys(TRIP_DB).find(k=>k.split(' + ')[0]===D.trip)||'';
+    if(!tk) tk=Object.keys(TRIP_DB).find(k=>TRIP_DB[k].dutyCode===code)||'';
+    const rec=TRIP_DB[tk]; if(!rec) return; D.trip=tk;
     const groups=[{title:rec.ret?(isRound(rec)?'رحلة الذهاب · Outbound':'الرحلة الأولى · First trip'):'نقاط التوقف · Stops',code:D.trip.split(' + ')[0],time:rec.time,stops:ROUTE_STOPS[rec.dirKey],start:rec.start,end:rec.end}];
     if(rec.ret) groups.push({title:isRound(rec)?'رحلة العودة · Return':'الرحلة الثانية · Second trip',code:rec.ret.code,time:rec.ret.time,stops:ROUTE_STOPS[rec.ret.dirKey],start:rec.ret.start,end:rec.ret.end});
     document.getElementById('cv-stops').innerHTML=groups.map(g=>`
