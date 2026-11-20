@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script>
-/* نظام الدخول — ما يُطلب من الكابتن اللي يفتح رابط البطاقة من واتساب */
+/* نظام الدخول — ما يُطلب من الكابتن اللي يفتح رابط جدول الرحلة من واتساب */
 if(!/[?&]card=/.test(location.search)){document.write('<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="trip"><\/script>');}
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -229,9 +229,9 @@ window.waAnchor=function(a,num){ var how=waHowGet(); a.href=waLink(num,'',how); 
 <button id="send-btn" disabled style="width:100%;font-weight:600;padding:12px;background:#25D366;color:#fff;border-color:#25D366;font-size:15px">إرسال عبر واتساب</button>
 <button id="send2-btn" type="button" disabled style="display:none;width:100%;font-weight:600;padding:12px;background:#128C7E;color:#fff;border-color:#128C7E;font-size:15px;margin-top:10px"></button>
 <div id="card-view" style="display:none;background:var(--surface-2);border-radius:12px;border:1px solid var(--border);padding:1.25rem;margin-bottom:16px;text-align:center">
-  <p style="margin:0 0 4px;font-size:18px;font-weight:700;color:#1F3864">بطاقة جدول الرحلة — Trip Schedule Card</p>
+  <p style="margin:0 0 4px;font-size:18px;font-weight:700;color:#1F3864">جدول الرحلة — Trip Schedule Card</p>
   <p id="cv-info" style="margin:0 0 14px;font-size:13px;color:var(--text-secondary);line-height:1.8"></p>
-  <p id="cv-status" style="margin:0 0 14px;font-size:13px;color:var(--text-muted)">جاري تجهيز البطاقة... Preparing the card...</p>
+  <p id="cv-status" style="margin:0 0 14px;font-size:13px;color:var(--text-muted)">جاري تجهيز جدول الرحلة... Preparing the card...</p>
   <img id="cv-preview" alt="Trip Schedule Card" style="display:none;width:100%;border:1px solid var(--border);border-radius:10px;margin-bottom:12px"/>
   <button id="cv-open" type="button" disabled style="width:100%;font-weight:700;padding:13px;background:#1F3864;color:#fff;border-color:#1F3864;font-size:15px">🖼️ فتح الصورة — Open image</button>
   <button id="cv-img" type="button" disabled style="width:100%;margin-top:8px;padding:11px;font-weight:600">🖼️ حفظ كصورة — Save as image</button>
@@ -586,7 +586,7 @@ document.addEventListener('click',(e)=>{
 });
 
 
-// ---------- Trip Schedule Card (بطاقة جدول الرحلة) ----------
+// ---------- Trip Schedule Card (جدول الرحلة) ----------
 // ملفات البطاقات في مجلد duty/ بنفس اسم الوردية، مثل duty/NW01-1-1.pdf
 // DUTY_INDEX: [عدد الكباتن, شكل النموذج]
 const DUTY_INDEX={"NW01-1-1":[2,"A"],"NW01-1-2":[2,"A"],"NW01-2-1":[2,"A"],"NW01-3-1":[2,"A"],"NW02-1-2":[1,"A"],"NW02-2-1":[1,"A"],"NW02-2-2":[1,"A"],"NW02-3-1":[1,"A"],"NW02-3-2":[1,"A"],"NW02-4-2":[1,"A"],"NW02-5-1":[1,"A"],"NW02-5-2":[1,"A"],"NW02-6-1":[1,"A"],"NW02-6-2":[1,"A"],"NW03-12-1":[2,"A"],"NW03-5-1":[2,"A"],"NW04-1-1":[2,"A"],"NW04-10-1":[2,"A"],"NW04-11-1":[2,"A"],"NW04-2-1":[2,"A"],"NW04-3-1":[2,"A"],"NW04-4-1":[2,"A"],"NW04-6-1":[2,"A"],"NW04-7-1":[2,"A"],"NW04-8-1":[2,"A"],"NW04-9-1":[2,"A"],"NW05-1-1":[2,"A"],"NW05-2-1":[2,"A"],"NW06-1-1":[1,"A"],"NW06-2-1":[1,"A"],"NW07-1-1":[2,"A"],"NW07-10-1":[2,"A"],"NW07-2-1":[2,"A"],"NW07-3-1":[2,"A"],"NW07-4-1":[2,"A"],"NW07-7-1":[2,"A"],"NW07-8-1":[2,"A"],"NW07-9-1":[2,"A"],"NW08-11-1":[2,"A"],"NW08-12-1":[2,"A"],"NW08-5-1":[2,"A"],"NW08-6-1":[2,"A"],"NW10-1-1":[2,"A"],"NW10-4-1":[2,"A"],"NW10-9-1":[2,"A"],"NW11-3-1":[2,"A"],"NW11-5-1":[2,"A"],"NW14-1-1":[2,"A"],"NW14-1-2":[2,"A"],"NW14-2-1":[2,"A"],"NW14-3-1":[2,"A"],"NW15-1-1":[2,"A"],"NW15-2-1":[2,"A"],"NW15-3-1":[2,"A"],"NW15-4-1":[2,"A"],"NW15B-1-1":[1,"C"],"NW15B-2-1":[1,"C"],"NW15B-3-1":[1,"C"],"NW15B-4-1":[1,"C"],"NW16-1-1":[2,"A"],"NW16-2-1":[2,"A"],"NW16-3-1":[2,"A"],"NW16-4-1":[2,"A"],"NW17-1-1":[2,"A"],"NW17-2-1":[2,"A"],"NW17-3-1":[2,"A"],"NW17-4-1":[2,"A"],"NW17B-1-1":[1,"A"],"NW17B-2-1":[1,"A"],"NW17B-3-1":[1,"A"],"NW17B-4-1":[1,"A"],"NW18-1-1":[2,"A"],"NW18-10-1":[2,"A"],"NW18-11-1":[2,"A"],"NW18-12-1":[2,"A"],"NW18-2-1":[2,"A"],"NW18-3-1":[2,"A"],"NW18-4-1":[2,"A"],"NW18-5-1":[2,"A"],"NW18-6-1":[2,"A"],"NW18-7-1":[2,"A"],"NW18-8-1":[2,"A"],"NW18-9-1":[2,"A"],"NW21-1-1":[2,"A"],"NW21-2-1":[2,"A"],"NW22-1-1":[1,"A"],"NW22-1-2":[1,"A"],"NW22-2-1":[1,"A"],"NW22-3-1":[1,"A"],"NW23-1-1":[2,"C"],"NW26-1-1":[1,"A"],"NW27-1-2":[2,"A"],"NW27-3-1":[2,"A"],"NW28-1-1":[1,"B"],"NW28-1-2":[1,"B"],"NW28-2-1":[1,"B"],"NW28-2-2":[1,"B"],"NW28-3-1":[1,"B"],"NW28-4-1":[1,"B"],"NW28-5-1":[1,"B"],"NW28-6-1":[1,"B"],"NW28-7-1":[1,"B"],"NW29-1-1":[2,"A"],"NW29-2-1":[2,"A"],"NW30-2-1":[2,"A"],"NW30-5-2":[2,"A"],"NW30-6-1":[2,"A"],"NW30-7-1":[2,"A"],"NW30-8-1":[2,"A"],"NW31-1-1":[2,"A"],"NW31-2-1":[2,"A"],"NW32-1-1":[2,"A"],"NW32-2-1":[2,"A"],"NW32-3-1":[2,"A"],"NW32-4-1":[2,"A"],"NW33-1-1":[2,"A"],"NW33-2-1":[2,"A"],"NW13+NW19-1-1":[2,"C"],"NW13+NW19-6-1":[2,"C"],"NW13+NW19-7-1":[2,"C"],"NW13+NW19-9-1":[2,"C"],"NW13+NW20-10-1":[2,"C"],"NW13+NW20-11-1":[2,"C"],"NW13+NW20-12-1":[2,"C"],"NW13+NW20-2-1":[2,"C"],"NW13+NW20-3-1":[2,"C"],"NW13+NW20-4-1":[2,"C"],"NW13+NW20-5-1":[2,"C"],"NW13+NW20-8-1":[2,"C"]};
@@ -596,10 +596,10 @@ const DUTY_LAYOUT={
   C:{rows:[[292,322],[322,350]],name:[23.5,216.5],iq:[217,280.8],mob:[348,444.5],bus:[482,311,577.8],date:[482,340.5,577.8]}   // نموذج البطاقات الجديد (NW15B و NW13+NW19/20 و NW23 — 11/2026) · الإقامة في الخانة الأولى لأن خانة Iqama مقسومة بخط
 };
 const DUTY_TXT={
-  ar:{label:'٥. بطاقة جدول الرحلة (Trip Schedule Card)',two:n=>'👥 الوردية '+n+' — بكابتنين (Double driver)',one:n=>'👤 الوردية '+n+' — بكابتن واحد',none:n=>'⚠️ لا توجد بطاقة جدول رحلة للوردية '+n,
+  ar:{label:'٥. جدول الرحلة (Trip Schedule Card)',two:n=>'👥 الوردية '+n+' — بكابتنين (Double driver)',one:n=>'👤 الوردية '+n+' — بكابتن واحد',none:n=>'⚠️ لا يوجد جدول رحلة للوردية '+n,
       pick1:'اختر الكابتن في الخطوة ٣',c2lbl:'👥 الكابتن الثاني — الرحلة بكابتنين (Captain #2)',c2opt:'👥 الكابتن الثاني (اختياري — إذا فيه كابتن ثاني) Captain #2',pick2:'اختر الكابتن الثاني في الخطوة ٣',extra2:' + كابتن ثاني إضافي',c2ph:'ابحث عن الكابتن الثاني برقم الإقامة أو الاسم',mob2:'جوال الكابتن الثاني',bus:'رقم الحافلة / رقم اللوحة BUS # (اختياري — يُترك فارغاً إذا غير معروف)',busph:'اضغط للقائمة أو ابحث برقم الحافلة أو اللوحة',plate:'لوحة',
-      share:'🔗 رابط البطاقة للكابتن',share1:'🔗 رابط البطاقة للكابتن الأول',share2:'🔗 رابط البطاقة للكابتن الثاني',file:'📎 ملف PDF',fmTitle:'إرسال بطاقة جدول الرحلة كصورة',fmMob:'رقم واتساب الكابتن (تأكد منه أو عدّله)',bad:'الرقم غير صحيح — سعودي 9 أرقام يبدأ بـ 5، أو دولي يبدأ بـ + ومفتاح الدولة',copyImg:'📋 نسخ الصورة',openChat:'💬 فتح محادثة الكابتن',pasteHint:'في واتساب: اضغط مطوّلاً على خانة الكتابة ← لصق ← إرسال',imgReady:'الصورة جاهزة — اضغط «نسخ الصورة» ثم افتح محادثة الكابتن',copiedImg:'✓ تم نسخ الصورة — افتح المحادثة والصقها',noClip:'جهازك ما يسمح بنسخ الصور — استخدم «مشاركة الصورة» واختر الكابتن',shareImg:'مشاركة الصورة…',fmBusy:'جاري تجهيز الملف...',fmReady:'الملف جاهز — اضغط "مشاركة الملف" ثم اختر واتساب وهذا الكابتن',fmShare:'مشاركة الملف',fmCancel:'إغلاق',copy:'نسخ الرقم',copied:'تم النسخ ✓',fmDl:'جهازك ما يدعم المشاركة — تم تحميل الملف، أرسله من واتساب كمرفق',r1:'الكابتن الأول — Captain #1',r2:'الكابتن الثاني — Captain #2',dl:'📄 تحميل PDF',dljpg:'🖼️ تحميل صورة',imgBusy:'جاري تحويل البطاقة لصورة...',imgFail:'تعذّر تحويل البطاقة لصورة — استخدم PDF',nolink:'رابط البطاقة يشتغل بس لما تفتح البرنامج من رابط GitHub',busy:'جاري تجهيز البطاقة...',ready:'البطاقة جاهزة — اضغط مشاركة مرة ثانية',done:'تم تجهيز البطاقة ✓',
-      nofile:'تعذّر فتح ملف البطاقة — تأكد إن مجلد duty مرفوع على GitHub وإنك فاتح البرنامج من رابط GitHub',nolib:'تعذّر تحميل أداة PDF — تأكد من الإنترنت',no2:'تنبيه: ما اخترت الكابتن الثاني — خانته بتطلع فاضية'},
+      share:'🔗 رابط جدول الرحلة للكابتن',share1:'🔗 رابط جدول الرحلة للكابتن الأول',share2:'🔗 رابط جدول الرحلة للكابتن الثاني',file:'📎 ملف PDF',fmTitle:'إرسال جدول الرحلة كصورة',fmMob:'رقم واتساب الكابتن (تأكد منه أو عدّله)',bad:'الرقم غير صحيح — سعودي 9 أرقام يبدأ بـ 5، أو دولي يبدأ بـ + ومفتاح الدولة',copyImg:'📋 نسخ الصورة',openChat:'💬 فتح محادثة الكابتن',pasteHint:'في واتساب: اضغط مطوّلاً على خانة الكتابة ← لصق ← إرسال',imgReady:'الصورة جاهزة — اضغط «نسخ الصورة» ثم افتح محادثة الكابتن',copiedImg:'✓ تم نسخ الصورة — افتح المحادثة والصقها',noClip:'جهازك ما يسمح بنسخ الصور — استخدم «مشاركة الصورة» واختر الكابتن',shareImg:'مشاركة الصورة…',fmBusy:'جاري تجهيز الملف...',fmReady:'الملف جاهز — اضغط "مشاركة الملف" ثم اختر واتساب وهذا الكابتن',fmShare:'مشاركة الملف',fmCancel:'إغلاق',copy:'نسخ الرقم',copied:'تم النسخ ✓',fmDl:'جهازك ما يدعم المشاركة — تم تحميل الملف، أرسله من واتساب كمرفق',r1:'الكابتن الأول — Captain #1',r2:'الكابتن الثاني — Captain #2',dl:'📄 تحميل PDF',dljpg:'🖼️ تحميل صورة',imgBusy:'جاري تحويل جدول الرحلة لصورة...',imgFail:'تعذّر تحويل جدول الرحلة لصورة — استخدم PDF',nolink:'رابط جدول الرحلة يشتغل بس لما تفتح البرنامج من رابط GitHub',busy:'جاري تجهيز جدول الرحلة...',ready:'جدول الرحلة جاهز — اضغط مشاركة مرة ثانية',done:'تم تجهيز جدول الرحلة ✓',
+      nofile:'تعذّر فتح ملف جدول الرحلة — تأكد إن مجلد duty مرفوع على GitHub وإنك فاتح البرنامج من رابط GitHub',nolib:'تعذّر تحميل أداة PDF — تأكد من الإنترنت',no2:'تنبيه: ما اخترت الكابتن الثاني — خانته بتطلع فاضية'},
   en:{label:'5. Trip Schedule Card',two:n=>'👥 Shift '+n+' — Double driver',one:n=>'👤 Shift '+n+' — Single driver',none:n=>'⚠️ No trip schedule card for shift '+n,
       pick1:'Select the driver in step 3',c2lbl:'👥 Second driver — double-driver trip (Captain #2)',c2opt:'👥 Second driver (optional — if there is one) Captain #2',pick2:'Select the second driver in step 3',extra2:' + extra second driver',c2ph:'Search second driver by Iqama or name',mob2:'Second driver mobile',bus:'Bus # / Plate # (optional — leave blank if unknown)',busph:'Tap for the list or search by bus or plate number',plate:'Plate',
       share:'🔗 Card link to driver',share1:'🔗 Card link to first driver',share2:'🔗 Card link to second driver',file:'📎 PDF file',fmTitle:'Send Trip Schedule Card as image',fmMob:'Driver WhatsApp number (check or edit)',bad:'Invalid number — Saudi 9 digits starting with 5, or international starting with + and country code',copyImg:'📋 Copy image',openChat:'💬 Open driver chat',pasteHint:'In WhatsApp: long-press the message box → Paste → Send',imgReady:'Image ready — tap “Copy image”, then open the driver chat',copiedImg:'✓ Image copied — open the chat and paste it',noClip:'Your device can’t copy images — use “Share image” and pick the driver',shareImg:'Share image…',fmBusy:'Preparing the file...',fmReady:'File ready — tap "Share file", choose WhatsApp, then this driver',fmShare:'Share file',fmCancel:'Close',copy:'Copy number',copied:'Copied ✓',fmDl:'Sharing not supported — the file was downloaded, attach it in WhatsApp',r1:'First driver — Captain #1',r2:'Second driver — Captain #2',dl:'📄 Download PDF',dljpg:'🖼️ Download image',imgBusy:'Converting the card to an image...',imgFail:'Could not convert to an image — use PDF',nolink:'The card link only works when the tool is opened from its GitHub link',busy:'Preparing the card...',ready:'Card ready — tap Share again',done:'Card ready ✓',
@@ -737,11 +737,11 @@ function cardLink(D){
 function cardMsg(drv,lang,link){
   const D=currentDutyData(), dt=formatTripDate(D.date,lang);
   return lang==='ar'
-    ? 'مرحباً '+drv.name+'،\nبطاقة جدول الرحلة لرحلتك '+selectedTrip.code+(dt?' بتاريخ '+dt:'')+' ('+D.code+'):\n'+link+'\n\nاضغط الرابط لعرض البطاقة وتحميلها.'
+    ? 'مرحباً '+drv.name+'،\nجدول الرحلة لرحلتك '+selectedTrip.code+(dt?' بتاريخ '+dt:'')+' ('+D.code+'):\n'+link+'\n\nاضغط الرابط لعرض جدول الرحلة وتحميلها.'
     : 'Hello '+drv.name+',\nYour trip schedule card for trip '+selectedTrip.code+(dt?' on '+dt:'')+' ('+D.code+'):\n'+link+'\n\nTap the link to view and download the card.';
 }
 dutyShareBtn.addEventListener('click',()=>openWaConfirm(1,'card'));
-// ---- تحويل البطاقة من PDF إلى صورة JPG ----
+// ---- تحويل جدول الرحلة من PDF إلى صورة JPG ----
 const PDFJS_BASE='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 async function pdfBlobToJpg(blob){
   if(!window.pdfjsLib) throw new Error('nolib');
@@ -761,7 +761,7 @@ async function dutyAsJpg(d){
   return d.jpg;
 }
 function downloadBlob(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); }
-// ---- إرسال البطاقة كصورة: نسخ الصورة + فتح محادثة الكابتن على رقمه ----
+// ---- إرسال جدول الرحلة كصورة: نسخ الصورة + فتح محادثة الكابتن على رقمه ----
 const fileModal=document.getElementById('file-modal'), fmShare=document.getElementById('fm-share'), fmStatus=document.getElementById('fm-status');
 const fmCopy=document.getElementById('fm-copy'), fmOpen=document.getElementById('fm-open'), fmMobile=document.getElementById('fm-mobile'), fmWarn=document.getElementById('fm-warn'), fmHint=document.getElementById('fm-hint');
 let fmFile=null, fmToken=0, fmWhich=1;
@@ -933,7 +933,7 @@ function updateSendState(){
 // ---------- WhatsApp send with number confirmation ----------
 const send2Btn=document.getElementById('send2-btn');
 const WA_TXT={
-  ar:{one:'إرسال للكابتن',first:'إرسال للكابتن الأول',second:'إرسال للكابتن الثاني',scT1:'إرسال للكابتن الأول',scT2:'إرسال للكابتن الثاني',scT:'إرسال للكابتن',scMsg:'رسالة نصية',scMsgS:'رسالة المسار والأوقات ونقاط التوقف',scLink:'بطاقة جدول الرحلة — رابط',scLinkS:'رسالة فيها رابط على الرقم المسجّل، والكابتن يفتح صورة البطاقة من الرابط',scCard:'بطاقة جدول الرحلة — صورة',scCardS:'تُنسخ الصورة وتنفتح محادثة الكابتن على رقمه — تلصقها وترسل',scNoCard:'لا توجد بطاقة لهذه الوردية',scCancel:'إلغاء',title:'تأكيد رقم الجوال قبل الإرسال',titleCard:'تأكيد الرقم — إرسال بطاقة جدول الرحلة',cardSent:'تم فتح واتساب برابط البطاقة — اضغط إرسال داخل المحادثة.',
+  ar:{one:'إرسال للكابتن',first:'إرسال للكابتن الأول',second:'إرسال للكابتن الثاني',scT1:'إرسال للكابتن الأول',scT2:'إرسال للكابتن الثاني',scT:'إرسال للكابتن',scMsg:'رسالة نصية',scMsgS:'رسالة المسار والأوقات ونقاط التوقف',scLink:'جدول الرحلة — رابط',scLinkS:'رسالة فيها رابط على الرقم المسجّل، والكابتن يفتح صورة جدول الرحلة من الرابط',scCard:'جدول الرحلة — صورة',scCardS:'تُنسخ الصورة وتنفتح محادثة الكابتن على رقمه — تلصقها وترسل',scNoCard:'لا يوجد جدول رحلة لهذه الوردية',scCancel:'إلغاء',title:'تأكيد رقم الجوال قبل الإرسال',titleCard:'تأكيد الرقم — إرسال جدول الرحلة',cardSent:'تم فتح واتساب برابط جدول الرحلة — اضغط إرسال داخل المحادثة.',
       r1:'الكابتن الأول — Captain #1',r2:'الكابتن الثاني — Captain #2',mob:'رقم الواتساب (تأكد منه أو عدّله)',ok:'تأكيد وإرسال',cancel:'إلغاء',
       bad:'الرقم غير صحيح — سعودي 9 أرقام يبدأ بـ 5 (5XXXXXXXX) أو دولي يبدأ بـ + (مثال: +92 3XX XXXXXXX)',sent1:'تم فتح واتساب للكابتن الأول — اضغط إرسال داخل المحادثة.',sent2:'تم فتح واتساب للكابتن الثاني — اضغط إرسال داخل المحادثة.'},
   en:{one:'Send to driver',first:'Send to first driver',second:'Send to second driver',scT1:'Send to first driver',scT2:'Send to second driver',scT:'Send to driver',scMsg:'Text message',scMsgS:'Route, times and stops',scLink:'Trip Schedule Card — link',scLinkS:'Sent straight to the registered number; the driver opens the card from the link',scCard:'Trip Schedule Card — image',scCardS:'The image is copied and the driver’s chat opens on his number — paste and send',scNoCard:'No trip schedule card for this shift',scCancel:'Cancel',title:'Confirm mobile number before sending',titleCard:'Confirm number — send Trip Schedule Card',cardSent:'WhatsApp opened with the card link — press send in the chat.',
@@ -1071,12 +1071,12 @@ send2Btn.addEventListener('click',()=>openChooser(2));
         </div>`).join(''):`<div style="font-size:14px">${esc(g.start)} → ${esc(g.end)}</div>`}
       </div>`).join('');
   })();
-  if(!DUTY_INDEX[code]){ st.textContent='⚠️ لا توجد بطاقة لهذه الوردية — No card for this shift'; st.style.color='var(--text-danger)'; return; }
+  if(!DUTY_INDEX[code]){ st.textContent='⚠️ لا يوجد جدول رحلة لهذه الوردية — No card for this shift'; st.style.color='var(--text-danger)'; return; }
   let res=null;
   const run=async()=>{
     try{ res=await buildDutyPdfFrom(D); await dutyAsJpg(res); }
-    catch(e){ st.textContent=e.message==='nolib'?'تعذّر تحميل أداة البطاقة — تأكد من الإنترنت وأعد فتح الرابط':e.message==='nofile'?'⚠️ ملف البطاقة غير موجود على الموقع ('+code+'.pdf)':'تعذّر تجهيز البطاقة — حاول مرة ثانية'; st.style.color='var(--text-danger)'; return; }
-    st.textContent='✓ البطاقة جاهزة — Card ready'; st.style.color='var(--text-success)'; op.disabled=dl.disabled=im.disabled=false;
+    catch(e){ st.textContent=e.message==='nolib'?'تعذّر تحميل أداة جدول الرحلة — تأكد من الإنترنت وأعد فتح الرابط':e.message==='nofile'?'⚠️ ملف جدول الرحلة غير موجود على الموقع ('+code+'.pdf)':'تعذّر تجهيز جدول الرحلة — حاول مرة ثانية'; st.style.color='var(--text-danger)'; return; }
+    st.textContent='✓ جدول الرحلة جاهز — Card ready'; st.style.color='var(--text-success)'; op.disabled=dl.disabled=im.disabled=false;
     const pv=document.getElementById('cv-preview'); pv.src=URL.createObjectURL(res.jpg.blob); pv.style.display='block';
   };
   op.addEventListener('click',()=>{ if(!res||!res.jpg) return; const u=URL.createObjectURL(res.jpg.blob); const w=window.open(u,'_blank'); if(!w) location.href=u; });
@@ -1086,7 +1086,7 @@ send2Btn.addEventListener('click',()=>openChooser(2));
     try{ const j=await dutyAsJpg(res); const f=new File([j.blob],j.name,{type:'image/jpeg'});
       if(navigator.canShare&&navigator.canShare({files:[f]})){ try{ await navigator.share({files:[f]}); }catch(e){ if(e.name!=='AbortError') downloadBlob(j.blob,j.name); } }
       else downloadBlob(j.blob,j.name);
-    }catch(e){ st.textContent='تعذّر تحويل البطاقة لصورة — استخدم PDF'; st.style.color='var(--text-danger)'; }
+    }catch(e){ st.textContent='تعذّر تحويل جدول الرحلة لصورة — استخدم PDF'; st.style.color='var(--text-danger)'; }
     im.textContent=old; im.disabled=false;
   });
   if(document.readyState==='complete') run(); else window.addEventListener('load',run);
@@ -1187,7 +1187,7 @@ applyUILang();
   const $=id=>document.getElementById(id);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const auth=window.NWAuth;
-  if(!auth||!auth.call) return;                      // رابط البطاقة للكابتن: بدون روستر
+  if(!auth||!auth.call) return;                      // رابط جدول الرحلة للكابتن: بدون روستر
   const canUp=auth.role==='مدير'||auth.role==='مشرف';
   const cache={};                                     // date -> {map, n, by, at}
   let filled={d1:null,d2:null,date:null};
@@ -1723,8 +1723,8 @@ applyUILang();
     const it=dayItems().find(x=>x.duty===duty); if(!it) return;
     const P=it.drivers.map(x=>{ const d=DRV[x]||[]; return d.length?{name:d[1],iqama:d[0],mobile:d[3]}:{name:'',iqama:x,mobile:''}; });
     const m=modal(`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><h3 style="margin:0">🖼️ ${esc(it.duty)} · ${esc(it.date)}</h3><button class="bbtn sm" data-close>✕</button></div>
-      ${busOf(it)?'':'<div class="bwarn" style="margin:0 0 10px">⚠️ رقم الحافلة ما تعيّن بعد — البطاقة تطلع بدون رقم حافلة</div>'}
-      <div id="cvBox" class="bmsg">جاري تجهيز البطاقة...</div>
+      ${busOf(it)?'':'<div class="bwarn" style="margin:0 0 10px">⚠️ رقم الحافلة ما تعيّن بعد — جدول الرحلة يطلع بدون رقم حافلة</div>'}
+      <div id="cvBox" class="bmsg">جاري تجهيز جدول الرحلة...</div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><a class="bbtn p" id="cvDl" style="display:none;text-decoration:none">⬇ حفظ الصورة</a><button class="bbtn" data-close>إغلاق</button></div>`);
     m.firstElementChild.style.maxWidth='820px';
     try{
@@ -1733,7 +1733,7 @@ applyUILang();
       const r=await pdfBlobToJpg(d.blob), url=URL.createObjectURL(r.jpg);
       m.querySelector('#cvBox').outerHTML=`<img src="${url}" alt="" style="width:100%;border-radius:10px;border:1px solid var(--nw-line);background:#fff">`;
       const a=m.querySelector('#cvDl'); a.href=url; a.download=it.duty+'_'+it.date+'.jpg'; a.style.display='';
-    }catch(e){ m.querySelector('#cvBox').textContent=L(e.message==='nofile'?'ما لقيت ملف البطاقة لهذا الواجب ('+it.duty+')':'تعذّر تجهيز البطاقة — تأكد من الإنترنت', e.message==='nofile'?'Card file not found for this duty ('+it.duty+')':'Could not build the card — check the connection'); }
+    }catch(e){ m.querySelector('#cvBox').textContent=L(e.message==='nofile'?'ما لقيت ملف جدول الرحلة لهذا الواجب ('+it.duty+')':'تعذّر تجهيز جدول الرحلة — تأكد من الإنترنت', e.message==='nofile'?'Card file not found for this duty ('+it.duty+')':'Could not build the card — check the connection'); }
   }
   async function unSub(duty,iq){
     const it=dayItems().find(x=>x.duty===duty), sb=it&&subOf(it,iq); if(!sb) return;
@@ -1751,7 +1751,7 @@ applyUILang();
       ${no?`<b style="direction:ltr">${esc(no)}</b>${info?` <span class="s">(لوحة ${esc(info[1])} · ${esc(info[2])})</span>`:''}${mism?` <span class="btag" style="background:#fee2e2;color:#b91c1c">نوعها مختلف عن الجدول</span>`:''} <span class="s">— ${esc(b[1])} ${esc(b[2])}</span>
         <button class="bbtn sm" data-busedit="${esc(it.duty)}">تغيير</button>`
       :`<input class="bbus" list="bBusList" inputmode="numeric" placeholder="مثال: 4012" data-busin="${esc(it.duty)}" style="width:120px;font:inherit;padding:6px 9px;border-radius:9px;border:1px solid var(--nw-line);background:var(--nw-card);color:var(--nw-ink)">
-        <button class="bbtn sm p" data-bussave="${esc(it.duty)}">حفظ</button><span class="s">مطلوب قبل إرسال البطاقة</span>`}</div>`;
+        <button class="bbtn sm p" data-bussave="${esc(it.duty)}">حفظ</button><span class="s">مطلوب قبل إرسال جدول الرحلة</span>`}</div>`;
   }
   async function saveBus(duty,val){
     const it=dayItems().find(x=>x.duty===duty); if(!it) return;
@@ -1779,9 +1779,9 @@ applyUILang();
             if(tg==='late') return `<div class="bok" style="color:#d97706">⚠️ انرسل متأخر — ${esc(m[0].by)} · ${esc(m[0].at)} <span class="s">(الموعد ${fmtTs(dl)})</span></div>`;
             if(tg==='over') return `<div class="bno">🔴 لم يُرسل — فات الموعد ${fmtTs(dl)}</div>`;
             return `<div class="bno" style="color:#b45309">⏳ لم يُرسل — آخر موعد ${fmtTs(dl)} (باقي ${left(dl-Date.now())})</div>`; })()}
-          ${c.length?`<div class="s">🪪 البطاقة انرسلت ${esc(c[c.length-1].at)}</div>`:''}${finesRow(it,iq)}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 البطاقة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="الكابتن متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
-    const viewBtn=it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض البطاقة</button>`;
+          ${c.length?`<div class="s">🪪 جدول الرحلة انرسل ${esc(c[c.length-1].at)}</div>`:''}${finesRow(it,iq)}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 جدول الرحلة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="الكابتن متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
+    const viewBtn=it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض جدول الرحلة</button>`;
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
       <div class="tm"><span class="bexit"><span>🏁 الخروج</span> <b dir="ltr">${esc(it.disp.dt||it.disp.t0)}</b>${prev?'<small>(الليلة اللي قبل)</small>':''}</span> · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}${viewBtn}</div>`;
   }
@@ -1800,7 +1800,7 @@ applyUILang();
   /* نصوص رسالة الكابتن: عربي، إنجليزي، أردو، هندي، إندونيسي — أسماء المحطات تبقى مثل ما هي */
   const ML={
     ar:{acc:(a)=>'🏠 بعد انتهاء الرحلة توجّه إلى سكن '+a.ar+':',name:'العربية',rtl:1,loc:'ar-SA-u-ca-gregory-nu-latn',hi:'مرحباً ',hi2:'،',duty:'واجبك: ',date:'التاريخ: ',bt:'نوع الباص: ',types:{VIP:'VIP',WHEELCHAIR:'كراسي متحركة',STANDARD:'عادي'},bus:'رقم الحافلة / اللوحة: ',rep:'وقت الحضور للكراج لاستلام الباص: ',night:' (الليلة اللي قبل الرحلة)',n:'عدد الرحلات في الواجب: ',trip:'الرحلة: ',tripN:i=>'الرحلة '+i+': ',route:'المسار: ',ar:' ← ',dep:'المغادرة: ',arr:' — الوصول: ',next:' (اليوم التالي)',stops:'نقاط التوقف:',rest:' (استراحة فقط)',a:'وصول ',d:'مغادرة ',bye:'الرجاء الحضور بالوقت المحدد. قيادة آمنة.',
-        card:(n,du,dt,l)=>'مرحباً '+n+'،\nبطاقة جدول الرحلة لواجبك '+du+' بتاريخ '+dt+':\n'+l+'\n\nاضغط الرابط لعرض البطاقة وتحميلها.'},
+        card:(n,du,dt,l)=>'مرحباً '+n+'،\nجدول الرحلة لواجبك '+du+' بتاريخ '+dt+':\n'+l+'\n\nاضغط الرابط لعرض جدول الرحلة وتحميلها.'},
     en:{acc:(a)=>'🏠 After the trip, go to the '+a.en+' accommodation:',name:'English',loc:'en-GB',hi:'Hello ',hi2:',',duty:'Your duty: ',date:'Date: ',bt:'Bus type: ',types:{VIP:'VIP',WHEELCHAIR:'Wheelchair bus',STANDARD:'Standard'},bus:'Bus / plate number: ',rep:'Report to depot (bus pickup): ',night:' (the night before)',n:'Trips in this duty: ',trip:'Trip: ',tripN:i=>'Trip '+i+': ',route:'Route: ',ar:' → ',dep:'Departure: ',arr:' — Arrival: ',next:' (next day)',stops:'Stops:',rest:' (rest only)',a:'arr ',d:'dep ',bye:'Please be on time. Drive safely.',
         card:(n,du,dt,l)=>'Hello '+n+',\nYour trip schedule card for duty '+du+' on '+dt+':\n'+l+'\n\nTap the link to view and download the card.'},
     ur:{acc:(a)=>'🏠 سفر ختم ہونے کے بعد '+a.en+' رہائش پر جائیں:',name:'اردو',rtl:1,loc:'ur-PK-u-nu-latn',hi:'السلام علیکم ',hi2:'،',duty:'آپ کی ڈیوٹی: ',date:'تاریخ: ',bt:'بس کی قسم: ',types:{VIP:'وی آئی پی',WHEELCHAIR:'وہیل چیئر بس',STANDARD:'اسٹینڈرڈ'},bus:'بس نمبر / پلیٹ: ',rep:'بس لینے کے لیے ڈپو پہنچنے کا وقت: ',night:' (سفر سے پہلی رات)',n:'اس ڈیوٹی میں ٹرپس: ',trip:'ٹرپ: ',tripN:i=>'ٹرپ '+i+': ',route:'روٹ: ',ar:' ← ',dep:'روانگی: ',arr:' — پہنچنا: ',next:' (اگلے دن)',stops:'اسٹاپس:',rest:' (صرف آرام)',a:'آمد ',d:'روانگی ',bye:'براہ کرم وقت پر پہنچیں۔ محفوظ ڈرائیونگ کریں۔',
@@ -1840,7 +1840,7 @@ applyUILang();
   /* ---------- نافذة الإرسال ---------- */
   function modal(html){ const m=document.createElement('div'); m.className='bmod'; m.innerHTML='<div>'+html+'</div>'; document.body.appendChild(m); m.addEventListener('click',e=>{ if(e.target===m||e.target.closest('[data-close]')) m.remove(); }); return m; }
   function waNum(iq){ const r=DRV[iq]||[]; return WAFIX[iq]||r[4]||r[3]||''; }
-  /* ---------- تنبيه المخالفات المرورية (من نظام المخالفات) قبل إرسال البطاقة ---------- */
+  /* ---------- تنبيه المخالفات المرورية (من نظام المخالفات) قبل إرسال جدول الرحلة ---------- */
   const FINES_API='https://script.google.com/macros/s/AKfycbyhMGws-oWKytVX3_tG_C9SsEwvf6cyLzCJmuiRpm4OyCS3xYcoFmjFfxuRcOrNDTmxfw/exec', FINES_OBJ='https://hanode40-sketch.github.io/fines/objection.html?t=';
   async function finesPending(iqs){
     try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(window.NWAuth.attach({action:'pendingFor',iqamas:iqs}))});
@@ -1866,7 +1866,7 @@ applyUILang();
       if(j&&j.ok){ p.noted={by:j.by||auth.name||'',at:j.at||''}; } else alert('ما انحفظ التأكيد: '+((j&&(j.message||j.error))||''));
     }catch(e){ alert('ما انحفظ التأكيد — تأكد من الاتصال'); } draw(); }
   async function finesUnnote(iq,duty){ const p=FINES[iq]; if(!p) return false;
-    if(!confirm('إلغاء علامة «تم التنبيه والتحدث مع الكابتن»؟\nبعد الإلغاء ما ينفتح إرسال البطاقة إلا بوضع العلامة من جديد.')){ draw(); return false; }
+    if(!confirm('إلغاء علامة «تم التنبيه والتحدث مع الكابتن»؟\nبعد الإلغاء ما ينفتح إرسال جدول الرحلة إلا بوضع العلامة من جديد.')){ draw(); return false; }
     try{ const r=await fetch(FINES_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(window.NWAuth.attach({action:'pendingUnnote',iqama:iq,duty}))}); const j=await r.json();
       if(j&&j.ok){ p.noted=null; draw(); return true; } alert('ما انلغى التأكيد: '+((j&&(j.message||j.error))||''));
     }catch(e){ alert('ما انلغى التأكيد — تأكد من الاتصال'); } draw(); return false; }
@@ -1883,7 +1883,7 @@ applyUILang();
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0">
         ${p.token?`<button class="bbtn" id="fnResend">📲 إعادة إرسال رابط المخالفات للكابتن</button>`:''}
         ${p.notSent?`<a class="bbtn wa" href="${FINES_SYS+encodeURIComponent(iq)}" target="_blank" rel="noopener" style="text-decoration:none">🗂️ إرسال المخالفات من نظام المخالفات</a>`:''}</div>
-        <label class="bnote" style="display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-weight:700"><input type="checkbox" id="fnTalk"> شفت التنبيه وتحدثت مع الكابتن عن المخالفات${must?' (مطلوب قبل إرسال البطاقة)':''}</label></div>`;
+        <label class="bnote" style="display:flex;align-items:center;gap:6px;margin-top:6px;cursor:pointer;font-weight:700"><input type="checkbox" id="fnTalk"> شفت التنبيه وتحدثت مع الكابتن عن المخالفات${must?' (مطلوب قبل إرسال جدول الرحلة)':''}</label></div>`;
       m.dataset.fines=must?'1':'';
       if(p.noted){ const t=box.querySelector('#fnTalk'); t.checked=true; t.parentElement.insertAdjacentHTML('beforeend',' <span class="bnote" id="fnBy">('+esc(p.noted.by)+' · '+esc(p.noted.at)+')</span>'); }
       const rs=box.querySelector('#fnResend'); if(rs) rs.onclick=()=>{ const d=window.waDigits?waDigits(num.value):num.value.replace(/\D/g,'');
@@ -1905,9 +1905,9 @@ applyUILang();
         return (ML[l]||ML.en).card(r[1]||'',it.duty,dateTxt(it.date,l),link); } return compose(it,iq,l); };
     let text;
     const orig=String(r[4]||r[3]||'').replace(/\D/g,''), origShow=window.waShow?waShow(orig):orig;
-    if(kind==='card'&&!busOf(it)){ alert(L('حدد رقم الحافلة للواجب أول — البطاقة تنرسل بعد تعيين الحافلة','Set the bus number for this duty first — the card is sent after the bus is assigned')); return; }
+    if(kind==='card'&&!busOf(it)){ alert(L('حدد رقم الحافلة للواجب أول — جدول الرحلة ينرسل بعد تعيين الحافلة','Set the bus number for this duty first — the card is sent after the bus is assigned')); return; }
     text=mk(lang);
-    const m=modal(`<h3 style="margin:0 0 6px">${kind==='card'?'🪪 إرسال البطاقة':'📤 إرسال المسار'} — ${esc(r[1]||iq)}</h3>
+    const m=modal(`<h3 style="margin:0 0 6px">${kind==='card'?'🪪 إرسال جدول الرحلة':'📤 إرسال المسار'} — ${esc(r[1]||iq)}</h3>
       <div class="bnote" style="margin:0 0 10px">${esc(it.duty)} · ${esc(it.date)}</div>
       <label class="bnote" style="display:block;margin:0 0 4px;font-weight:700">رقم الواتساب</label>
       <input id="bmNum" type="tel" dir="ltr" style="width:100%;box-sizing:border-box;margin-bottom:4px" value="${esc(window.waShow?waShow(waNum(iq)):waNum(iq))}">
@@ -2005,15 +2005,15 @@ applyUILang();
     ['واجب رحلة خروجه مو موجودة في الروستر:','duties whose first trip is not in the roster:'],
     ['🏁 الخروج','🏁 Depot out'],[' · الخروج ',' · depot out '],['الخروج','depot out'],[' عنده رحلة ',' has trip '],['الليلة اللي قبل الرحلة','the night before'],['الليلة اللي قبل','night before'],['⏰ إرسال المسار قبل','⏰ Send route before'],
     ['كراسي متحركة','Wheelchair'],['عادي','Standard'],[' رحلات',' trips'],['مغادرة','Dep'],['وصول','Arr'],
-    ['🚌 رقم الحافلة:','🚌 Bus number:'],['مطلوب قبل إرسال البطاقة','required before sending the card'],['مثال: 4012','e.g. 4012'],['نوعها مختلف عن الجدول','type differs from schedule'],['لوحة','plate'],['تغيير','Change'],['حفظ للكل','Save for everyone'],['حفظ','Save'],
+    ['🚌 رقم الحافلة:','🚌 Bus number:'],['مطلوب قبل إرسال جدول الرحلة','required before sending the trip schedule'],['مثال: 4012','e.g. 4012'],['نوعها مختلف عن الجدول','type differs from schedule'],['لوحة','plate'],['تغيير','Change'],['حفظ للكل','Save for everyone'],['حفظ','Save'],
     ['الكابتن الأول','Captain 1'],['الكابتن الثاني','Captain 2'],['مو في قائمة الكباتن','not in driver list'],['🔁 بديل','🔁 Substitute'],['بدل','replacing'],['إلغاء التبديل','Cancel swap'],
     ['⚠️ المسار كان انرسل للكابتن الأصلي — بلّغه إنه انشال من الواجب','⚠️ The route was sent to the original driver — tell him he was removed'],
-    ['✓ المسار انرسل —','✓ Route sent —'],['⚠️ انرسل متأخر —','⚠️ Sent late —'],['(الموعد','(deadline'],['باقي','left'],['🪪 البطاقة انرسلت','🪪 Card sent'],
-    ['📤 إرسال المسار','📤 Send route'],['🖼️ عرض البطاقة','🖼️ View card'],['⬇ حفظ الصورة','⬇ Save image'],['جاري تجهيز البطاقة...','Preparing card...'],['إغلاق','Close'],['⚠️ رقم الحافلة ما تعيّن بعد — البطاقة تطلع بدون رقم حافلة','⚠️ Bus number not set yet — the card will show without it'],['↻ إعادة','↻ Resend'],['🪪 البطاقة','🪪 Card'],['🔁 تبديل','🔁 Swap'],['حدد رقم الحافلة أول','Set the bus number first'],['الكابتن متعذر؟ بدّله','Captain unavailable? Swap'],
+    ['✓ المسار انرسل —','✓ Route sent —'],['⚠️ انرسل متأخر —','⚠️ Sent late —'],['(الموعد','(deadline'],['باقي','left'],['🪪 جدول الرحلة انرسل','🪪 Trip schedule sent'],
+    ['📤 إرسال المسار','📤 Send route'],['🖼️ عرض جدول الرحلة','🖼️ View trip schedule'],['⬇ حفظ الصورة','⬇ Save image'],['جاري تجهيز جدول الرحلة...','Preparing card...'],['إغلاق','Close'],['⚠️ رقم الحافلة ما تعيّن بعد — جدول الرحلة يطلع بدون رقم حافلة','⚠️ Bus number not set yet — the card will show without it'],['↻ إعادة','↻ Resend'],['🪪 جدول الرحلة','🪪 Card'],['🔁 تبديل','🔁 Swap'],['حدد رقم الحافلة أول','Set the bus number first'],['الكابتن متعذر؟ بدّله','Captain unavailable? Swap'],
     ['بدون كابتن في الروستر','no driver in roster'],['مو موجود في روستر هذا اليوم','not in today\'s roster'],
     ['✅ كل المسارات انرسلت','✅ All routes sent'],['✅ ما فيه مسارات فات موعدها','✅ No overdue routes'],['لا توجد واجبات','No duties'],['ما فيه نتائج','No results'],['⚪ لا يعمل','⚪ not running'],
     ['جاري تحميل الروستر وحالة الإرسال...','Loading roster and send status...'],['جاري التحميل...','Loading...'],
-    ['📤 إرسال المسار —','📤 Send route —'],['🪪 إرسال البطاقة —','🪪 Send card —'],['رقم الواتساب','WhatsApp number'],['طريقة الفتح','Open with'],['الرابط العادي (الجوال)','Standard link (phone)'],['تطبيق واتساب على الكمبيوتر — مباشرة','WhatsApp desktop app — direct'],['واتساب ويب','WhatsApp Web'],['الرقم غير صحيح','Invalid number'],['لغة الرسالة','Message language'],
+    ['📤 إرسال المسار —','📤 Send route —'],['🪪 إرسال جدول الرحلة —','🪪 Send trip schedule —'],['رقم الواتساب','WhatsApp number'],['طريقة الفتح','Open with'],['الرابط العادي (الجوال)','Standard link (phone)'],['تطبيق واتساب على الكمبيوتر — مباشرة','WhatsApp desktop app — direct'],['واتساب ويب','WhatsApp Web'],['الرقم غير صحيح','Invalid number'],['لغة الرسالة','Message language'],
     ['الرسالة (تقدر تعدّلها)','Message (you can edit it)'],['فتح واتساب وإرسال','Open WhatsApp & send'],['إلغاء','Cancel'],
     ['🔁 تبديل كابتن —','🔁 Swap driver —'],['الكابتن المتعذر:','Unavailable driver:'],['الكابتن البديل (اسم أو إقامة)','Replacement driver (name or Iqama)'],['ابحث...','Search...'],
     ['السبب','Reason'],['— اختر —','— choose —'],['ملاحظة (إجباري)','Note (required)'],['مثال: اتصل الساعة 3 واعتذر بسبب...','e.g. called at 3 and excused because...'],['تبديل','Swap'],
