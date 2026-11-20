@@ -1516,7 +1516,7 @@ applyUILang();
   const isDisp=String(auth.role||'').replace(/\u0651/g,'').trim()==='مرحل';   // الدور مكتوب «مرحّل» بالشدة
   const canSwap=it=>canUp||(isDisp&&(!myG().length||myG().includes(it.garage)));   // المرحّل يبدّل في واجبات كراجه
   const BUS={ 'VIP':['#d4a017','#fef3c7','#92400e','VIP'], 'WHEELCHAIR':['#0ea5e9','#e0f2fe','#075985','كراسي متحركة'], 'STANDARD':['#94a3b8','#f1f5f9','#334155','عادي'] };
-  const GAR=[[/shumays|shumais|yanbu|jeddah|makkah|mecca|الشميسي|جدة|مكة|ينبع/i,'الشميسي'],[/riyadh/i,'الرياض'],[/madinah|medina/i,'المدينة'],[/tabuk|haql/i,'تبوك'],[/jazan|jizan/i,'جازان'],[/khamis/i,'خميس مشيط'],[/hail|rafha/i,'حائل'],[/bashayer/i,'البشائر'],[/buraydah|qassim/i,'بريدة']];
+  const GAR=[[/shumays|shumais|yanbu|jeddah|makkah|mecca|الشميسي|جدة|مكة|ينبع/i,'الشميسي'],[/riyadh/i,'الرياض'],[/madinah|medina|rafha/i,'المدينة'],[/tabuk|haql/i,'تبوك'],[/jazan|jizan/i,'جازان'],[/khamis/i,'خميس مشيط'],[/hail/i,'حائل'],[/bashayer/i,'البشائر'],[/buraydah|qassim/i,'بريدة']];
   const garOf=s=>{ for(const [re,g] of GAR) if(re.test(s||'')) return g; return ''; };
   const gN=g=>String(g||'').replace(/كراج/g,'').trim();
   const NODISP=s=>/no dispatch/i.test(s||'');
