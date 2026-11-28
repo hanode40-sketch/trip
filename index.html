@@ -1577,6 +1577,7 @@ applyUILang();
         <button class="bbtn" id="bRefresh">🔄 تحديث</button>
         <button class="bbtn" id="bUpSched" style="display:none">📤 رفع الجدول</button>
         <button class="bbtn" id="bUpRoster" style="display:none">📤 رفع الروستر</button>
+        <button class="bbtn" id="bXNew" style="display:none">➕ رحلة إضافية (مسار خاص)</button>
       </div>
       <div class="bprog"><b id="bPct">—</b><div class="bar"><i id="bBar" style="width:0"></i></div><span id="bCnt" class="bnote" style="margin:0"></span></div>
       <div class="bchips" id="bChips"></div>
@@ -1611,7 +1612,7 @@ applyUILang();
   const gN=g=>String(g||'').replace(/كراج/g,'').trim();
   const NODISP=s=>/no dispatch/i.test(s||'');
 
-  let SCHED=null, META={}, DUTIES=[], ROSTER=null, SENT={}, BUSES={}, SUBS=[], FILTER='miss', LOADING=0;
+  let SCHED=null, META={}, DUTIES=[], ROSTER=null, SENT={}, BUSES={}, SUBS=[], FILTER='miss', LOADING=0, EXTRAS=[], EXD=[];
   const REASONS=['رفض الرحلة','مريض','غياب','ظرف طارئ','تأخر','أخرى'];
   const LEAD_H=6;    // المسار لازم يوصل الكابتن قبل الرحلة بـ 6 ساعات كأقل حد
   const BUSL=(typeof BUS_DATA!=='undefined'?BUS_DATA:[]);   // [رقم الحافلة، اللوحة، النوع VIP/WCR/STD]
@@ -1712,6 +1713,7 @@ applyUILang();
         if(k.includes('+')) k.split('+').forEach(p=>{ if(p&&!ROSTER[p]) ROSTER[p]=v; }); });   // روستر قديم بأرقام مدموجة (A + B)
       // التبديلات (من إدارة الكباتن أو من هنا): الخادم يطبقها على رحلة وحدة — نطبقها على رحلة الخروج حق نفس الواجب
       SUBS=(r&&r.subs)||[];
+      EXTRAS=(r&&r.extras)||[]; buildExtras();
       const T2D={}; (SCHED||[]).forEach(t=>T2D[nk(t.trip)]=t.duty);
       SUBS.forEach(x=>{ const du=DUTIES.find(d=>d.duty===T2D[nk(x.trip)]); if(!du) return; const e=ROSTER[nk(du.disp.trip)];
         if(e){ const i=e.indexOf(x.orig); if(i>-1) e[i]=x.rep; } });
@@ -1724,7 +1726,7 @@ applyUILang();
   }
   function dayItems(){
     const date=$('bDate').value, out=[];
-    DUTIES.forEach(d=>{
+    DUTIES.concat(EXD).forEach(d=>{
       const e=ROSTER&&(ROSTER[nk(d.disp.trip)]||null);
       const drivers=e?e.filter(Boolean):[];
       out.push({...d, date, drivers, inRoster:!!e, off:!drivers.length});
@@ -1765,7 +1767,7 @@ applyUILang();
     info.push(`<div class="bnote">📅 الجدول${META.__prev?' <b style="color:#b7791f">(السابق — هذا اليوم قبل بداية الجدول الجديد)</b>':''}: ${esc(META.valid||'—')}${META.by?' · رفعه '+esc(META.by)+' ('+esc(META.at)+')':''} · 📋 روستر ${esc($('bDate').value)}: ${ROSTER&&ROSTER.__n?ROSTER.__n+' رحلة'+(ROSTER.__by?' · رفعه '+esc(ROSTER.__by)+' ('+esc(ROSTER.__at)+')':''):'<b style="color:#dc2626">غير مرفوع</b>'}</div>`);
     if(ROSTER&&!ROSTER.__n) info.push('<div class="bwarn">⚠️ ما فيه روستر مرفوع لهذا التاريخ — الواجبات تطلع «لا يعمل اليوم» لين يترفع.</div>');
     if(ROSTER&&ROSTER.__n){   // تطابق الروستر مع الجدول: رحلات في الروستر مو موجودة في الجدول = غالباً روستر قديم أو جدول قديم
-      const known=new Set((SCHED||[]).map(t=>nk(t.trip)));
+      const known=new Set((SCHED||[]).map(t=>nk(t.trip)).concat(EXTRAS.map(x=>nk(x.trip))));
       const unk=Object.keys(ROSTER).filter(k=>!k.startsWith('__')&&!known.has(k));
       const miss=all.filter(it=>!it.inRoster).map(it=>it.disp.trip);
       if(unk.length) info.push(`<div class="bwarn">⚠️ ${unk.length} رحلة في روستر هذا اليوم مو موجودة في الجدول المرفوع — غالباً الروستر مرفوع من ملف قديم أو بأرقام رحلات مختلفة. أعد رفع الروستر بنفس شكل ملف الجدول الحالي.<div style="direction:ltr;text-align:start;font-size:12px;margin-top:4px">${esc(unk.slice(0,30).join(', '))}${unk.length>30?' …':''}</div></div>`);
@@ -1820,7 +1822,7 @@ applyUILang();
     m.firstElementChild.style.maxWidth='820px';
     try{
       if(typeof buildDutyPdfFrom!=='function'||typeof pdfBlobToJpg!=='function') throw new Error('nolib');
-      const d=await buildDutyPdfFrom({code:it.duty,trip:it.trips[0].trip,date:it.date,bus:busFull(it),p1:P[0]||null,p2:P[1]||null});
+      const d=await buildDutyPdfFrom({code:(it.extra&&it.extra.parentDuty)||it.duty,trip:it.trips[0].trip,date:it.date,bus:busFull(it),p1:P[0]||null,p2:P[1]||null});
       const r=await pdfBlobToJpg(d.blob), url=URL.createObjectURL(r.jpg);
       m.querySelector('#cvBox').outerHTML=`<img src="${url}" alt="" style="width:100%;border-radius:10px;border:1px solid var(--nw-line);background:#fff">`;
       const a=m.querySelector('#cvDl'); a.href=url; a.download=it.duty+'_'+it.date+'.jpg'; a.style.display='';
@@ -1872,7 +1874,9 @@ applyUILang();
             return `<div class="bno" style="color:#b45309">⏳ لم يُرسل — آخر موعد ${fmtTs(dl)} (باقي ${left(dl-Date.now())})</div>`; })()}
           ${c.length?`<div class="s">🪪 جدول الرحلة انرسل ${esc(c[c.length-1].at)}</div>`:''}${finesRow(it,iq)}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 جدول الرحلة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="الكابتن متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
-    const viewBtn=it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض جدول الرحلة</button>`;
+    const viewBtn=(it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض جدول الرحلة</button>`)
+      +(it.extra?`<div class="bnote" style="margin-top:8px;border-color:#f59e0b">➕ <b>رحلة إضافية</b>${it.extra.parent?' على '+esc(it.extra.parent):' — مسار خاص'} · ${esc(it.extra.reason)}${it.extra.note?' · '+esc(it.extra.note):''} <span class="s">(${esc(it.extra.by)} ${esc(it.extra.at)})</span>${canUp?` <button class="bbtn sm" data-xedit="${esc(it.extra.id)}">✏️ تعديل</button> <button class="bbtn sm" data-xcancel="${esc(it.extra.id)}" style="color:#dc2626">✖ إلغاء الرحلة</button>`:''}</div>`
+        :(canUp&&!it.off?` <button class="bbtn sm" data-xadd="${esc(it.duty)}" style="margin-top:6px">➕ رحلة إضافية</button>`:''));
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
       <div class="tm"><span class="bexit"><span>🏁 الخروج</span> <b dir="ltr">${esc(it.disp.dt||it.disp.t0)}</b>${prev?'<small>(الليلة اللي قبل)</small>':''}</span> · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}${viewBtn}</div>`;
   }
@@ -2178,7 +2182,93 @@ applyUILang();
   { const dl=document.createElement('datalist'); dl.id='bBusList'; dl.innerHTML=BUSL.map(b=>`<option value="${esc(b[0])}">${esc(b[1])} · ${esc(b[2])}</option>`).join(''); document.body.appendChild(dl); }
   setInterval(()=>{ if(document.visibilityState==='visible'&&!document.querySelector('.bmod')&&!(document.activeElement&&document.activeElement.matches('input'))) draw(); },60e3);   // تحديث العدّاد كل دقيقة
   $('bList').onclick=e=>{ const s=e.target.closest('[data-send]'), c=e.target.closest('[data-card]'); if(s) openSend(s.dataset.send,s.dataset.iq,'msg'); else if(c) openSend(c.dataset.card,c.dataset.iq,'card'); };
-  if(canUp){ $('bUpSched').style.display=''; $('bUpRoster').style.display=''; }
+  if(canUp){ $('bUpSched').style.display=''; $('bUpRoster').style.display=''; $('bXNew').style.display=''; }
+  /* ================= الرحلات الإضافية (المدير والمشرف) =================
+     على رحلة مجدولة: نفس الخط والمحطات والأوقات — أو مسار خاص. تنحفظ في الشيت وتدخل الروستر، فتطلع هنا كواجب
+     وتنحسب في إدارة السائقين وملف التحضير الشهري (الحافز حسب الخط) */
+  const XREASONS=['ركاب زيادة','باص بديل (عطل)','طلب الإدارة','أخرى'];
+  const GAR_EN={'الشميسي':'Shumaysi','الرياض':'Riyadh','المدينة':'Madinah','تبوك':'Tabuk','جازان':'Jazan','خميس مشيط':'Khamis Mushait','حائل':'Hail','البشائر':'Al Bashayer','بريدة':'Buraydah'};
+  function buildExtras(){
+    EXD=EXTRAS.map(x=>{ const t={trip:x.trip,route:x.route,duty:x.duty,disp:x.disp,dt:x.dt,fr:x.fr,t0:x.t0,to:x.to,t1:x.t1,bus:x.bus,stops:x.stops||[],days:'Daily'};
+      return { duty:x.duty, disp:t, trips:[t], garage:garOf(x.disp)||garOf(x.fr), bus:x.bus, days:'Daily', extra:x }; });
+  }
+  async function openExtra(duty,xid){
+    const ed=xid?EXTRAS.find(x=>x.id===xid):null, par=duty?DUTIES.find(d=>d.duty===duty):null;
+    const custom=!par&&!(ed&&ed.parent);
+    const pd=ed&&ed.parentDuty?DUTIES.find(d=>d.duty===ed.parentDuty):par;
+    const trips=pd?pd.trips:[];
+    const routes=[...new Set((SCHED||[]).map(t=>t.route).filter(Boolean))].sort();
+    const stations=[...new Set((SCHED||[]).flatMap(t=>[t.fr,t.to]).filter(Boolean))].sort();
+    const m=modal(`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><h3 style="margin:0">➕ ${ed?'تعديل رحلة إضافية '+esc(ed.trip):custom?'رحلة إضافية — مسار خاص':'رحلة إضافية على '+esc(duty)}</h3><button class="bbtn sm" data-close>✕</button></div>
+      <div class="bnote" style="margin-top:0">📅 ${esc($('bDate').value)}${ed?'':' · الرحلة تدخل روستر هذا اليوم، وتنحسب للكباتن في الحوافز حسب الخط'}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${custom?`<label>الخط (للحوافز) <select id="xRoute">${routes.map(r=>`<option${ed&&ed.route===r?' selected':''}>${esc(r)}</option>`).join('')}</select></label>
+          <label>نوع الباص <select id="xBus">${['STANDARD','VIP','WHEELCHAIR'].map(b=>`<option value="${b}"${ed&&busKey(ed.bus)===b?' selected':''}>${BUS[b][3]}</option>`).join('')}</select></label>
+          <label>من <input id="xFr" list="xSt" value="${esc(ed?ed.fr:'')}"></label><label>إلى <input id="xTo" list="xSt" value="${esc(ed?ed.to:'')}"></label>
+          <label>الخروج من الكراج <select id="xDisp">${GKNOWN.map(g=>`<option${ed&&garOf(ed.disp)===g?' selected':''}>${g}</option>`).join('')}</select></label>`
+        :`<label style="grid-column:1/-1">الرحلة <select id="xTrip"${ed?' disabled':''}>${trips.map((t,i)=>`<option value="${i}"${ed&&nk(ed.parent)===nk(t.trip)?' selected':''}>${esc(t.trip)} · ${esc(t.fr)} ← ${esc(t.to)} · ${esc(t.t0)}</option>`).join('')}</select></label>`}
+        <label>وقت الخروج من الكراج <input id="xDt" type="time"></label>
+        <label>المغادرة <input id="xT0" type="time"></label>
+        <label>الوصول <input id="xT1" type="time"></label>
+        <label>السبب <select id="xReason">${XREASONS.map(r=>`<option${ed&&ed.reason===r?' selected':''}>${r}</option>`).join('')}</select></label>
+        <label style="grid-column:1/-1">ملاحظة <input id="xNote" value="${esc(ed?ed.note:'')}" placeholder="مثلاً: 20 راكب زيادة"></label>
+        <label style="grid-column:1/-1">بحث عن كابتن <input id="xQ" type="search" placeholder="اسم أو إقامة أو رقم وظيفي"></label>
+        <label>الكابتن الأول <select id="xD1"></select></label>
+        <label>الكابتن الثاني (اختياري) <select id="xD2"></select></label>
+      </div>
+      <datalist id="xSt">${stations.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>
+      <div class="bnote" id="xHint"></div>
+      <div id="xErr" class="bwarn" style="display:none"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="bbtn" data-close>إلغاء</button><button class="bbtn p" id="xSave">💾 ${ed?'حفظ التعديل':'فتح الرحلة'}</button></div>`);
+    const q=s2=>m.querySelector(s2);
+    // الأوقات الافتراضية
+    const fillTimes=()=>{ if(custom){ if(ed){ q('#xDt').value=ed.dt||''; q('#xT0').value=ed.t0||''; q('#xT1').value=ed.t1||''; } return; }
+      const t=trips[+q('#xTrip').value]||{}; const first=pd&&pd.trips[0]===t;
+      q('#xT0').value=ed?ed.t0:(t.t0||''); q('#xT1').value=ed?ed.t1:(t.t1||'');
+      q('#xDt').value=ed?ed.dt:(first&&pd.disp.dt?pd.disp.dt:(mins(t.t0)!=null?hhmm(mins(t.t0)-60):'')); };
+    if(!custom) q('#xTrip').onchange=fillTimes; fillTimes();
+    // الكباتن: على رأس العمل وما عندهم رحلة هذا اليوم — كراج الانطلاق أول
+    const busy=new Set(); Object.keys(ROSTER||{}).forEach(k=>{ if(!k.startsWith('__')) (ROSTER[k]||[]).forEach(iq=>{ if(iq) busy.add(String(iq)); }); });
+    if(ed) [ed.d1,ed.d2].forEach(iq=>iq&&busy.delete(iq));
+    const L0=(await auth.drivers()).filter(d=>d[6]==='operation'&&!busy.has(String(d[0])));
+    const garNow=()=>custom?q('#xDisp').value:((pd&&pd.garage)||garOf((trips[+q('#xTrip').value]||{}).fr));
+    const fillSel=()=>{ const g=GAR_EN[garNow()]||'', s2=q('#xQ').value.trim().toLowerCase();
+      const L=L0.filter(d=>!s2||(d[0]+' '+d[1]+' '+d[2]).toLowerCase().includes(s2)).sort((a,b)=>(b[5]===g)-(a[5]===g)||String(a[2]).localeCompare(String(b[2])));
+      const opt=(d,sel)=>`<option value="${esc(d[0])}"${sel?' selected':''}>${esc(d[2])} · ${esc(d[0])}${d[5]&&d[5]!==g?' · '+esc(d[5]):''}</option>`;
+      const v1=q('#xD1').value||(ed&&ed.d1)||'', v2=q('#xD2').value||(ed&&ed.d2)||'';
+      const keep=iq=>iq&&!L.some(d=>d[0]===iq)?L0.filter(d=>d[0]===iq):[];
+      q('#xD1').innerHTML='<option value="">— اختر —</option>'+keep(v1).concat(L).map(d=>opt(d,d[0]===v1)).join('');
+      q('#xD2').innerHTML='<option value="">— بدون —</option>'+keep(v2).concat(L).map(d=>opt(d,d[0]===v2)).join('');
+      q('#xHint').textContent=`${L.length} كابتن متاح (على رأس العمل وما عندهم رحلة اليوم) — سائقين ${garNow()||'الكراج'} أول`; };
+    q('#xQ').oninput=fillSel; if(custom) q('#xDisp').onchange=fillSel; else q('#xTrip').addEventListener('change',fillSel); fillSel();
+    q('#xSave').onclick=async()=>{
+      const err=t=>{ const e=q('#xErr'); e.textContent=t; e.style.display=''; };
+      let x;
+      if(custom){ const g=q('#xDisp').value; x={route:q('#xRoute').value,bus:q('#xBus').value,fr:q('#xFr').value.trim(),to:q('#xTo').value.trim(),disp:g+' Depot',stops:[[q('#xFr').value.trim(),'',q('#xT0').value,'ACTIVE'],[q('#xTo').value.trim(),q('#xT1').value,'','ACTIVE']]}; }
+      else { const t=trips[+q('#xTrip').value]; if(!t) return err('اختر الرحلة'); const first=pd.trips[0]===t;
+        x={parent:t.trip,parentDuty:pd.duty,route:t.route||(String(t.trip).match(/^NW\d+[A-Z]?/)||[''])[0],bus:t.bus,fr:t.fr,to:t.to,disp:first&&!NODISP(pd.disp.disp)?pd.disp.disp:t.fr,stops:t.stops||[]}; }
+      Object.assign(x,{id:ed?ed.id:'',date:$('bDate').value,dt:q('#xDt').value,t0:q('#xT0').value,t1:q('#xT1').value,reason:q('#xReason').value,note:q('#xNote').value.trim(),d1:q('#xD1').value,d2:q('#xD2').value});
+      if(!x.fr||!x.to) return err('اكتب محطة الانطلاق والوصول'); if(!x.t0) return err('حدد وقت المغادرة'); if(!x.d1) return err('اختر الكابتن الأول');
+      if(x.reason==='أخرى'&&x.note.length<3) return err('اكتب السبب في الملاحظة');
+      const b=q('#xSave'); b.disabled=true; b.textContent='جاري الحفظ...';
+      try{ const j=await auth.call('extraSave',{extra:x});
+        if(!j||!j.ok){ const E={DRIVER_BUSY:`الكابتن ${j&&j.who} عنده رحلة ثانية اليوم (${j&&j.trip})`,NOT_OPERATION:`الكابتن ${j&&j.who} مو على رأس العمل`,NO_DRIVER:'الكابتن مو موجود في إدارة السائقين',
+            NEED_REASON:'اختر السبب',BAD_DATA:'تأكد من الخط والمحطات والأوقات',BAD_DRIVER:'تأكد من الكباتن',FORBIDDEN:'فتح الرحلات الإضافية للمدير والمشرف بس',UNKNOWN_ACTION:'لازم يتحدّث كود Apps Script (نظام الدخول) أول',AUTH:'انتهت الجلسة — سجّل دخول من جديد'};
+          b.disabled=false; b.textContent='💾 '+(ed?'حفظ التعديل':'فتح الرحلة'); return err(E[j&&j.error]||('تعذّر الحفظ: '+(j&&j.error||''))); }
+        m.remove(); FILTER='all'; await loadDay(); $('bQ').value=j.extra.duty; draw();
+      }catch(e2){ b.disabled=false; b.textContent='💾 فتح الرحلة'; err('تعذّر الاتصال — جرّب مرة ثانية'); }
+    };
+  }
+  async function cancelExtra(id){
+    const x=EXTRAS.find(e=>e.id===id); if(!x) return;
+    const why=prompt(L('إلغاء الرحلة الإضافية '+x.trip+'؟\nالكباتن يرجعون استعداد.\n\nسبب الإلغاء (اختياري):','Cancel extra trip '+x.trip+'?\n\nReason (optional):'),''); if(why===null) return;
+    const j=await auth.call('extraCancel',{id,reason:why});
+    if(!j||!j.ok) return alert(L('تعذّر الإلغاء: ','Could not cancel: ')+((j&&j.error)||''));
+    loadDay();
+  }
+  $('bXNew').onclick=()=>openExtra(null,null);
+  $('bList').addEventListener('click',e=>{ const a=e.target.closest('[data-xadd]'), ed=e.target.closest('[data-xedit]'), c=e.target.closest('[data-xcancel]');
+    if(a) openExtra(a.dataset.xadd,null); else if(ed) openExtra(null,ed.dataset.xedit); else if(c) cancelExtra(c.dataset.xcancel); });
   $('bUpSched').onclick=openSchedUp;
   $('bUpRoster').onclick=()=>{ const b=$('roster-up-btn'); if(b){ if(typeof tripDateInput!=='undefined') tripDateInput.value=$('bDate').value; b.click(); const sv=$('rm-save'); if(sv&&!sv.dataset.bh){ sv.dataset.bh=1; sv.addEventListener('click',()=>setTimeout(loadDay,2500)); } } };
   loadDay();
