@@ -1557,9 +1557,9 @@ applyUILang();
   .xform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px;margin-top:4px}
   .xform label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--nw-muted,#64748b);min-width:0}
   .xform label.full{grid-column:1/-1}
-  .xform input,.xform select{width:100%;box-sizing:border-box;padding:9px 11px;border-radius:10px;border:1px solid var(--nw-line,#d6dee9);background:var(--nw-card,#fff);color:var(--nw-ink,#0f1e3d);font:inherit;font-size:14px;font-weight:600;min-height:42px}
+  .xform input,.xform select,.xform textarea{width:100%;box-sizing:border-box;padding:9px 11px;border-radius:10px;border:1px solid var(--nw-line,#d6dee9);background:var(--nw-card,#fff);color:var(--nw-ink,#0f1e3d);font:inherit;font-size:14px;font-weight:600;min-height:42px}
   .xform input:focus,.xform select:focus{outline:2px solid #3b82f6;outline-offset:0;border-color:transparent}
-  html[data-theme="dark"] .xform input,html[data-theme="dark"] .xform select{background:#0f1626;color-scheme:dark}
+  html[data-theme="dark"] .xform input,html[data-theme="dark"] .xform select,html[data-theme="dark"] .xform textarea{background:#0f1626;color-scheme:dark}
   .xform input[type=time]{direction:ltr;text-align:right}
   @media (max-width:560px){ .xform{grid-template-columns:1fr} }
   .bmod textarea{width:100%;box-sizing:border-box;min-height:240px;font:inherit;font-size:13px}
@@ -1884,7 +1884,7 @@ applyUILang();
           ${c.length?`<div class="s">🪪 جدول الرحلة انرسل ${esc(c[c.length-1].at)}</div>`:''}${finesRow(it,iq)}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="bbtn sm wa" data-send="${esc(it.duty)}" data-iq="${esc(iq)}">${m.length?'↻ إعادة':'📤 إرسال المسار'}</button><button class="bbtn sm" data-card="${esc(it.duty)}" data-iq="${esc(iq)}" ${busOf(it)?'':'disabled title="حدد رقم الحافلة أول"'}>🪪 جدول الرحلة</button>${canSwap(it)?`<button class="bbtn sm" data-swap="${esc(it.duty)}" data-iq="${esc(iq)}" title="الكابتن متعذر؟ بدّله">🔁 تبديل</button>`:''}</div></div>`; }).join('');
     const viewBtn=(it.off?'':`<button class="bbtn sm" data-view="${esc(it.duty)}" style="margin-top:6px">🖼️ عرض جدول الرحلة</button>`)
-      +(it.extra?`<div class="bnote" style="margin-top:8px;border-color:#f59e0b">➕ <b>رحلة إضافية</b>${it.extra.parent?' على '+esc(it.extra.parent):' — مسار خاص'} · ${esc(it.extra.reason)}${it.extra.note?' · '+esc(it.extra.note):''} <span class="s">(${esc(it.extra.by)} ${esc(it.extra.at)})</span>${canUp?` <button class="bbtn sm" data-xedit="${esc(it.extra.id)}">✏️ تعديل</button> <button class="bbtn sm" data-xcancel="${esc(it.extra.id)}" style="color:#dc2626">✖ إلغاء الرحلة</button>`:''}</div>`
+      +(it.extra?`<div class="bnote" style="margin-top:8px;border-color:#f59e0b">➕ <b>رحلة إضافية</b>${it.extra.parent?' على '+esc(it.extra.parent):' — مسار خاص'} · ${(it.extra.stops||[]).length<=2?'🚀 <b>مباشر</b>':'🛑 بنقاط توقف ('+((it.extra.stops||[]).length)+')'} · ${esc(it.extra.reason)}${it.extra.note?' · '+esc(it.extra.note):''} <span class="s">(${esc(it.extra.by)} ${esc(it.extra.at)})</span>${canUp?` <button class="bbtn sm" data-xedit="${esc(it.extra.id)}">✏️ تعديل</button> <button class="bbtn sm" data-xcancel="${esc(it.extra.id)}" style="color:#dc2626">✖ إلغاء الرحلة</button>`:''}</div>`
         :(canUp&&!it.off?` <button class="bbtn sm" data-xadd="${esc(it.duty)}" style="margin-top:6px">➕ رحلة إضافية</button>`:''));
     return `<div class="bduty${dutyDone(it)?' done':''}${it.off?' off':''}" style="--bc:${B[0]}"><div class="bdh"><div><span class="t">${esc(it.duty)}</span><span class="btag" style="background:${B[1]};color:${B[2]}">${B[3]}</span>${it.trips.length>1?`<span class="btag" style="background:#ede9fe;color:#5b21b6">${it.trips.length} رحلات</span>`:''}</div>
       <div class="tm"><span class="bexit"><span>🏁 الخروج</span> <b dir="ltr">${esc(it.disp.dt||it.disp.t0)}</b>${prev?'<small>(الليلة اللي قبل)</small>':''}</span> · ${esc(it.garage)}${it.off?'':`<br>⏰ إرسال المسار قبل ${fmtTs(dlTs(it))}`}</div></div><div class="btrips">${trips}</div>${it.off?'':busRow(it)}${drv}${viewBtn}</div>`;
@@ -2220,6 +2220,8 @@ applyUILang();
         <label>المغادرة <input id="xT0" type="time"></label>
         <label>الوصول <input id="xT1" type="time"></label>
         <label>السبب <select id="xReason">${XREASONS.map(r=>`<option${ed&&ed.reason===r?' selected':''}>${r}</option>`).join('')}</select></label>
+        <label class="full">نوع الرحلة <select id="xKind"><option value="stops">🛑 بنقاط توقف</option><option value="direct"${ed&&(ed.stops||[]).length<=2?' selected':''}>🚀 مباشر (دايركت) — بدون توقف</option></select></label>
+        <label class="full" id="xStopsW">نقاط التوقف <textarea id="xStops" rows="4" style="min-height:90px" placeholder="محطة في كل سطر — وتقدر تكتب الوقت بعدها، مثال:&#10;Al Jumum 02:10&#10;Taif Bus Station 04:20">${esc(ed&&custom?(ed.stops||[]).slice(1,-1).map(x=>x[0]+(x[2]||x[1]?' '+(x[2]||x[1]):'')).join('\n'):'')}</textarea></label>
         <label class="full">ملاحظة <input id="xNote" value="${esc(ed?ed.note:'')}" placeholder="مثلاً: 20 راكب زيادة"></label>
         <label class="full">بحث عن كابتن <input id="xQ" type="search" placeholder="اسم أو إقامة أو رقم وظيفي"></label>
         <label>الكابتن الأول <select id="xD1"></select></label>
@@ -2237,6 +2239,13 @@ applyUILang();
       q('#xT0').value=ed?ed.t0:(t.t0||''); q('#xT1').value=ed?ed.t1:(t.t1||'');
       q('#xDt').value=ed?ed.dt:(first&&pd.disp.dt?pd.disp.dt:(mins(t.t0)!=null?hhmm(mins(t.t0)-60):'')); };
     if(!custom) q('#xTrip').onchange=fillTimes; fillTimes();
+    // نوع الرحلة: بنقاط توقف (نقاط الرحلة الأصلية، أو تكتبها للمسار الخاص) أو مباشر (الانطلاق والوصول بس)
+    const kindUi=()=>{ const st=q('#xKind').value==='stops', t=custom?null:trips[+q('#xTrip').value];
+      q('#xStopsW').style.display=st&&custom?'':'none';
+      q('#xHint2')&&q('#xHint2').remove();
+      if(!custom){ const n=((t&&t.stops)||[]).filter(x=>String(x[3]).toUpperCase()!=='INACTIVE').length;
+        q('#xKind').insertAdjacentHTML('afterend',`<span id="xHint2" class="s" style="font-weight:500">${st?`نفس نقاط توقف الرحلة الأصلية (${n} نقطة)`:'من '+esc(t?t.fr:'')+' إلى '+esc(t?t.to:'')+' مباشرة بدون أي توقف'}</span>`); } };
+    q('#xKind').onchange=kindUi; if(!custom) q('#xTrip').addEventListener('change',kindUi); kindUi();
     // الكباتن: على رأس العمل وما عندهم رحلة هذا اليوم — كراج الانطلاق أول
     const busy=new Set(); Object.keys(ROSTER||{}).forEach(k=>{ if(!k.startsWith('__')) (ROSTER[k]||[]).forEach(iq=>{ if(iq) busy.add(String(iq)); }); });
     if(ed) [ed.d1,ed.d2].forEach(iq=>iq&&busy.delete(iq));
@@ -2254,9 +2263,15 @@ applyUILang();
     q('#xSave').onclick=async()=>{
       const err=t=>{ const e=q('#xErr'); e.textContent=t; e.style.display=''; };
       let x;
-      if(custom){ const g=q('#xDisp').value; x={route:q('#xRoute').value,bus:q('#xBus').value,fr:q('#xFr').value.trim(),to:q('#xTo').value.trim(),disp:g+' Depot',stops:[[q('#xFr').value.trim(),'',q('#xT0').value,'ACTIVE'],[q('#xTo').value.trim(),q('#xT1').value,'','ACTIVE']]}; }
+      const direct=q('#xKind').value==='direct';
+      if(custom){ const g=q('#xDisp').value, fr=q('#xFr').value.trim(), to=q('#xTo').value.trim();
+        const mid=direct?[]:q('#xStops').value.split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>{ const m2=l.match(/^(.*?)[\s\-–]*(\d{1,2}:\d{2})\s*$/); const nm=(m2?m2[1]:l).trim(), tt=m2?('0'+m2[2]).slice(-5):''; return [nm,tt,tt,'ACTIVE']; });
+        if(!direct&&!mid.length) return err('اكتب نقاط التوقف، أو اختر «مباشر»');
+        x={route:q('#xRoute').value,bus:q('#xBus').value,fr,to,disp:g+' Depot',stops:[[fr,'',q('#xT0').value,'ACTIVE']].concat(mid,[[to,q('#xT1').value,'','ACTIVE']])}; }
       else { const t=trips[+q('#xTrip').value]; if(!t) return err('اختر الرحلة'); const first=pd.trips[0]===t;
-        x={parent:t.trip,parentDuty:pd.duty,route:t.route||(String(t.trip).match(/^NW\d+[A-Z]?/)||[''])[0],bus:t.bus,fr:t.fr,to:t.to,disp:first&&!NODISP(pd.disp.disp)?pd.disp.disp:t.fr,stops:t.stops||[]}; }
+        const t0v=q('#xT0').value, t1v=q('#xT1').value;
+        x={parent:t.trip,parentDuty:pd.duty,route:t.route||(String(t.trip).match(/^NW\d+[A-Z]?/)||[''])[0],bus:t.bus,fr:t.fr,to:t.to,disp:first&&!NODISP(pd.disp.disp)?pd.disp.disp:t.fr,
+          stops:direct||!(t.stops||[]).length?[[t.fr,'',t0v,'ACTIVE'],[t.to,t1v,'','ACTIVE']]:t.stops}; }
       Object.assign(x,{id:ed?ed.id:'',date:$('bDate').value,dt:q('#xDt').value,t0:q('#xT0').value,t1:q('#xT1').value,reason:q('#xReason').value,note:q('#xNote').value.trim(),d1:q('#xD1').value,d2:q('#xD2').value});
       if(!x.fr||!x.to) return err('اكتب محطة الانطلاق والوصول'); if(!x.t0) return err('حدد وقت المغادرة'); if(!x.d1) return err('اختر الكابتن الأول');
       if(x.reason==='أخرى'&&x.note.length<3) return err('اكتب السبب في الملاحظة');
