@@ -1553,6 +1553,15 @@ applyUILang();
   .lF button.on{background:var(--nw-navy,#13274f);color:#fff;border-color:transparent}
   .bmod{position:fixed;inset:0;z-index:3000;background:rgba(8,15,30,.55);display:flex;align-items:flex-start;justify-content:center;padding:6vh 12px;overflow:auto}
   .bmod>div{background:var(--nw-card,#fff);color:var(--nw-ink);border-radius:16px;width:100%;max-width:620px;padding:18px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  /* نموذج الرحلة الإضافية */
+  .xform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px;margin-top:4px}
+  .xform label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--nw-muted,#64748b);min-width:0}
+  .xform label.full{grid-column:1/-1}
+  .xform input,.xform select{width:100%;box-sizing:border-box;padding:9px 11px;border-radius:10px;border:1px solid var(--nw-line,#d6dee9);background:var(--nw-card,#fff);color:var(--nw-ink,#0f1e3d);font:inherit;font-size:14px;font-weight:600;min-height:42px}
+  .xform input:focus,.xform select:focus{outline:2px solid #3b82f6;outline-offset:0;border-color:transparent}
+  html[data-theme="dark"] .xform input,html[data-theme="dark"] .xform select{background:#0f1626;color-scheme:dark}
+  .xform input[type=time]{direction:ltr;text-align:right}
+  @media (max-width:560px){ .xform{grid-template-columns:1fr} }
   .bmod textarea{width:100%;box-sizing:border-box;min-height:240px;font:inherit;font-size:13px}
 </style>
 <div class="bwrap" id="bWrap" style="display:none">
@@ -2201,25 +2210,26 @@ applyUILang();
     const stations=[...new Set((SCHED||[]).flatMap(t=>[t.fr,t.to]).filter(Boolean))].sort();
     const m=modal(`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><h3 style="margin:0">➕ ${ed?'تعديل رحلة إضافية '+esc(ed.trip):custom?'رحلة إضافية — مسار خاص':'رحلة إضافية على '+esc(duty)}</h3><button class="bbtn sm" data-close>✕</button></div>
       <div class="bnote" style="margin-top:0">📅 ${esc($('bDate').value)}${ed?'':' · الرحلة تدخل روستر هذا اليوم، وتنحسب للكباتن في الحوافز حسب الخط'}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="xform">
         ${custom?`<label>الخط (للحوافز) <select id="xRoute">${routes.map(r=>`<option${ed&&ed.route===r?' selected':''}>${esc(r)}</option>`).join('')}</select></label>
           <label>نوع الباص <select id="xBus">${['STANDARD','VIP','WHEELCHAIR'].map(b=>`<option value="${b}"${ed&&busKey(ed.bus)===b?' selected':''}>${BUS[b][3]}</option>`).join('')}</select></label>
           <label>من <input id="xFr" list="xSt" value="${esc(ed?ed.fr:'')}"></label><label>إلى <input id="xTo" list="xSt" value="${esc(ed?ed.to:'')}"></label>
           <label>الخروج من الكراج <select id="xDisp">${GKNOWN.map(g=>`<option${ed&&garOf(ed.disp)===g?' selected':''}>${g}</option>`).join('')}</select></label>`
-        :`<label style="grid-column:1/-1">الرحلة <select id="xTrip"${ed?' disabled':''}>${trips.map((t,i)=>`<option value="${i}"${ed&&nk(ed.parent)===nk(t.trip)?' selected':''}>${esc(t.trip)} · ${esc(t.fr)} ← ${esc(t.to)} · ${esc(t.t0)}</option>`).join('')}</select></label>`}
+        :`<label class="full">الرحلة <select id="xTrip"${ed?' disabled':''}>${trips.map((t,i)=>`<option value="${i}"${ed&&nk(ed.parent)===nk(t.trip)?' selected':''}>${esc(t.trip)} · ${esc(t.fr)} ← ${esc(t.to)} · ${esc(t.t0)}</option>`).join('')}</select></label>`}
         <label>وقت الخروج من الكراج <input id="xDt" type="time"></label>
         <label>المغادرة <input id="xT0" type="time"></label>
         <label>الوصول <input id="xT1" type="time"></label>
         <label>السبب <select id="xReason">${XREASONS.map(r=>`<option${ed&&ed.reason===r?' selected':''}>${r}</option>`).join('')}</select></label>
-        <label style="grid-column:1/-1">ملاحظة <input id="xNote" value="${esc(ed?ed.note:'')}" placeholder="مثلاً: 20 راكب زيادة"></label>
-        <label style="grid-column:1/-1">بحث عن كابتن <input id="xQ" type="search" placeholder="اسم أو إقامة أو رقم وظيفي"></label>
+        <label class="full">ملاحظة <input id="xNote" value="${esc(ed?ed.note:'')}" placeholder="مثلاً: 20 راكب زيادة"></label>
+        <label class="full">بحث عن كابتن <input id="xQ" type="search" placeholder="اسم أو إقامة أو رقم وظيفي"></label>
         <label>الكابتن الأول <select id="xD1"></select></label>
         <label>الكابتن الثاني (اختياري) <select id="xD2"></select></label>
       </div>
       <datalist id="xSt">${stations.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>
-      <div class="bnote" id="xHint"></div>
+      <div class="bnote" id="xHint" style="margin-top:8px"></div>
       <div id="xErr" class="bwarn" style="display:none"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="bbtn" data-close>إلغاء</button><button class="bbtn p" id="xSave">💾 ${ed?'حفظ التعديل':'فتح الرحلة'}</button></div>`);
+    m.firstElementChild.style.maxWidth='720px';
     const q=s2=>m.querySelector(s2);
     // الأوقات الافتراضية
     const fillTimes=()=>{ if(custom){ if(ed){ q('#xDt').value=ed.dt||''; q('#xT0').value=ed.t0||''; q('#xT1').value=ed.t1||''; } return; }
